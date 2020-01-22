@@ -6,6 +6,7 @@ Call module from wt_data.py to load all data.
 
 import pyuff
 import pprint
+import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -92,12 +93,23 @@ class TenSecondInterval:
             plt.show()
 
 
+    def save_df(self):  # Save dataframe to easier open in another file.
+        content = {'sensor_data_df' : self.sensor_df, 'op_df': self.op_df}
+        pickle.dump(content, open('saved_dfs.p', 'wb'))
+
+    def load_df(self):
+        content = pickle.load(open('saved_dfs.p', 'rb'))
+        print(content['op_df'])
+
+
 # Example for WT01:
 interval = TenSecondInterval()
 interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 # interval.load_data('/Users/stian/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 print(interval.date) # Printing date
 interval.plot_data(interval.sensor_df)
-print(interval.df)
+print(interval.sensor_df)
+interval.save_df()
+interval.load_df()
 # data, name, date, turbine = load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 

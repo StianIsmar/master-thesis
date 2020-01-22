@@ -14,8 +14,9 @@ import logging
 
 class TenSecondInterval:
     def __init__(self):
-        self.df = None
-        self.name = None
+        self.sensor_df = None # Dataframe for sensor data
+        self.op_df = None # Dataframe for operational data
+        self.name = None # Name
         self.date = None
         self.turbine = None
 
@@ -23,47 +24,57 @@ class TenSecondInterval:
         print ("Start read...\n")
         pp = pprint.PrettyPrinter(indent=4)
 
-        try:
-            uff_file = pyuff.UFF(path)
-            data = uff_file.read_sets()
 
-            date    = data[0]['id3']  # Extract the date and time for operation
-            turbine = data[0]['id4']  # Extract info of which turbine data belongs to
+        uff_file = pyuff.UFF(path)
+        data = uff_file.read_sets()
 
-            timeStamp     = []  # Placeholder for time-stamp
-            sensor_name   = []  # Stores sensor name
-            sensor_data   = []  # Stores sensor data
+        date    = data[0]['id3']  # Extract the date and time for operation
+        turbine = data[0]['id4']  # Extract info of which turbine data belongs to
 
-            for i in range(len(data)):
-                name = data[i]['id5']
-                info = (data[i]['data'])
+        timeStamp         = []  # Placeholder for time-stamp
+        sensor_name       = []  # Stores sensor name
+        sensor_data       = []  # Stores sensor data
+        op_condition_name = [] # Stores name for operational condition
+        op_condition_data = [] # Stores operational condition data, i.e. Average Power for the 10 second interval
 
-                if len(info) > 1:   # only add sensor data which has some measurements
-                    sensor_name.append(name)
-                    sensor_data.append(info)
+        for i in range(len(data)):
+            name = data[i]['id5']
+            info = (data[i]['data'])
 
-                    if len(timeStamp) == 0:   # timestamp is the same for all sensor data, so load it only once
-                        timeStamp.append(data[i]['x'])
-                        timeStamp = timeStamp[0]
+            if len(info) > 1:   # only add sensor data which has some measurements
+                sensor_name.append(name)
+                sensor_data.append(info)
 
-            data_np = np.array(sensor_data)  # create a numpy array to be able to transpose it and get it in the right order
-            data_pd = pd.DataFrame(data_np.T, columns=sensor_name)
-            data_pd.insert(0, column='TimeStamp', value=timeStamp)
+                if len(timeStamp) == 0:   # timestamp is the same for all sensor data, so load it only once
+                    timeStamp.append(data[i]['x'])
+                    timeStamp = timeStamp[0]
 
+            else: # Append to the operational information
+                op_condition_name.append(name)
+                op_condition_data.append(info)
 
-            print(f"Loaded turbine {turbine} for date {date}.")
-            print('----------------------------------------------------------------------\n')
-            #pp.pprint(data[2]) # used to print a raw sensor measurement
+        # Create a dataframe for the sensor data
+        sensor_data_np = np.array(sensor_data)  # create a numpy array to be able to transpose it and get it in the right order
+        sensor_data_df = pd.DataFrame(sensor_data_np.T, columns=sensor_name)
+        sensor_data_df.insert(0, column='TimeStamp', value=timeStamp)
 
-            # Setting the class variables
-            self.df = data_pd
-            self.name = name
-            self.date = date
-            self.turbine = turbine
+        # Create a dataframe for the operational condition data
+        op_data_np = np.array(op_condition_data)
+        op_data_df = pd.DataFrame(op_data_np.T, columns=op_condition_name)
 
-        except Exception as e:
-            logging.exception(e)
-            print(f" Error loading 10 second interval data for path = {path}.")
+        print(f"Loaded turbine {turbine} for date {date}.")
+        print('----------------------------------------------------------------------\n')
+        #pp.pprint(data[2]) # used to print a raw sensor measurement
+
+        del sensor_data_np, op_data_np
+
+        # Setting the class variables
+        self.sensor_df = sensor_data_df
+        self.name = name
+        self.date = date
+        self.turbine = turbine
+        self.op_df = op_data_df
+
 
     def plot_data(self, dataframe):
         x_values = dataframe['TimeStamp']
@@ -83,8 +94,8 @@ class TenSecondInterval:
 
 # Example for WT01:
 interval = TenSecondInterval()
-# interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
-interval.load_data('/Users/stian/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+# interval.load_data('/Users/stian/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 print(interval.date) # Printing date
 interval.plot_data(interval.df)
 print(interval.df)

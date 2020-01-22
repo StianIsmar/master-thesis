@@ -32,31 +32,26 @@ def load_data(path):
                 timeStamp.append(data[i]['x'])
                 timeStamp = timeStamp[0]
 
-    #sensor_data.append(timeStamp[0])
-    #sensor_name.append('TimeStamp')
-    data_np = np.array(sensor_data)
-
-    #single_pd = pd.DataFrame(single_info, columns=single__name)
-
+    data_np = np.array(sensor_data)  # create a numpy array to be able to transpose it and get it in the right order
     data_pd = pd.DataFrame(data_np.T, columns=sensor_name)
     data_pd.insert(0, column='TimeStamp', value=timeStamp)
 
 
     print(f"Loaded turbine {turbine} for date {date}.")
     print('----------------------------------------------------------------------\n')
-    #pp.pprint(data[2]) # used to print a whole sensor measurement
+    #pp.pprint(data[2]) # used to print a raw sensor measurement
 
     return data_pd, name, date, turbine
+
+
 
 def plot_data(dataframe):
     x_values = dataframe['TimeStamp']
     dataframe = dataframe.drop(columns=['TimeStamp'])
     sensor_name = list(dataframe.columns.values)
 
-
-
     for i in range(len(sensor_name)):
-        if i == 5:
+        if sensor_name[i] == "LssShf;1;V":  # Plot the whole 10 sec for this sensor.
             plt.plot(x_values, dataframe[sensor_name[i]], linewidth=0.1)
         else:
             plt.plot(x_values[0:12500], dataframe[sensor_name[i]][0:12500], linewidth=0.1)

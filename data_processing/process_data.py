@@ -97,7 +97,7 @@ interval = TenSecondInterval()
 interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 # interval.load_data('/Users/stian/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 print(interval.date) # Printing date
-interval.plot_data(interval.df)
+interval.plot_data(interval.sensor_df)
 print(interval.df)
 # data, name, date, turbine = load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 

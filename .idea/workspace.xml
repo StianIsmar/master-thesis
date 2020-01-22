@@ -2,66 +2,31 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/master-thesis.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/master-thesis.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/read_uff.py" beforeDir="false" afterPath="$PROJECT_DIR$/read_uff.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/process_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/process_data.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/read_uff.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="636">
-              <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
-              <folding>
-                <element signature="e#21#33#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Library/Python/3.7/lib/python/site-packages/matplotlib/pyplot.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="41085">
-              <caret line="2788" selection-start-line="2788" selection-end-line="2788" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff">
-          <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="37320">
-              <caret line="2488" column="17" selection-start-line="2488" selection-start-column="4" selection-end-line="2488" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>data</find>
-      <find>DATAX</find>
-      <find>DF</find>
-    </findStrings>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$USER_HOME$/Library/Python/3.7/lib/python/site-packages/pyuff.py" />
-        <option value="$PROJECT_DIR$/read_uff.py" />
-      </list>
-    </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-324" />
@@ -69,43 +34,35 @@
     <option name="width" value="1920" />
     <option name="height" value="1200" />
   </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="master-thesis" type="b2602c69:ProjectViewProjectNode" />
-              <item name="master-thesis" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
-  </component>
   <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mysql" />
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.process_data">
+    <configuration name="process_data" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="master-thesis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_processing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_processing/process_data.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="read_uff" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="master-thesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -118,6 +75,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/read_uff.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -129,9 +87,22 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.process_data" />
         <item itemvalue="Python.read_uff" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -146,47 +117,27 @@
     </task>
     <servers />
   </component>
-  <component name="ToolWindowManager">
-    <frame x="-324" y="-1177" width="1920" height="1109" extended-state="6" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.015974442" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="0" />
-      <window_info anchor="bottom" id="Python Console" order="1" />
-      <window_info anchor="bottom" id="Terminal" order="2" weight="0.20845625" />
-      <window_info anchor="bottom" id="Event Log" order="3" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="4" />
-      <window_info anchor="bottom" id="Find" order="5" />
-      <window_info anchor="bottom" id="Cvs" order="6" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="7" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="8" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Run" order="3" weight="0.5149095" />
-      <window_info anchor="right" id="Debug" order="4" weight="0.49840257" />
-    </layout>
-    <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.015974442" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="0" />
-      <window_info anchor="bottom" id="Python Console" order="1" />
-      <window_info anchor="bottom" id="Terminal" order="2" visible="true" weight="0.20845625" />
-      <window_info anchor="bottom" id="Event Log" order="3" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="4" />
-      <window_info anchor="bottom" id="Find" order="5" />
-      <window_info anchor="bottom" id="Cvs" order="6" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="7" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="8" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" id="Run" order="3" visible="true" weight="0.5149095" />
-      <window_info anchor="right" id="Debug" order="4" weight="0.49840257" />
-    </layout-to-restore>
+  <component name="WindowStateProjectService">
+    <state x="236" y="-923" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1579693457074">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state x="236" y="-923" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579693457074" />
+    <state width="966" height="401" key="GridCell.Tab.0.bottom" timestamp="1579693392828">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state width="966" height="401" key="GridCell.Tab.0.bottom/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579693392828" />
+    <state width="966" height="401" key="GridCell.Tab.0.center" timestamp="1579693392827">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state width="966" height="401" key="GridCell.Tab.0.center/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579693392827" />
+    <state width="966" height="401" key="GridCell.Tab.0.left" timestamp="1579693392826">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state width="966" height="401" key="GridCell.Tab.0.left/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579693392826" />
+    <state width="966" height="401" key="GridCell.Tab.0.right" timestamp="1579693392827">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state width="966" height="401" key="GridCell.Tab.0.right/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579693392827" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -199,66 +150,8 @@
       </default-breakpoints>
     </breakpoint-manager>
   </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Library/Python/3.7/lib/python/site-packages/pyuff.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="434" selection-start-line="434" selection-end-line="434" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="383">
-          <caret line="311" selection-start-line="311" selection-end-line="311" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Volumes/Harddriver/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff" />
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="573">
-          <caret line="1716" column="35" lean-forward="true" selection-start-line="1716" selection-start-column="34" selection-end-line="1716" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Python/3.7/lib/python/site-packages/pandas/core/frame.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="3486" selection-start-line="3486" selection-end-line="3486" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/read_uff.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="636">
-          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
-          <folding>
-            <element signature="e#21#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Python/3.7/lib/python/site-packages/matplotlib/pyplot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="41085">
-          <caret line="2788" selection-start-line="2788" selection-end-line="2788" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="37320">
-          <caret line="2488" column="17" selection-start-line="2488" selection-start-column="4" selection-end-line="2488" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/master_thesis$read_uff.coverage" NAME="read_uff Coverage Results" MODIFIED="1579691820223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/master_thesis$process_data.coverage" NAME="process_data Coverage Results" MODIFIED="1579693384768" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
   </component>
 </project>

@@ -6,72 +6,68 @@ import matplotlib.pyplot as plt
 #import seabon as sns; sns.set()
 
 
-print ("Start read")
-pp = pprint.PrettyPrinter(indent=4)
+def load_data(path):
+    print ("Start read...\n")
+    pp = pprint.PrettyPrinter(indent=4)
+
+    uff_file = pyuff.UFF(path)
+    data = uff_file.read_sets()
+
+    date    = data[0]['id3']  # Extract the date and time for operation
+    turbine = data[0]['id4']  # Extract info of which turbine data belongs to
+
+    timeStamp     = []  # Placeholder for time-stamp
+    sensor_name   = []  # Stores sensor name
+    sensor_data   = []  # Stores sensor data
+
+    for i in range(len(data)):
+        name = data[i]['id5']
+        info = (data[i]['data'])
+
+        if len(info) > 1:   # only add sensor data which has some measurements
+            sensor_name.append(name)
+            sensor_data.append(info)
+
+            if len(timeStamp) == 0:   # timestamp is the same for all sensor data, so load it only once
+                timeStamp.append(data[i]['x'])
+                timeStamp = timeStamp[0]
+
+    #sensor_data.append(timeStamp[0])
+    #sensor_name.append('TimeStamp')
+    data_np = np.array(sensor_data)
+
+    #single_pd = pd.DataFrame(single_info, columns=single__name)
+
+    data_pd = pd.DataFrame(data_np.T, columns=sensor_name)
+    data_pd.insert(0, column='TimeStamp', value=timeStamp)
 
 
-uff_file = pyuff.UFF('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+    print(f"Loaded turbine {turbine} for date {date}.")
+    print('----------------------------------------------------------------------\n')
+    #pp.pprint(data[2]) # used to print a whole sensor measurement
 
-data = uff_file.read_sets()
+    return data_pd, name, date, turbine
 
-
-
-time    = data[0]['id3']
-turbine = data[0]['id4']
-
-x             = []
-single__name  = []
-multi_name    = []
-single_info   = []
-multi_info    = []
-
-for i in range(len(data)):
-
-    name = data[i]['id5']
-    info = (data[i]['data'])
-
-
-    if len(info) > 0:
-        multi_name.append(name)
-        multi_info.append(info)
-
-        if len(x) == 0:
-            x.append(data[i]['x'])
-            print('x', x)
-            print('info', info)
-
-multi_info.append(x[0])
-multi_name.append('TimeStamp')
-multi_info_np = np.array(multi_info)
-
-#single_pd = pd.DataFrame(single_info, columns=single__name)
-multi_pd = pd.DataFrame(multi_info_np.T, columns=multi_name)
-
-
-
-print(name)
-print(time)
-print(turbine)
-print("X", x)
-print('info', info)
-print()
-pp.pprint(data[2])
-print()
-print('length of multi_name', len(multi_name))
-print()
-print('length of multi_info', len(multi_info))
-print(multi_info_np.shape)
-print()
-print(len(x))
-print(multi_pd)
-
-
-for i in range(len(multi_name)):
-    plt.plot(multi_pd['TimeStamp'][0:12500], multi_pd[multi_name[i]][0:12500], linewidth=0.1)
-    plt.title(multi_name[i] + ' VS time')
-    plt.ylabel(multi_name[i])
-    plt.xlabel('Time')
-    plt.show()
+def plot_data(dataframe):
+    x_values = dataframe['TimeStamp']
+    dataframe = dataframe.drop(columns=['TimeStamp'])
+    sensor_name = list(dataframe.columns.values)
 
 
 
+    for i in range(len(sensor_name)):
+        if i == 5:
+            plt.plot(x_values, dataframe[sensor_name[i]], linewidth=0.1)
+        else:
+            plt.plot(x_values[0:12500], dataframe[sensor_name[i]][0:12500], linewidth=0.1)
+        plt.title(sensor_name[i] + ' VS time')
+        plt.ylabel(sensor_name[i])
+        plt.xlabel('Time')
+        plt.show()
+
+
+
+data, name, date, turbine = load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+
+plot_data(data)
+print(data)

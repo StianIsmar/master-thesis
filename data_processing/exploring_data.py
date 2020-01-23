@@ -85,14 +85,14 @@ print(op_df)
 print(op_df.shape)
 
 '''
-def load_instance():
-    content = pickle.load(open('saved_instance.p', 'rb'))
-    return content
+
+
+
+
 
 instance = process_data.TenSecondInterval()
-instance.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
-instance.save_instance()
-instance.load_instance()
+
+instance = process_data.load_instance()
 print(instance.date)
 
 

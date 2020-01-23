@@ -105,9 +105,9 @@ class TenSecondInterval:
         content = self
         pickle.dump(content, open('saved_instance.p', 'wb'))
 
-    def load_instance(self):
-        content = pickle.load(open('saved_instance.p', 'rb'))
-        return content
+def load_instance():
+    content = pickle.load(open('saved_instance.p', 'rb'))
+    return content
 
 
 

@@ -90,7 +90,7 @@ print(op_df.shape)
 
 
 
-instance = process_data.TenSecondInterval()
+#instance = process_data.TenSecondInterval()
 
 instance = process_data.load_instance()
 print(instance.date)

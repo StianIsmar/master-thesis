@@ -6,7 +6,7 @@ four wind turbines at Skomakerfjellet.
 import os
 from process_data import TenSecondInterval
 import pandas as pd
-
+import pickle
 
 class Wt_data():
     # Takes on of the following as wt_name: WTG01, WTG02, WTG03, WTG04.
@@ -30,7 +30,7 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            if filename.endswith(".uff") and not filename[0]== ".":
+            if filename.endswith(".uff") and not filename[0] == ".":
                 print("Files read: ", loop_count, "/", number_of_files)
                 loop_count+=1
                 print("Filename: " + filename)
@@ -56,19 +56,16 @@ class Wt_data():
                 wt_op_df.append(op_df.iloc[0,:])
                 print(wt_op_df.shape)
 
+    def save_df(self):  # Save dataframe to easier open in another file.
+        content = {'wt_obj' : self}
+        pickle.dump(content, open('wt_obj.p', 'wb'))
+
+
 wt_01 = Wt_data("WTG01")
-
-
-
-# Loop leser inn alle og lager alle
-
-
 
 # wt_02 = Wt_data()
 
-
 # wt_03 = Wt_data()
-
 
 # wt_04 = Wt_data()
 

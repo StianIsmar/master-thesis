@@ -101,15 +101,29 @@ class TenSecondInterval:
         content = pickle.load(open('saved_dfs.p', 'rb'))
         print(content['op_df'])
 
+    def save_instance(self):
+        content = self
+        pickle.dump(content, open('saved_instance.p', 'wb'))
+
+    def load_instance(self):
+        content = pickle.load(open('saved_instance.p', 'rb'))
+        return content
+
+
 
 # Example for WT01:
-interval = TenSecondInterval()
-interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+#interval = TenSecondInterval()
+#interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 # interval.load_data('/Users/stian/Desktop/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
-print(interval.date) # Printing date
-interval.plot_data(interval.sensor_df)
-print(interval.sensor_df)
-interval.save_df()
-interval.load_df()
+#print(interval.date) # Printing date
+
+#interval.plot_data(interval.sensor_df)
+#print(interval.sensor_df)
+#interval.save_df()
+#interval.load_df()
 # data, name, date, turbine = load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+
+#interval.save_instance()
+#instance = load_instance()
+#print(instance.op_df)
 

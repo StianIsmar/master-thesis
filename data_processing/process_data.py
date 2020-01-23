@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import logging
+import gc
 
 
 class TenSecondInterval:
@@ -38,7 +39,7 @@ class TenSecondInterval:
         op_condition_name = [] # Stores name for operational condition
         op_condition_data = [] # Stores operational condition data, i.e. Average Power for the 10 second interval
 
-        for i in range(len(data)):
+        for i in range(len(data)): # Looping through each "variable" in i=0 to 178
             name = data[i]['id5']
             info = (data[i]['data'])
 
@@ -67,7 +68,9 @@ class TenSecondInterval:
         print('----------------------------------------------------------------------\n')
         #pp.pprint(data[2]) # used to print a raw sensor measurement
 
-        del sensor_data_np, op_data_np
+        del sensor_data_np, op_data_np, data, info, sensor_data
+
+        gc.collect()
 
         # Setting the class variables
         self.sensor_df = sensor_data_df

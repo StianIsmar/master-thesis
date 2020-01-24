@@ -97,8 +97,19 @@ print(op_df.shape)
 #print(instance.date)
 
 
-#wt_instance = wt_data.create_wt_data()
-wt_instance = wt_data.load_instance("WTG01")
+
+# --------- TO CREATE
+
+wt_instance_1 = wt_data.create_wt_data("WTG01")
+wt_instance_2 = wt_data.create_wt_data("WTG02")
+wt_instance_3 = wt_data.create_wt_data("WTG03")
+wt_instance_4 = wt_data.create_wt_data("WTG04")
+
+
+#wt_instance_1 = wt_data.load_instance("WTG01")
+#wt_instance_2 = wt_data.load_instance("WTG02")
+#wt_instance_3 = wt_data.load_instance("WTG03")
+#wt_instance_4 = wt_data.load_instance("WTG04")
 
 
 

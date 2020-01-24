@@ -30,7 +30,7 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            if loop_count > 10:
+            if loop_count > 2:
                 break
             if filename.endswith(".uff") and not filename[0] == ".":
                 print("Files read: ", loop_count, "/", number_of_files)
@@ -62,17 +62,19 @@ class Wt_data():
 
     def save_instance(self):
         content = self
-        pickle.dump(content, open('saved_instance_' + self.name + '.p', 'wb'))
+        path = '/Volumes/OsvikExtra/VibrationData/'
+        pickle.dump(content, open(path + 'saved_instance_' + self.name + '.p', 'wb'))
 
 
 def load_instance(name):
     wt_01 = Wt_data(name)
-    wt_01 = pickle.load(open('saved_instance_' + name + '.p', 'rb'))
+    path = '/Volumes/OsvikExtra/VibrationData/'
+    wt_01 = pickle.load(open(path + 'saved_instance_' + name + '.p', 'rb'))
     return wt_01
 
-def create_wt_data():
-    wt_01 = Wt_data("WTG01")
-    wt_01.loop_directory("WTG01")
+def create_wt_data(name):
+    wt_01 = Wt_data(name)
+    wt_01.loop_directory(name)
     wt_01.save_instance()
     return wt_01
 

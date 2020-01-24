@@ -22,9 +22,7 @@ class TenSecondInterval:
         self.turbine = None
 
     def load_data(self, path):
-        print ("Start read...\n")
         pp = pprint.PrettyPrinter(indent=4)
-
 
         uff_file = pyuff.UFF(path)
         data = uff_file.read_sets()
@@ -65,6 +63,7 @@ class TenSecondInterval:
 
         print(f"Loaded turbine {turbine} for date {date}.")
         print('----------------------------------------------------------------------\n')
+
         #pp.pprint(data[2]) # used to print a raw sensor measurement
 
         del sensor_data_np, op_data_np, data, info, sensor_data
@@ -112,8 +111,13 @@ class TenSecondInterval:
                         second_pulse_time - first_pulse_time)  # Calculate the time to do one revolution and append it to the list
                     first_pulse_time = second_pulse_time
 
-        avg_rotation = sum(rotations) / len(rotations)  # This is seconds per rotation
-        avg_rotation_per_sec = 1 / avg_rotation  # This gives rotation per second
+        # If the data measurements does not contain a whole rotation, set the speed to None
+        if len(rotations) > 0:
+            avg_rotation = sum(rotations) / len(rotations)  # This is seconds per rotation
+            avg_rotation_per_sec = 1 / avg_rotation  # This gives rotation per second
+        else:
+            avg_rotation_per_sec = None
+
         return avg_rotation_per_sec
 
     # Finds data from sensor_df
@@ -143,8 +147,7 @@ def load_instance():
     content = pickle.load(open('saved_instance.p', 'rb'))
     return content
 
-
-
+'''
 # Example for WT01:
 interval = TenSecondInterval()
 interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
@@ -162,3 +165,4 @@ print(interval.op_df)
 #instance = load_instance()
 #print(instance.op_df)
 
+'''

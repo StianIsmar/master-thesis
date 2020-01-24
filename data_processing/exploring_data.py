@@ -87,6 +87,7 @@ print(op_df.shape)
 '''
 
 
+wt_data.create_wt_data("WTG01")
 
 
 
@@ -98,7 +99,7 @@ print(op_df.shape)
 
 
 #wt_instance = wt_data.create_wt_data()
-wt_instance = wt_data.load_instance("WTG01")
+# wt_instance = wt_data.load_instance("WTG01")
 
 
 

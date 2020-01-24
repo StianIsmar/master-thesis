@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/exploring_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/exploring_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/wt_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/wt_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +49,29 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
-  <component name="RunManager" selected="Python.wt_data">
+  <component name="RunManager" selected="Python.exploring_data">
+    <configuration name="exploring_data" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="master-thesis" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_processing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_processing/exploring_data.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="process_data" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="master-thesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -139,6 +162,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.exploring_data" />
         <item itemvalue="Python.wt_data" />
         <item itemvalue="Python.process_data" />
         <item itemvalue="Python.testing" />
@@ -169,7 +193,7 @@
       <option name="presentableId" value="Default" />
       <updated>1579601408582</updated>
       <workItem from="1579854478117" duration="404000" />
-      <workItem from="1579860090947" duration="68000" />
+      <workItem from="1579860090947" duration="838000" />
     </task>
     <servers />
   </component>
@@ -185,22 +209,22 @@
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
     <state x="124" y="-910" key="DiffContextDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579790560498" />
-    <state width="1878" height="268" key="GridCell.Tab.0.bottom" timestamp="1579787744071">
+    <state width="1878" height="300" key="GridCell.Tab.0.bottom" timestamp="1579861159961">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
-    <state width="1878" height="268" key="GridCell.Tab.0.bottom/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579787744071" />
-    <state width="1878" height="268" key="GridCell.Tab.0.center" timestamp="1579787744070">
+    <state width="1878" height="300" key="GridCell.Tab.0.bottom/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579861159961" />
+    <state width="1878" height="300" key="GridCell.Tab.0.center" timestamp="1579861159960">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
-    <state width="1878" height="268" key="GridCell.Tab.0.center/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579787744070" />
-    <state width="1878" height="268" key="GridCell.Tab.0.left" timestamp="1579787744069">
+    <state width="1878" height="300" key="GridCell.Tab.0.center/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579861159960" />
+    <state width="1878" height="300" key="GridCell.Tab.0.left" timestamp="1579861159959">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
-    <state width="1878" height="268" key="GridCell.Tab.0.left/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579787744069" />
-    <state width="1878" height="268" key="GridCell.Tab.0.right" timestamp="1579787744071">
+    <state width="1878" height="300" key="GridCell.Tab.0.left/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579861159959" />
+    <state width="1878" height="300" key="GridCell.Tab.0.right" timestamp="1579861159960">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
-    <state width="1878" height="268" key="GridCell.Tab.0.right/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579787744071" />
+    <state width="1878" height="300" key="GridCell.Tab.0.right/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1579861159960" />
     <state width="935" height="700" key="GridCell.Tab.1.bottom" timestamp="1579695400799">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
@@ -247,7 +271,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/master_thesis$read_uff.coverage" NAME="read_uff Coverage Results" MODIFIED="1579691820223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/master_thesis$wt_data.coverage" NAME="wt_data Coverage Results" MODIFIED="1579854701376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
+    <SUITE FILE_PATH="coverage/master_thesis$wt_data.coverage" NAME="wt_data Coverage Results" MODIFIED="1579861139424" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
+    <SUITE FILE_PATH="coverage/master_thesis$exploring_data.coverage" NAME="exploring_data Coverage Results" MODIFIED="1579861159949" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
     <SUITE FILE_PATH="coverage/master_thesis$testing.coverage" NAME="testing Coverage Results" MODIFIED="1579783389852" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
     <SUITE FILE_PATH="coverage/master_thesis$process_data.coverage" NAME="process_data Coverage Results" MODIFIED="1579787627600" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
   </component>

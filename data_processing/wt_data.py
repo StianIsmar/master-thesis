@@ -7,6 +7,8 @@ import os
 from process_data import TenSecondInterval
 import pandas as pd
 import pickle
+import os.path
+
 
 class Wt_data():
     # Takes on of the following as wt_name: WTG01, WTG02, WTG03, WTG04.
@@ -70,13 +72,15 @@ def load_instance(name):
     wt_01 = pickle.load(open('saved_instance_' + name + '.p', 'rb'))
     return wt_01
 
-def create_wt_data():
-    wt_01 = Wt_data("WTG01")
-    wt_01.loop_directory("WTG01")
-    wt_01.save_instance()
-    return wt_01
+def create_wt_data(name):
+    if os.path.isfile('saved_instance_'+ name +'.p'):
+        print("Pickle already exist!")
+    else:
+        wt_01 = Wt_data(name)
+        wt_01.loop_directory(name)
+        wt_01.save_instance()
+        return wt_01
 
-#create_wt_data()
 
     # wt_02 = Wt_data()
 

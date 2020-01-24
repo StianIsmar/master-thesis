@@ -58,7 +58,7 @@ def calc_avg_speed(dataframe, col_name):
     avg_rotation_per_sec = 1/avg_rotation  # This gives rotation per second
     return avg_rotation_per_sec
 
-'''
+
 content = pickle.load(open('saved_dfs.p', 'rb'))
 
 op_df = content['op_df']
@@ -84,7 +84,7 @@ op_df.insert(len(op_df.columns.values), "HighSpeed:rps", high_rot_seed)
 print(op_df)
 print(op_df.shape)
 
-'''
+
 
 
 

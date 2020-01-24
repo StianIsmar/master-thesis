@@ -32,7 +32,7 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            if loop_count > 10:
+            if loop_count > 2:
                 break
             if filename.endswith(".uff") and not filename[0] == ".":
                 print("Files read: ", loop_count, "/", number_of_files)
@@ -75,14 +75,10 @@ def load_instance(name):
     return wt_01
 
 def create_wt_data(name):
-    # Check if file is alredy created
-    if os.path.isfile('saved_instance_'+ name +'.p'):
-        print("Pickle already exist!")
-    else:
-        wt_01 = Wt_data(name)
-        wt_01.loop_directory(name)
-        wt_01.save_instance()
-        return wt_01
+    wt_01 = Wt_data(name)
+    wt_01.loop_directory(name)
+    wt_01.save_instance()
+    return wt_01
 
 #create_wt_data()
 

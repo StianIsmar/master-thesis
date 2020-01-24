@@ -32,10 +32,9 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            if loop_count > 2:
-                break
+            #if loop_count > 2:
+                #break
             if filename.endswith(".uff") and not filename[0] == ".":
-                print(f"Files read: {loop_count} / {number_of_files}", end="\r")
                 loop_count+=1
                 #print("Filename: " + filename)
                 # print(os.path.join(directory, filename))
@@ -45,6 +44,7 @@ class Wt_data():
 
                 # Added object to list of objects for particular wind turbine
                 self.add_interval(interval_object)
+                print(f"Files read: {loop_count} / {number_of_files}", end="\r")
             else:
                 continue
         print(f"Files read: {loop_count-1} / {number_of_files}")

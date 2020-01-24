@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/process_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/process_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/wt_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/wt_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -193,7 +191,7 @@
       <option name="presentableId" value="Default" />
       <updated>1579601408582</updated>
       <workItem from="1579854478117" duration="404000" />
-      <workItem from="1579860090947" duration="1162000" />
+      <workItem from="1579860090947" duration="1212000" />
     </task>
     <servers />
   </component>

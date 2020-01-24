@@ -73,6 +73,7 @@ def load_instance(name):
     return wt_01
 
 def create_wt_data(name):
+    # Check if file is alredy created
     if os.path.isfile('saved_instance_'+ name +'.p'):
         print("Pickle already exist!")
     else:

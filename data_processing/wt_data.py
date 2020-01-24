@@ -71,6 +71,9 @@ def load_instance(name):
 
 def create_wt_data():
     wt_01 = Wt_data("WTG01")
+    wt_01.loop_directory("WTG01")
+
+create_wt_data()
 
     # wt_02 = Wt_data()
 

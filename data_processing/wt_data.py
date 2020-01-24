@@ -28,16 +28,16 @@ class Wt_data():
         for file in os.listdir(count_path):
             if not file.startswith("."):
                 number_of_files+=1
-        print("Number of files: ", number_of_files)
+        print(f"\nNumber of files for {self.name}: {number_of_files}")
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
             if loop_count > 2:
                 break
             if filename.endswith(".uff") and not filename[0] == ".":
-                print("Files read: ", loop_count, "/", number_of_files)
+                print(f"Files read: {loop_count} / {number_of_files}", end="\r")
                 loop_count+=1
-                print("Filename: " + filename)
+                #print("Filename: " + filename)
                 # print(os.path.join(directory, filename))
                 interval_object = TenSecondInterval()
                 interval_object.load_data(path + wt_name + "/" + filename)
@@ -47,6 +47,8 @@ class Wt_data():
                 self.add_interval(interval_object)
             else:
                 continue
+        print(f"Files read: {loop_count-1} / {number_of_files}")
+        print(f"Completed reading of {self.name}")
 
     def add_interval(self, interval):
         self.ten_second_intervals.append(interval)
@@ -66,12 +68,14 @@ class Wt_data():
         content = self
         path = '/Volumes/OsvikExtra/VibrationData/'
         pickle.dump(content, open(path + 'saved_instance_' + self.name + '.p', 'wb'))
+        print(f'Saved to file')
 
 
 def load_instance(name):
     wt_01 = Wt_data(name)
     path = '/Volumes/OsvikExtra/VibrationData/'
     wt_01 = pickle.load(open(path + 'saved_instance_' + name + '.p', 'rb'))
+    print(f'\nLoaded {name}')
     return wt_01
 
 def create_wt_data(name):

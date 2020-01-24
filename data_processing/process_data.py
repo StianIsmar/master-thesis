@@ -22,7 +22,6 @@ class TenSecondInterval:
         self.turbine = None
 
     def load_data(self, path):
-        print ("Start read...\n")
         pp = pprint.PrettyPrinter(indent=4)
 
 
@@ -63,8 +62,6 @@ class TenSecondInterval:
         op_data_np = np.array(op_condition_data)
         op_data_df = pd.DataFrame(op_data_np.T, columns=op_condition_name)
 
-        print(f"Loaded turbine {turbine} for date {date}.")
-        print('----------------------------------------------------------------------\n')
 
         #pp.pprint(data[2]) # used to print a raw sensor measurement
 

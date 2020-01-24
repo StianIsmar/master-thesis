@@ -98,13 +98,15 @@ print(op_df.shape)
 
 
 
-# --------- TO CREATE
+# --------- TO CREATE WT INSTANCES --------------
 
 #wt_instance_1 = wt_data.create_wt_data("WTG01")
 #wt_instance_2 = wt_data.create_wt_data("WTG02")
 #wt_instance_3 = wt_data.create_wt_data("WTG03")
 #wt_instance_4 = wt_data.create_wt_data("WTG04")
 
+
+# ---------  TO LOAD WT INSTANCES --------------
 
 wt_instance_1 = wt_data.load_instance("WTG01")
 wt_instance_2 = wt_data.load_instance("WTG02")

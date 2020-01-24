@@ -8,10 +8,20 @@ print(interval.date)
 
 '''
 import pickle
+
+import dateutil.parser
 import numpy as np
 import matplotlib.pyplot as plt
 import process_data
 import wt_data
+from datetime import datetime
+import seaborn as sns
+import pandas as pd
+import matplotlib.dates as dates
+import datetime
+
+import time
+
 
 def plot_data(dataframe, colName, plot_all=False):
     x_values = dataframe['TimeStamp']
@@ -41,23 +51,76 @@ def plot_data(dataframe, colName, plot_all=False):
 def calc_avg_speed(dataframe, col_name):
     x = np.array(dataframe['TimeStamp'])
     data_list = np.array(dataframe[col_name])
-    first_pulse_time = None   # Remember when the first pulse starts
-    rotations = []    # Store the time it takes to do one revolution
-    if data_list[0] > 20:    # If the timeserie start at the peak we record its corresponding time
+    first_pulse_time = None  # Remember when the first pulse starts
+    rotations = []  # Store the time it takes to do one revolution
+    if data_list[0] > 20:  # If the timeserie start at the peak we record its corresponding time
         first_pulse_time = x[0]
 
     for i in range(len(data_list)):
-        if (data_list[i] > 20) and (data_list[i-1] < 20):
-            if first_pulse_time is None:   # Find start time of the first pulse
+        if (data_list[i] > 20) and (data_list[i - 1] < 20):
+            if first_pulse_time is None:  # Find start time of the first pulse
                 first_pulse_time = x[i]
             else:
                 second_pulse_time = x[i]
-                rotations.append(second_pulse_time - first_pulse_time) # Calculate the time to do one revolution and append it to the list
+                # Calculate the time to do one revolution and append it to the list
+                rotations.append(second_pulse_time - first_pulse_time)
                 first_pulse_time = second_pulse_time
 
-    avg_rotation = sum(rotations)/len(rotations) # This is seconds per rotation
-    avg_rotation_per_sec = 1/avg_rotation  # This gives rotation per second
+    avg_rotation = sum(rotations) / len(rotations)  # This is seconds per rotation
+    avg_rotation_per_sec = 1 / avg_rotation  # This gives rotation per second
     return avg_rotation_per_sec
+
+
+# Plotting all intervals for a certain wt:
+def build_op_df_for_wt(wt_obj):
+    wt_name = wt_obj.name  # Name of the windturbine
+    variables = wt_obj.ten_second_intervals[0].op_df.columns  # All op variables for the ten_second_intervals
+
+    # Defining the dataframe to hold all interval op data
+    df_op_wt = pd.DataFrame(columns=variables)
+    dates = []
+
+    # Loop through all 10-second intervals from wind turbine
+    for i, interval in enumerate(wt_obj.ten_second_intervals):
+
+        # Getting the date on a different format
+        date = dateutil.parser.isoparse("20" + interval.date)
+        # date = datetime.datetime.strptime(date,"%Y%m%d %h:").date()
+        #dates.append(str(date.year) + "-" + str(date.month) + "-" + str(date.day) + "-" + str(date.hour) + ":" + str(date.minute) + ":" + str(date.second))
+        dates.append(date)
+        # Inserting the row for each interval
+        name = interval.name
+        row = interval.op_df.iloc[0, :]
+        df_op_wt = df_op_wt.append(row.T)
+
+    # All rows are now added to dataframe. Now, add date list
+    df_op_wt.insert(0, column='Date', value=dates)  # Insert the first column to hold date (for the 10 second interval)
+    return df_op_wt
+
+
+def plot_op_df(op_dataframe):
+    # Plot in this loop
+
+
+    date_series = op_dataframe['Date']
+    #date_series.
+    for i in range(1, op_dataframe.shape[1]):
+        variable_name = op_dataframe.columns[i]
+
+        #op_dataframe.iloc[:, 0]
+
+
+        x_dates = dates.date2num(date_series)
+
+        sns.lineplot(x_dates, op_dataframe.iloc[:,variable_name])
+        plt.show()
+
+wt_instance_1 = wt_data.load_instance("WTG01")
+df = build_op_df_for_wt(wt_instance_1)
+# plot_op_df(df)
+
+
+
 
 '''
 content = pickle.load(open('saved_dfs.p', 'rb'))
@@ -86,32 +149,23 @@ print(op_df)
 print(op_df.shape)
 '''
 
+# instance = process_data.TenSecondInterval()
 
-
-
-
-
-#instance = process_data.TenSecondInterval()
-
-#instance = process_data.load_instance()
-#print(instance.date)
-
+# instance = process_data.load_instance()
+# print(instance.date)
 
 
 # --------- TO CREATE WT INSTANCES --------------
 
-wt_instance_1 = wt_data.create_wt_data("WTG01")
-wt_instance_2 = wt_data.create_wt_data("WTG02")
-wt_instance_3 = wt_data.create_wt_data("WTG03")
-wt_instance_4 = wt_data.create_wt_data("WTG04")
+# wt_instance_1 = wt_data.create_wt_data("WTG01")
+# wt_instance_2 = wt_data.create_wt_data("WTG02")
+# wt_instance_3 = wt_data.create_wt_data("WTG03")
+# wt_instance_4 = wt_data.create_wt_data("WTG04")
 
 
 # ---------  TO LOAD WT INSTANCES --------------
 
-#wt_instance_1 = wt_data.load_instance("WTG01")
-#wt_instance_2 = wt_data.load_instance("WTG02")
-#wt_instance_3 = wt_data.load_instance("WTG03")
-#wt_instance_4 = wt_data.load_instance("WTG04")
-
-
-
+# wt_instance_1 = wt_data.load_instance("WTG01")
+# wt_instance_2 = wt_data.load_instance("WTG02")
+# wt_instance_3 = wt_data.load_instance("WTG03")
+# wt_instance_4 = wt_data.load_instance("WTG04")

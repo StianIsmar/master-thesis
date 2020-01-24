@@ -11,6 +11,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import process_data
+import wt_data
 
 def plot_data(dataframe, colName, plot_all=False):
     x_values = dataframe['TimeStamp']
@@ -58,7 +59,7 @@ def calc_avg_speed(dataframe, col_name):
     avg_rotation_per_sec = 1/avg_rotation  # This gives rotation per second
     return avg_rotation_per_sec
 
-
+'''
 content = pickle.load(open('saved_dfs.p', 'rb'))
 
 op_df = content['op_df']
@@ -83,7 +84,7 @@ op_df.insert(len(op_df.columns.values), "HighSpeed:rps", high_rot_seed)
 
 print(op_df)
 print(op_df.shape)
-
+'''
 
 
 
@@ -92,10 +93,11 @@ print(op_df.shape)
 
 #instance = process_data.TenSecondInterval()
 
-instance = process_data.load_instance()
-print(instance.date)
+#instance = process_data.load_instance()
+#print(instance.date)
 
-
+wt_instance = wt_data.Wt_data("WTG01")
+wt_instance = wt_data.load_instance("WTG01")
 
 
 

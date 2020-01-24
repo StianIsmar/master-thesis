@@ -13,8 +13,8 @@ class Wt_data():
     def __init__(self, wt_name):
         self.name = wt_name
         self.ten_second_intervals = []
-        self.loop_directory(wt_name)
-        self.save_instance()
+        # self.loop_directory(wt_name)
+        # self.save_instance()
 
     def loop_directory(self, wt_name):
 
@@ -30,6 +30,8 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
+            if loop_count > 10:
+                break
             if filename.endswith(".uff") and not filename[0] == ".":
                 print("Files read: ", loop_count, "/", number_of_files)
                 loop_count+=1
@@ -37,6 +39,7 @@ class Wt_data():
                 # print(os.path.join(directory, filename))
                 interval_object = TenSecondInterval()
                 interval_object.load_data(path + wt_name + "/" + filename)
+                interval_object.insert_speed()
 
                 # Added object to list of objects for particular wind turbine
                 self.add_interval(interval_object)
@@ -59,21 +62,21 @@ class Wt_data():
 
     def save_instance(self):
         content = self
-        pickle.dump(content, open('saved_instance_' + self.wt_name + '.p', 'wb'))
+        pickle.dump(content, open('saved_instance_' + self.name + '.p', 'wb'))
 
 
-def load_instance():
-    content = pickle.load(open('saved_instance.p', 'rb'))
+def load_instance(name):
+    content = pickle.load(open('saved_instance_' + name + '.p', 'rb'))
     return content
 
+def create_wt_data():
+    wt_01 = Wt_data("WTG01")
 
-wt_01 = Wt_data("WTG01")
+    # wt_02 = Wt_data()
 
-# wt_02 = Wt_data()
+    # wt_03 = Wt_data()
 
-# wt_03 = Wt_data()
-
-# wt_04 = Wt_data()
+    # wt_04 = Wt_data()
 
 
 

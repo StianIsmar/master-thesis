@@ -22,7 +22,9 @@ class TenSecondInterval:
         self.turbine = None
 
     def load_data(self, path):
+        print ("Start read...\n")
         pp = pprint.PrettyPrinter(indent=4)
+
 
         uff_file = pyuff.UFF(path)
         data = uff_file.read_sets()
@@ -165,4 +167,3 @@ print(interval.op_df)
 #instance = load_instance()
 #print(instance.op_df)
 
-'''

@@ -7,6 +7,8 @@ import os
 from process_data import TenSecondInterval
 import pandas as pd
 import pickle
+import os.path
+
 
 class Wt_data():
     # Takes on of the following as wt_name: WTG01, WTG02, WTG03, WTG04.
@@ -30,7 +32,7 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            if loop_count > 2:
+            if loop_count > 10:
                 break
             if filename.endswith(".uff") and not filename[0] == ".":
                 print("Files read: ", loop_count, "/", number_of_files)
@@ -73,10 +75,14 @@ def load_instance(name):
     return wt_01
 
 def create_wt_data(name):
-    wt_01 = Wt_data(name)
-    wt_01.loop_directory(name)
-    wt_01.save_instance()
-    return wt_01
+    # Check if file is alredy created
+    if os.path.isfile('saved_instance_'+ name +'.p'):
+        print("Pickle already exist!")
+    else:
+        wt_01 = Wt_data(name)
+        wt_01.loop_directory(name)
+        wt_01.save_instance()
+        return wt_01
 
 #create_wt_data()
 

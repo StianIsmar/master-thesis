@@ -96,7 +96,8 @@ print(op_df.shape)
 #instance = process_data.load_instance()
 #print(instance.date)
 
-wt_instance = wt_data.Wt_data("WTG01")
+
+#wt_instance = wt_data.create_wt_data()
 wt_instance = wt_data.load_instance("WTG01")
 
 

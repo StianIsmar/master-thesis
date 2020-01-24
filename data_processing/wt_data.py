@@ -66,14 +66,17 @@ class Wt_data():
 
 
 def load_instance(name):
-    content = pickle.load(open('saved_instance_' + name + '.p', 'rb'))
-    return content
+    wt_01 = Wt_data(name)
+    wt_01 = pickle.load(open('saved_instance_' + name + '.p', 'rb'))
+    return wt_01
 
 def create_wt_data():
     wt_01 = Wt_data("WTG01")
     wt_01.loop_directory("WTG01")
+    wt_01.save_instance()
+    return wt_01
 
-create_wt_data()
+#create_wt_data()
 
     # wt_02 = Wt_data()
 

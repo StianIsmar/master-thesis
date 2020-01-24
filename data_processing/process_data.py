@@ -144,7 +144,7 @@ def load_instance():
     return content
 
 
-
+'''
 # Example for WT01:
 interval = TenSecondInterval()
 interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
@@ -162,3 +162,5 @@ print(interval.op_df)
 #instance = load_instance()
 #print(instance.op_df)
 
+
+'''

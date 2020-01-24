@@ -81,7 +81,6 @@ def create_wt_data(name):
         wt_01.save_instance()
         return wt_01
 
-
     # wt_02 = Wt_data()
 
     # wt_03 = Wt_data()

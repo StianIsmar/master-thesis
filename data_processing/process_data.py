@@ -1,6 +1,6 @@
 '''
-This module contains the class TenSecondInterval, which reads transforms a uff file to a pandas dataframe.
-Call module from wt_data.py to load all data.
+This module contains the class TenSecondInterval, which reads and transforms a uff file to a pandas dataframe.
+This class is called in module wt_data.py when reading all data.
 '''
 
 
@@ -12,7 +12,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import logging
 import gc
-
 
 class TenSecondInterval:
     def __init__(self):

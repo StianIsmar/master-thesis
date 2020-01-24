@@ -10,16 +10,16 @@ import pickle
 
 class Wt_data():
     # Takes on of the following as wt_name: WTG01, WTG02, WTG03, WTG04.
-    def __init__(self,wt_name):
+    def __init__(self, wt_name):
+        self.name = wt_name
         self.ten_second_intervals = []
         self.loop_directory(wt_name)
+        self.save_instance()
 
     def loop_directory(self, wt_name):
 
         path = '/Volumes/OsvikExtra/VibrationData/'
         # Count how many files in directory
-
-
         import os
         count_path = '/Volumes/OsvikExtra/VibrationData/' + wt_name
         number_of_files = 0
@@ -46,6 +46,7 @@ class Wt_data():
     def add_interval(self, interval):
         self.ten_second_intervals.append(interval)
 
+    # Method for combining the operational data
     def combine_op_data(self):
         for interval, i in enumerate(self.ten_second_intervals):
             print(i)
@@ -56,9 +57,14 @@ class Wt_data():
                 wt_op_df.append(op_df.iloc[0,:])
                 print(wt_op_df.shape)
 
-    def save_df(self):  # Save dataframe to easier open in another file.
-        content = {'wt_obj' : self}
-        pickle.dump(content, open('wt_obj.p', 'wb'))
+    def save_instance(self):
+        content = self
+        pickle.dump(content, open('saved_instance_' + self.wt_name + '.p', 'wb'))
+
+
+def load_instance():
+    content = pickle.load(open('saved_instance.p', 'rb'))
+    return content
 
 
 wt_01 = Wt_data("WTG01")

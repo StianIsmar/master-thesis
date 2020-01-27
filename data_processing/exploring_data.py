@@ -82,12 +82,14 @@ def build_op_df_for_wt(wt_obj):
 
     # Loop through all 10-second intervals from wind turbine
     for i, interval in enumerate(wt_obj.ten_second_intervals):
+        print(interval.name)
+        interval.date = "20" +interval.date
+        date = interval.date
+        date = dateutil.parser.isoparse(interval.date)
 
+        datetime_obj = datetime.datetime(date.year, date.month,date.day,date.hour,date.minute,date.second)
         # Getting the date on a different format
-        date = dateutil.parser.isoparse("20" + interval.date)
-        # date = datetime.datetime.strptime(date,"%Y%m%d %h:").date()
-        #dates.append(str(date.year) + "-" + str(date.month) + "-" + str(date.day) + "-" + str(date.hour) + ":" + str(date.minute) + ":" + str(date.second))
-        dates.append(date)
+        dates.append(datetime_obj)
         # Inserting the row for each interval
         name = interval.name
         row = interval.op_df.iloc[0, :]
@@ -104,20 +106,21 @@ def plot_op_df(op_dataframe):
 
     date_series = op_dataframe['Date']
     #date_series.
+    oppa = (op_dataframe.shape[1])
     for i in range(1, op_dataframe.shape[1]):
         variable_name = op_dataframe.columns[i]
 
-        #op_dataframe.iloc[:, 0]
-
-
+        # x-axis
         x_dates = dates.date2num(date_series)
+        # y-axis
+        y = op_dataframe.loc[:, variable_name]
 
-        sns.lineplot(x_dates, op_dataframe.iloc[:,variable_name])
+        sns.lineplot(x_dates, y)
         plt.show()
 
 wt_instance_1 = wt_data.load_instance("WTG01")
 df = build_op_df_for_wt(wt_instance_1)
-# plot_op_df(df)
+plot_op_df(df)
 
 
 

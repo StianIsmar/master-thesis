@@ -32,8 +32,8 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            #if loop_count > 2:
-                #break
+            #if loop_count > 10:
+                # break
             if filename.endswith(".uff") and not filename[0] == ".":
                 loop_count+=1
                 #print("Filename: " + filename)
@@ -85,6 +85,7 @@ def create_wt_data(name):
     return wt_01
 
 #create_wt_data()
+# wt_instance_1 = create_wt_data("WTG01")
 
     # wt_02 = Wt_data()
 

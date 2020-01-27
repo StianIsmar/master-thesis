@@ -8,6 +8,7 @@ from process_data import TenSecondInterval
 import pandas as pd
 import pickle
 import os.path
+import os
 
 
 class Wt_data():
@@ -18,11 +19,11 @@ class Wt_data():
         # self.loop_directory(wt_name)
         # self.save_instance()
 
-    def loop_directory(self, wt_name):
-
+# Only loading 10 of the intervals with save_minimal set to True, for development purposes
+    def loop_directory(self, wt_name, save_minimal = False):
         path = '/Volumes/OsvikExtra/VibrationData/'
         # Count how many files in directory
-        import os
+
         count_path = '/Volumes/OsvikExtra/VibrationData/' + wt_name
         number_of_files = 0
         for file in os.listdir(count_path):
@@ -32,8 +33,9 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            #if loop_count > 10:
-                # break
+            if (save_minimal == True):
+                if loop_count > 10:
+                    break
             if filename.endswith(".uff") and not filename[0] == ".":
                 loop_count+=1
                 #print("Filename: " + filename)
@@ -64,35 +66,49 @@ class Wt_data():
                 wt_op_df.append(op_df.iloc[0,:])
                 print(wt_op_df.shape)
 
-    def save_instance(self):
+    def save_instance(self,save_minimal=False):
         content = self
         path = '/Volumes/OsvikExtra/VibrationData/'
-        pickle.dump(content, open(path + 'saved_instance_' + self.name + '.p', 'wb'))
-        print(f'Saved to file')
+
+        if (save_minimal == True):
+            pickle.dump(content, open(path + 'saved_instance_MINIMAL' + self.name + '.p', 'wb'))
+            print(f'Saved **MINIMAL INTEVALS** to file')
+        else:
+
+            pickle.dump(content, open(path + 'saved_instance_' + self.name + '.p', 'wb'))
+            print(f'Saved to file')
 
 
-def load_instance(name):
+def load_instance(name, load_minimal=False):
     print(f'\nLoading {name}...', end='\r')
     wt_01 = Wt_data(name)
     path = '/Volumes/OsvikExtra/VibrationData/'
-    wt_01 = pickle.load(open(path + 'saved_instance_' + name + '.p', 'rb'))
-    print(f'\nLoaded {name}')
+    if (load_minimal == True):
+        wt_01 = pickle.load(open(path + 'saved_instance_MINIMAL' + name + '.p', 'rb'))
+    else:
+        wt_01 = pickle.load(open(path + 'saved_instance_' + name + '.p', 'rb'))
+        print(f'\nLoaded {name}')
     return wt_01
 
-def create_wt_data(name):
-    wt_01 = Wt_data(name)
-    wt_01.loop_directory(name)
-    wt_01.save_instance()
+def create_wt_data(name, save_minimal=False):
+    if (save_minimal == True):
+        wt_01 = Wt_data(name)
+        wt_01.loop_directory(name, True)
+        wt_01.save_instance(True)
+    else:
+        wt_01 = Wt_data(name)
+        wt_01.loop_directory(name)
+        wt_01.save_instance()
     return wt_01
 
 #create_wt_data()
-# wt_instance_1 = create_wt_data("WTG01")
+# wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
 
-    # wt_02 = Wt_data()
+# wt_02 = Wt_data()
 
-    # wt_03 = Wt_data()
+# wt_03 = Wt_data()
 
-    # wt_04 = Wt_data()
+# wt_04 = Wt_data()
 
 
 

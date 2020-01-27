@@ -126,6 +126,7 @@ class TenSecondInterval:
     # Calculates the speed for the slow rotating shaft and the fast rotating shaft
     # inserts the calculations into op_df with column names "LowSpeed:rps" and "HighSpeed:rps"
     # The units are rounds per second.
+
     def insert_speed(self):
         low_rot_speed = self.calc_speed('LssShf;1;V')
         high_rot_seed = self.calc_speed('Speed Sensor;1;V')

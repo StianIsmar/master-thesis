@@ -19,6 +19,7 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.dates as dates
 import datetime
+from pandas.plotting import register_matplotlib_converters
 
 import time
 
@@ -82,16 +83,15 @@ def build_op_df_for_wt(wt_obj):
 
     # Loop through all 10-second intervals from wind turbine
     for i, interval in enumerate(wt_obj.ten_second_intervals):
-        print(interval.name)
         interval.date = "20" +interval.date
-        date = interval.date
         date = dateutil.parser.isoparse(interval.date)
 
+        # Create datetime object
         datetime_obj = datetime.datetime(date.year, date.month,date.day,date.hour,date.minute,date.second)
-        # Getting the date on a different format
         dates.append(datetime_obj)
+
         # Inserting the row for each interval
-        name = interval.name
+        # name = interval.name
         row = interval.op_df.iloc[0, :]
         df_op_wt = df_op_wt.append(row.T)
 
@@ -105,24 +105,33 @@ def plot_op_df(op_dataframe):
 
 
     date_series = op_dataframe['Date']
-    #date_series.
-    oppa = (op_dataframe.shape[1])
-    for i in range(1, op_dataframe.shape[1]):
-        variable_name = op_dataframe.columns[i]
 
-        # x-axis
-        x_dates = dates.date2num(date_series)
+    # Looping through the columns in the dataframe
+    for i in range(1, op_dataframe.shape[1]):
+        if (i > 40):
+            break;
+        variable_name = op_dataframe.columns[i]
+        register_matplotlib_converters() # From import to convert from timestamp objects to datateim
+        x_dates = pd.to_datetime(date_series)
+
+       # x_dates = dates.date2num(x_dates)
+        # x_dates = date_series
+
         # y-axis
         y = op_dataframe.loc[:, variable_name]
 
         sns.lineplot(x_dates, y)
+        plt.xticks(rotation='vertical')
+
         plt.show()
 
-wt_instance_1 = wt_data.load_instance("WTG01")
+# wt_instance_1 = wt_data.load_instance("WTG01", True) # True for loading minimal
+wt_instance_1 = wt_data.load_instance("WTG01", False) # True for loading minimal
+
+print("Building op dataframe...")
 df = build_op_df_for_wt(wt_instance_1)
+print("Plotting dataframe...")
 plot_op_df(df)
-
-
 
 
 '''

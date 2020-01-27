@@ -108,8 +108,6 @@ def plot_op_df(op_dataframe):
 
     # Looping through the columns in the dataframe
     for i in range(1, op_dataframe.shape[1]):
-        if (i > 40):
-            break;
         variable_name = op_dataframe.columns[i]
         register_matplotlib_converters() # From import to convert from timestamp objects to datateim
         x_dates = pd.to_datetime(date_series)
@@ -122,16 +120,57 @@ def plot_op_df(op_dataframe):
 
         sns.lineplot(x_dates, y)
         plt.xticks(rotation='vertical')
+        if (variable_name.find('/')):
+            variable_name.replace('/' ,'_')
+        plt.savefig(f'./plotting/op_plot_{variable_name}.png')
+        # plt.show()
 
-        plt.show()
+def draw_correlation_plot(df):
+    sns.set(style="white")
+    df = df.drop(columns = ["Date"])
 
-# wt_instance_1 = wt_data.load_instance("WTG01", True) # True for loading minimal
+    # Compute the correlation matrix
+    corr = df.corr()
+
+    # Generate a mask for the upper triangle
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+
+    # Set up the matplotlib figure
+    f, ax = plt.subplots(figsize=(11, 9))
+
+    # Generate a custom diverging colormap
+    # cmap = sns.diverging_palette(220, 10, as_cmap=True)
+    # cmap = sns.light_palette("#2ecc71", as_cmap=True)
+    cmap = sns.diverging_palette(220, 20, sep=20, as_cmap=True)
+
+
+    # Draw the heatmap with the mask and correct aspect ratio
+    sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+                square=True, linewidths=.5, cbar_kws={"shrink": .5})
+
+
+    # saving the file
+    f.tight_layout()
+    f.savefig('./plotting/correlation_plot.eps', format='eps')
+
+def get_min_max_from_column(df, column_name):
+    print(df[column_name].max())
+    print(df[column_name].min())
+
 wt_instance_1 = wt_data.load_instance("WTG01", False) # True for loading minimal
 
 print("Building op dataframe...")
-df = build_op_df_for_wt(wt_instance_1)
+op_df = build_op_df_for_wt(wt_instance_1)
 print("Plotting dataframe...")
-plot_op_df(df)
+plot_op_df(op_df)
+get_min_max_from_column(op_df, "PwrAct;kW")
+
+# Corr plot
+print("Getting correlation plot..")
+draw_correlation_plot(op_df)
+
+
 
 
 '''

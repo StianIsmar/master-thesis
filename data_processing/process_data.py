@@ -93,28 +93,33 @@ class TenSecondInterval:
             plt.show()
 
     def calc_speed(self, col_name):
-        x = np.array(self.sensor_df['TimeStamp'])
-        data_list = np.array(self.sensor_df[col_name])
-        first_pulse_time = None  # Remember when the first pulse starts
-        rotations = []  # Store the time it takes to do one revolution
-        if data_list[0] > 20:  # If the timeserie start at the peak we record its corresponding time
-            first_pulse_time = x[0]
+        # Use try/except to deal with not finding the right column
+        try:
+            x = np.array(self.sensor_df['TimeStamp'])
+            data_list = np.array(self.sensor_df[col_name])
+            first_pulse_time = None  # Remember when the first pulse starts
+            rotations = []  # Store the time it takes to do one revolution
+            if data_list[0] > 20:  # If the timeserie start at the peak we record its corresponding time
+                first_pulse_time = x[0]
 
-        for i in range(len(data_list)):
-            if (data_list[i] > 20) and (data_list[i - 1] < 20):
-                if first_pulse_time is None:  # Find start time of the first pulse
-                    first_pulse_time = x[i]
-                else:
-                    second_pulse_time = x[i]
-                    rotations.append(
-                        second_pulse_time - first_pulse_time)  # Calculate the time to do one revolution and append it to the list
-                    first_pulse_time = second_pulse_time
+            for i in range(len(data_list)):
+                if (data_list[i] > 20) and (data_list[i - 1] < 20):
+                    if first_pulse_time is None:  # Find start time of the first pulse
+                        first_pulse_time = x[i]
+                    else:
+                        second_pulse_time = x[i]
+                        rotations.append(
+                            second_pulse_time - first_pulse_time)  # Calculate the time to do one revolution and append it to the list
+                        first_pulse_time = second_pulse_time
 
-        # If the data measurements does not contain a whole rotation, set the speed to None
-        if len(rotations) > 0:
-            avg_rotation = sum(rotations) / len(rotations)  # This is seconds per rotation
-            avg_rotation_per_sec = 1 / avg_rotation  # This gives rotation per second
-        else:
+            # If the data measurements does not contain a whole rotation, set the speed to None
+            if len(rotations) > 0:
+                avg_rotation = sum(rotations) / len(rotations)  # This is seconds per rotation
+                avg_rotation_per_sec = 1 / avg_rotation  # This gives rotation per second
+            else:
+                avg_rotation_per_sec = None
+
+        except Exception:
             avg_rotation_per_sec = None
 
         return avg_rotation_per_sec
@@ -129,14 +134,6 @@ class TenSecondInterval:
         self.op_df.insert(len(self.op_df.columns.values), "LowSpeed:rps", low_rot_speed)
         self.op_df.insert(len(self.op_df.columns.values), "HighSpeed:rps", high_rot_seed)
 
-
-    def save_df(self):  # Save dataframe to easier open in another file.
-        content = {'sensor_data_df' : self.sensor_df, 'op_df': self.op_df}
-        pickle.dump(content, open('saved_dfs.p', 'wb'))
-
-    def load_df(self):
-        content = pickle.load(open('saved_dfs.p', 'rb'))
-        print(content['op_df'])
 
     def save_instance(self):
         content = self

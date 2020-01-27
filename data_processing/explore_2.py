@@ -38,26 +38,6 @@ def plot_data(dataframe, colName, plot_all=False):
         plt.show()
 
 
-def calc_avg_speed(dataframe, col_name):
-    x = np.array(dataframe['TimeStamp'])
-    data_list = np.array(dataframe[col_name])
-    first_pulse_time = None   # Remember when the first pulse starts
-    rotations = []    # Store the time it takes to do one revolution
-    if data_list[0] > 20:    # If the timeserie start at the peak we record its corresponding time
-        first_pulse_time = x[0]
-
-    for i in range(len(data_list)):
-        if (data_list[i] > 20) and (data_list[i-1] < 20):
-            if first_pulse_time is None:   # Find start time of the first pulse
-                first_pulse_time = x[i]
-            else:
-                second_pulse_time = x[i]
-                rotations.append(second_pulse_time - first_pulse_time) # Calculate the time to do one revolution and append it to the list
-                first_pulse_time = second_pulse_time
-
-    avg_rotation = sum(rotations)/len(rotations) # This is seconds per rotation
-    avg_rotation_per_sec = 1/avg_rotation  # This gives rotation per second
-    return avg_rotation_per_sec
 
 '''
 content = pickle.load(open('saved_dfs.p', 'rb'))
@@ -108,7 +88,7 @@ print(op_df.shape)
 
 # ---------  TO LOAD WT INSTANCES --------------
 
-wt_instance_1 = wt_data.load_instance("WTG01")
+#wt_instance_1 = wt_data.load_instance("WTG01")
 #wt_instance_2 = wt_data.load_instance("WTG02")
 #wt_instance_3 = wt_data.load_instance("WTG03")
 #wt_instance_4 = wt_data.load_instance("WTG04")

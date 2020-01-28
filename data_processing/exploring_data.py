@@ -195,8 +195,14 @@ def remove_irrelevant_features(df):
 
 def remove_rows_with_wild_noise(df):
     print("Shape before removing noise", df.shape)
-    for i, cols in enumerate(df.columns):
-        df = df.loc[[cols] > -10**6]
+    i = 0
+    for cols in (df.columns):
+        if i == 0:  # Skip the first row, which is datetime objects
+            i=i+1
+            continue
+        df = df[df[cols] > -10**15]
+        i=i+1
+
     print("Shape after removing noise", df.shape)
     return df
 
@@ -205,17 +211,12 @@ def load_and_build_df(name):
     wt_instance_1 = wt_data.load_instance(name, False)  # True for loading minimal
     gc.collect()
     op_df = build_op_df_for_wt(wt_instance_1)
+    del wt_instance_1
+    op_df = remove_rows_with_wild_noise(op_df)
     gc.collect()
     # get_min_max_from_column(op_df, "PwrAct;kW")
     # Removing irrelevant features
     op_df = remove_irrelevant_features(op_df)
-    print(op_df['GnSpdAvg;Hz'].nunique())
-    print(op_df['GnSpdAvg;Hz'])
-
-    print("PLOTTING")
-    sns.lineplot(range(op_df['GnSpdAvg;Hz'].shape[0]),op_df['GnSpdAvg;Hz'])
-    plt.show()
-
     gc.collect()
     draw_correlation_plot(op_df)
     plot_op_df(op_df)

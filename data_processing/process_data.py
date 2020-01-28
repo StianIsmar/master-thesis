@@ -17,7 +17,6 @@ class TenSecondInterval:
     def __init__(self):
         self.sensor_df = None # Dataframe for sensor data
         self.op_df = None # Dataframe for operational data
-        self.name = None # Name
         self.date = None
         self.turbine = None
 
@@ -71,7 +70,6 @@ class TenSecondInterval:
 
         # Setting the class variables
         self.sensor_df = sensor_data_df
-        self.name = name
         self.date = date
         self.turbine = turbine
         self.op_df = op_data_df
@@ -131,6 +129,7 @@ class TenSecondInterval:
     # Calculates the speed for the slow rotating shaft and the fast rotating shaft
     # inserts the calculations into op_df with column names "LowSpeed:rps" and "HighSpeed:rps"
     # The units are rounds per second.
+
     def insert_speed(self):
         low_rot_speed, low_peak_array = self.calc_speed('LssShf;1;V')
         high_rot_seed, high_peak_array = self.calc_speed('Speed Sensor;1;V')
@@ -149,14 +148,13 @@ def load_instance():
     content = pickle.load(open(path + 'saved_instance.p', 'rb'))
     return content
 
-'''
 # Example for WT01:
-interval = TenSecondInterval()
-interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
-print(interval.date) # Printing date
+# interval = TenSecondInterval()
+# interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+# print(interval.date) # Printing date
 
-interval.insert_speed()
-print(interval.op_df)
+# interval.insert_speed()
+# print(interval.op_df)
 #interval.plot_data(interval.sensor_df)
 #print(interval.sensor_df)
 #interval.save_df()
@@ -165,4 +163,3 @@ print(interval.op_df)
 
 #interval.save_instance()
 #instance = load_instance()
-'''

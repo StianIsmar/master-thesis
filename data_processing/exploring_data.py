@@ -19,6 +19,7 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.dates as dates
 import datetime
+from pandas.plotting import register_matplotlib_converters
 
 import time
 
@@ -82,14 +83,15 @@ def build_op_df_for_wt(wt_obj):
 
     # Loop through all 10-second intervals from wind turbine
     for i, interval in enumerate(wt_obj.ten_second_intervals):
+        interval.date = "20" +interval.date
+        date = dateutil.parser.isoparse(interval.date)
 
-        # Getting the date on a different format
-        date = dateutil.parser.isoparse("20" + interval.date)
-        # date = datetime.datetime.strptime(date,"%Y%m%d %h:").date()
-        #dates.append(str(date.year) + "-" + str(date.month) + "-" + str(date.day) + "-" + str(date.hour) + ":" + str(date.minute) + ":" + str(date.second))
-        dates.append(date)
+        # Create datetime object
+        datetime_obj = datetime.datetime(date.year, date.month,date.day,date.hour,date.minute,date.second)
+        dates.append(datetime_obj)
+
         # Inserting the row for each interval
-        name = interval.name
+        # name = interval.name
         row = interval.op_df.iloc[0, :]
         df_op_wt = df_op_wt.append(row.T)
 
@@ -103,21 +105,70 @@ def plot_op_df(op_dataframe):
 
 
     date_series = op_dataframe['Date']
-    #date_series.
+
+    # Looping through the columns in the dataframe
     for i in range(1, op_dataframe.shape[1]):
         variable_name = op_dataframe.columns[i]
+        register_matplotlib_converters() # From import to convert from timestamp objects to datateim
+        x_dates = pd.to_datetime(date_series)
 
-        #op_dataframe.iloc[:, 0]
+       # x_dates = dates.date2num(x_dates)
+        # x_dates = date_series
+
+        # y-axis
+        y = op_dataframe.loc[:, variable_name]
+
+        sns.lineplot(x_dates, y)
+        plt.xticks(rotation='vertical')
+        if (variable_name.find('/')):
+            variable_name.replace('/' ,'_')
+        plt.savefig(f'./plotting/op_plot_{variable_name}.png')
+        # plt.show()
+
+def draw_correlation_plot(df):
+    sns.set(style="white")
+    df = df.drop(columns = ["Date"])
+
+    # Compute the correlation matrix
+    corr = df.corr()
+
+    # Generate a mask for the upper triangle
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+
+    # Set up the matplotlib figure
+    f, ax = plt.subplots(figsize=(11, 9))
+
+    # Generate a custom diverging colormap
+    # cmap = sns.diverging_palette(220, 10, as_cmap=True)
+    # cmap = sns.light_palette("#2ecc71", as_cmap=True)
+    cmap = sns.diverging_palette(220, 20, sep=20, as_cmap=True)
 
 
-        x_dates = dates.date2num(date_series)
+    # Draw the heatmap with the mask and correct aspect ratio
+    sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+                square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
-        sns.lineplot(x_dates, op_dataframe.iloc[:,variable_name])
-        plt.show()
 
-wt_instance_1 = wt_data.load_instance("WTG01")
-df = build_op_df_for_wt(wt_instance_1)
-# plot_op_df(df)
+    # saving the file
+    f.tight_layout()
+    f.savefig('./plotting/correlation_plot.eps', format='eps')
+
+def get_min_max_from_column(df, column_name):
+    print(df[column_name].max())
+    print(df[column_name].min())
+
+wt_instance_1 = wt_data.load_instance("WTG01", False) # True for loading minimal
+
+print("Building op dataframe...")
+op_df = build_op_df_for_wt(wt_instance_1)
+print("Plotting dataframe...")
+plot_op_df(op_df)
+get_min_max_from_column(op_df, "PwrAct;kW")
+
+# Corr plot
+print("Getting correlation plot..")
+draw_correlation_plot(op_df)
 
 
 

@@ -99,18 +99,21 @@ class TenSecondInterval:
             data_list = np.array(self.sensor_df[col_name])
             first_pulse_time = None  # Remember when the first pulse starts
             rotations = []  # Store the time it takes to do one revolution
+            peaks = []   # Store the time for each peak
             if data_list[0] > 20:  # If the timeserie start at the peak we record its corresponding time
                 first_pulse_time = x[0]
+                peaks.append(first_pulse_time)
 
             for i in range(len(data_list)):
                 if (data_list[i] > 20) and (data_list[i - 1] < 20):
                     if first_pulse_time is None:  # Find start time of the first pulse
                         first_pulse_time = x[i]
+                        peaks.append(first_pulse_time)
                     else:
                         second_pulse_time = x[i]
-                        rotations.append(
-                            second_pulse_time - first_pulse_time)  # Calculate the time to do one revolution and append it to the list
+                        rotations.append(second_pulse_time - first_pulse_time)  # Calculate the time to do one revolution and append it to the list
                         first_pulse_time = second_pulse_time
+                        peaks.append(first_pulse_time)
 
             # If the data measurements does not contain a whole rotation, set the speed to None
             if len(rotations) > 0:
@@ -122,25 +125,28 @@ class TenSecondInterval:
         except Exception:
             avg_rotation_per_sec = None
 
-        return avg_rotation_per_sec
+        return avg_rotation_per_sec, peaks
 
     # Finds data from sensor_df
     # Calculates the speed for the slow rotating shaft and the fast rotating shaft
     # inserts the calculations into op_df with column names "LowSpeed:rps" and "HighSpeed:rps"
     # The units are rounds per second.
     def insert_speed(self):
-        low_rot_speed = self.calc_speed('LssShf;1;V')
-        high_rot_seed = self.calc_speed('Speed Sensor;1;V')
+        low_rot_speed, low_peak_array = self.calc_speed('LssShf;1;V')
+        high_rot_seed, high_peak_array = self.calc_speed('Speed Sensor;1;V')
         self.op_df.insert(len(self.op_df.columns.values), "LowSpeed:rps", low_rot_speed)
         self.op_df.insert(len(self.op_df.columns.values), "HighSpeed:rps", high_rot_seed)
 
 
     def save_instance(self):
         content = self
-        pickle.dump(content, open('saved_instance.p', 'wb'))
+        path = '/Volumes/OsvikExtra/VibrationData/'
+        pickle.dump(content, open(path + 'saved_instance.p', 'wb'))
 
 def load_instance():
-    content = pickle.load(open('saved_instance.p', 'rb'))
+    content = TenSecondInterval()
+    path = '/Volumes/OsvikExtra/VibrationData/'
+    content = pickle.load(open(path + 'saved_instance.p', 'rb'))
     return content
 
 '''

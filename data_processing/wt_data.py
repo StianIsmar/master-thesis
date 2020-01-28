@@ -75,7 +75,7 @@ def load_instance(name):
     print(f'\nLoading {name}...', end='\r')
     wt_01 = Wt_data(name)
     path = '/Volumes/OsvikExtra/VibrationData/'
-    wt_01 = pickle.load(open(path + 'saved_instance_' + name + '.p', 'rb'))
+    wt_01 = pickle.load(open(path + 'short_saved_instance_' + name + '.p', 'rb'))
     print(f'\nLoaded {name}')
     return wt_01
 

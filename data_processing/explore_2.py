@@ -13,27 +13,34 @@ import matplotlib.pyplot as plt
 import process_data
 import wt_data
 
-def plot_sensor_data(interval, colName, title=""):
+def get_speed_and_peaks(interval, col_name):
+    avg_speed, peak_array = interval.calc_speed(col_name)
+    return avg_speed, peak_array
+
+def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
     x_values   = interval.sensor_df['TimeStamp']
     dataframe  = interval.sensor_df.drop(columns=['TimeStamp'])
-    low_speed  = interval.op_df['LowSpeed:rps'][0]
-    high_speed = interval.op_df['HighSpeed:rps'][0]
 
-    avg_low_speed, low_peak_array = interval.calc_speed('LssShf;1;V')
-    avg_high_speed, high_peak_array = interval.calc_speed('Speed Sensor;1;V')
+    delta_t = x_values[1] - x_values[0]
+    samples_between_peaks = []
+    for i in range(len(peak_array)-1):
+        samples_between_two_peaks = (peak_array[i+1] - peak_array[i]) / delta_t
+        samples_between_peaks.append(samples_between_two_peaks)
+    print(f'Delta t is {delta_t}')
+    print(samples_between_peaks)
+    print(f'Lowest amount of samples between two peaks: {min(samples_between_peaks)}')
 
-    low_peak_array = np.array(low_peak_array) * low_speed
-
-    x_values = x_values * low_speed
-    x_values -= low_peak_array[0]
+    peak_array = np.array(peak_array) * avg_speed
+    x_values = x_values * avg_speed
+    x_values -= peak_array[0]
     vertical_lines = np.arange(np.ceil(max(x_values)))
 
     for i, col in enumerate(colName):
         plt.figure(figsize=(20, 10))
         y_values = dataframe[col]
-        plt.plot(x_values, y_values, linewidth=0.1)
+        # plt.plot(x_values, y_values, linewidth=0.1)
+        plt.plot(x_values[0:500], dataframe[col][0:500], linewidth=0.1)
         y_mean = np.mean(y_values)
-        # plt.plot(x_values[0:15000], dataframe[col][0:15000], linewidth=0.1)
         if title != "":
             plt.title(col + ' VS Round for ' + title + f'. Power Generated: {interval.op_df["PwrAvg;kW"][0]}. Mean value: {y_mean}')
         else:
@@ -41,7 +48,9 @@ def plot_sensor_data(interval, colName, title=""):
         plt.ylabel(col)
         plt.xlabel('Rounds')
         for i, x_val in enumerate(vertical_lines):
-            plt.axvline(x=x_val, c='r', linewidth=0.5)
+            if x_val > x_values[500]:
+                break
+            plt.axvline(x=x_val, c='r', linewidth=0.3)
         plt.margins(0)
         plt.show()
 
@@ -106,14 +115,22 @@ print(op_df.shape)
 #wt_instance_2 = wt_data.load_instance("WTG02")
 #wt_instance_3 = wt_data.load_instance("WTG03")
 #wt_instance_4 = wt_data.load_instance("WTG04")
-wt_instance = wt_data.load_instance("WTG01")
+wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
 intervals = wt_instance.ten_second_intervals
 
 # ------- Plot high rot speed ------------
-#plot_data(instance.sensor_df, 'GnNDe;0,0102;m/s2', speed_rps=instance.op_df['HighSpeed:rps'][0])
+for i, interval in enumerate(intervals):
+    if i > 1:
+        break
+    print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["HighSpeed:rps"][0]}')
+    print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
+    cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
+    avg_speed, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
+    print(f'Average Rotational Speed for {i}: {avg_speed}')
+    plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
 
 # ------- Plot low rot speed -------------
-
+'''
 for i, interval in enumerate(intervals):
     if i > 9:
         break
@@ -121,8 +138,5 @@ for i, interval in enumerate(intervals):
     print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
     cols = ['LssShf;1;V', 'MnBrg;0,0102;m/s2']#, 'GbxRotBrg;0,0102;m/s2']
     plot_sensor_data(interval, cols, title=f'{i}')
-    #plot_data(interval.sensor_df, 'LssShf;1;V', speed_rps=interval.op_df['LowSpeed:rps'][0], title=f'{i}')
-    #plot_data(interval.sensor_df, 'MnBrg;0,0102;m/s2', speed_rps=interval.op_df['LowSpeed:rps'][0], title=f'{i}')
-    #plot_data(interval.sensor_df, 'GbxRotBrg;0,0102;m/s2', speed_rps=interval.op_df['LowSpeed:rps'][0], title=f'{i}')
-
+'''
 

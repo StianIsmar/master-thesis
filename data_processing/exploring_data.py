@@ -20,6 +20,7 @@ import pandas as pd
 import matplotlib.dates as dates
 import datetime
 from pandas.plotting import register_matplotlib_converters
+import gc
 
 import time
 
@@ -74,6 +75,7 @@ def calc_avg_speed(dataframe, col_name):
 
 # Plotting all intervals for a certain wt:
 def build_op_df_for_wt(wt_obj):
+
     wt_name = wt_obj.name  # Name of the windturbine
     variables = wt_obj.ten_second_intervals[0].op_df.columns  # All op variables for the ten_second_intervals
 
@@ -97,19 +99,21 @@ def build_op_df_for_wt(wt_obj):
 
     # All rows are now added to dataframe. Now, add date list
     df_op_wt.insert(0, column='Date', value=dates)  # Insert the first column to hold date (for the 10 second interval)
+
+    print("df shape for building dataframe: ", df_op_wt.shape)
     return df_op_wt
 
 
 def plot_op_df(op_dataframe):
     # Plot in this loop
 
-
     date_series = op_dataframe['Date']
 
     # Looping through the columns in the dataframe
     for i in range(1, op_dataframe.shape[1]):
+        print(i)
         variable_name = op_dataframe.columns[i]
-        register_matplotlib_converters() # From import to convert from timestamp objects to datateim
+        register_matplotlib_converters()  # From import to convert from timestamp objects to datateim
         x_dates = pd.to_datetime(date_series)
 
        # x_dates = dates.date2num(x_dates)
@@ -120,12 +124,23 @@ def plot_op_df(op_dataframe):
 
         sns.lineplot(x_dates, y)
         plt.xticks(rotation='vertical')
-        if (variable_name.find('/')):
-            variable_name.replace('/' ,'_')
+
+        def remove_back(variable):
+            check = variable.find('/')
+            if check == -1:
+                return variable
+            else:
+                variable = variable.replace('/', '_')
+                remove_back(variable)
+
+        # variable_name = remove_back(variable_name)
+        variable_name = variable_name.replace('/', '_')
         plt.savefig(f'./plotting/op_plot_{variable_name}.png')
-        # plt.show()
+        plt.show()
+
 
 def draw_correlation_plot(df):
+    print("df shape for correlation plot: ", df.shape)
     sns.set(style="white")
     df = df.drop(columns = ["Date"])
 
@@ -149,7 +164,6 @@ def draw_correlation_plot(df):
     sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
                 square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
-
     # saving the file
     f.tight_layout()
     f.savefig('./plotting/correlation_plot.eps', format='eps')
@@ -158,69 +172,60 @@ def get_min_max_from_column(df, column_name):
     print(df[column_name].max())
     print(df[column_name].min())
 
-wt_instance_1 = wt_data.load_instance("WTG01", False) # True for loading minimal
 
-print("Building op dataframe...")
-op_df = build_op_df_for_wt(wt_instance_1)
-print("Plotting dataframe...")
-plot_op_df(op_df)
-get_min_max_from_column(op_df, "PwrAct;kW")
+def remove_irrelevant_features(df):
 
-# Corr plot
-print("Getting correlation plot..")
-draw_correlation_plot(op_df)
+    '''
+    print("Before constant clean", df.shape)
+    drop_these = df.columns[df.nunique() <= 1]
+    df.drop(drop_these, axis=1, inplace=True)
+    print("After constant clean", df.shape)
+    '''
 
-
-
-
-'''
-content = pickle.load(open('saved_dfs.p', 'rb'))
-
-op_df = content['op_df']
-sensor_data_df = content['sensor_data_df']
-
-print(sensor_data_df.columns.values)
-
-plot_data(sensor_data_df, 'Speed Sensor;1;V')
-
-plot_data(sensor_data_df, 'LssShf;1;V')
-
-low_rot_speed = calc_avg_speed(sensor_data_df, 'LssShf;1;V')
-high_rot_seed = calc_avg_speed(sensor_data_df, 'Speed Sensor;1;V')
-
-print('Low rotational speed is:   ', low_rot_speed)
-print('High rotational speed is:  ', high_rot_seed)
-print(op_df)
-print(op_df.shape)
-
-op_df.insert(len(op_df.columns.values), "LowSpeed:rps", low_rot_speed)
-op_df.insert(len(op_df.columns.values), "HighSpeed:rps", high_rot_seed)
-
-print(op_df)
-print(op_df.shape)
-'''
-
-# instance = process_data.TenSecondInterval()
-
-# instance = process_data.load_instance()
-# print(instance.date)
+    print("Before unique clean: ", df.shape)
+    n_cols_before = df.shape[1]
+    for i, col in enumerate(df.columns):
+        if df[col].nunique() < 6:
+            df.drop(col, axis=1, inplace=True)
+    print("After unique cleand: ", df.shape)
+    n_cols_after = df.shape[1]
+    print("Number of columns removed: ", n_cols_before-n_cols_after)
+    return df
 
 
+def remove_rows_with_wild_noise(df):
+    print("Shape before removing noise", df.shape)
+    i = 0
+    for cols in (df.columns):
+        if i == 0:  # Skip the first row, which is datetime objects
+            i=i+1
+            continue
+        df = df[df[cols] > -10**15]
+        i=i+1
 
-# --------- TO CREATE WT INSTANCES --------------
-
-# wt_instance_1 = wt_data.create_wt_data("WTG01")
-# wt_instance_2 = wt_data.create_wt_data("WTG02")
-# wt_instance_3 = wt_data.create_wt_data("WTG03")
-# wt_instance_4 = wt_data.create_wt_data("WTG04")
+    print("Shape after removing noise", df.shape)
+    return df
 
 
-# ---------  TO LOAD WT INSTANCES --------------
+def load_and_build_df(name):
+    wt_instance_1 = wt_data.load_instance(name, False)  # True for loading minimal
+    gc.collect()
+    op_df = build_op_df_for_wt(wt_instance_1)
+    del wt_instance_1
+    op_df = remove_rows_with_wild_noise(op_df)
+    gc.collect()
+    # get_min_max_from_column(op_df, "PwrAct;kW")
+    # Removing irrelevant features
+    op_df = remove_irrelevant_features(op_df)
+    gc.collect()
+    draw_correlation_plot(op_df)
+    plot_op_df(op_df)
+    op_df = remove_rows_with_wild_noise(op_df)
+    return op_df
 
-# wt_instance_1 = wt_data.load_instance("WTG01")
-# wt_instance_2 = wt_data.load_instance("WTG02")
-# wt_instance_3 = wt_data.load_instance("WTG03")
-# wt_instance_4 = wt_data.load_instance("WTG04")
+# --------- LOAD WT INSTANCE AND BUILD DATAFRAME (OP DATA) --------------
 
+
+op_df_WTG01 = load_and_build_df("WTG01")
 
 

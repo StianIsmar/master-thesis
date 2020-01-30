@@ -4,9 +4,6 @@
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/explore_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/explore_2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/exploring_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/exploring_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/fft.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/ff_transform.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/plotting/correlation_plot.eps" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/plotting/correlation_plot.eps" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -224,7 +221,7 @@
       <workItem from="1580380029397" duration="723000" />
       <workItem from="1580383233855" duration="49000" />
       <workItem from="1580383437744" duration="7827000" />
-      <workItem from="1580393726301" duration="2858000" />
+      <workItem from="1580393726301" duration="2996000" />
     </task>
     <servers />
   </component>
@@ -331,6 +328,14 @@
     <state width="1878" height="319" key="GridCell.Tab.1.right/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580393135186" />
     <state width="1238" height="191" key="GridCell.Tab.1.right/0.23.1280.777@0.23.1280.777" timestamp="1580310679601" />
     <state width="1238" height="191" key="GridCell.Tab.1.right/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319075273" />
+    <state x="-324" y="-1177" width="1920" height="1177" key="MergeDialog" timestamp="1580397056648">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state x="-324" y="-1177" width="1920" height="1177" key="MergeDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580397056648" />
+    <state x="352" y="-866" key="MultipleFileMergeDialog" timestamp="1580397056697">
+      <screen x="-324" y="-1177" width="1920" height="1177" />
+    </state>
+    <state x="352" y="-866" key="MultipleFileMergeDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580397056697" />
     <state x="614" y="-1063" key="SettingsEditor" timestamp="1580379106456">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
@@ -369,13 +374,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/data_processing/explore_2.py</url>
-          <line>244</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">

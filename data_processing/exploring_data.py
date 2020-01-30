@@ -220,7 +220,6 @@ def load_and_build_df(name):
     gc.collect()
     draw_correlation_plot(op_df)
     plot_op_df(op_df)
-    op_df = remove_rows_with_wild_noise(op_df)
     return op_df
 
 # --------- LOAD WT INSTANCE AND BUILD DATAFRAME (OP DATA) --------------

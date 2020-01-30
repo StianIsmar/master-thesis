@@ -101,43 +101,43 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
 
 
     if plotting:
-    # ------ Plot original signal -------
-    x_original = []
-    y_original = []
-    for i in range(round_plots):
-        x_original = np.append(x_original, x_interval[i])
-        y_original = np.append(y_original, y_interval[i])
-    original_vertical_lines = peak_array[0:round_plots+1]
+        # ------ Plot original signal -------
+        x_original = []
+        y_original = []
+        for i in range(round_plots):
+            x_original = np.append(x_original, x_interval[i])
+            y_original = np.append(y_original, y_interval[i])
+        original_vertical_lines = peak_array[0:round_plots+1]
 
-    plt.figure(figsize=(20, 10))
-    plt.plot(x_original, y_original, c='b', linewidth=0.1)
-    plt.title(f'Original Vibration Data. Number of Data Points: {x_original.shape[0]}', fontsize=20)
-    plt.xlabel('Time (in s)', fontsize=16)
-    plt.ylabel('Vibration amplitude (in m/s2)', fontsize=16)
-    for i, round_value in enumerate(original_vertical_lines):
-        plt.axvline(x=round_value, c='r', linewidth=0.3)
-    plt.margins(0)
-    plt.show()
+        plt.figure(figsize=(20, 10))
+        plt.plot(x_original, y_original, c='b', linewidth=0.1)
+        plt.title(f'Original Vibration Data. Number of Data Points: {x_original.shape[0]}', fontsize=20)
+        plt.xlabel('Time (in s)', fontsize=16)
+        plt.ylabel('Vibration amplitude (in m/s2)', fontsize=16)
+        for i, round_value in enumerate(original_vertical_lines):
+            plt.axvline(x=round_value, c='r', linewidth=0.3)
+        plt.margins(0)
+        plt.show()
 
 
-    # ------ Plot resampled signal ------
-    x_resampled = []
-    y_resampled = []
-    resampled_vertical_lines = []
-    for i in range(round_plots):
-        x_resampled = np.append(x_resampled, X_values_round_domain_list[i])
-        y_resampled = np.append(y_resampled, resampled_y_values[i])
-        resampled_vertical_lines.append(X_values_round_domain_list[i][0])
+        # ------ Plot resampled signal ------
+        x_resampled = []
+        y_resampled = []
+        resampled_vertical_lines = []
+        for i in range(round_plots):
+            x_resampled = np.append(x_resampled, X_values_round_domain_list[i])
+            y_resampled = np.append(y_resampled, resampled_y_values[i])
+            resampled_vertical_lines.append(X_values_round_domain_list[i][0])
 
-    plt.figure(figsize=(20, 10))
-    plt.plot(x_resampled, y_resampled, c='b', linewidth=0.1)
-    plt.title(f'Resampled Vibration Data. Number of Data Points: {x_resampled.shape[0]}', fontsize=20)
-    plt.xlabel('Rounds (in radians)', fontsize=16)
-    plt.ylabel('Vibration amplitude (in m/s2', fontsize=16)
-    for i, round_value in enumerate(resampled_vertical_lines):
-        plt.axvline(x=round_value, c='r', linewidth=0.3)
-    plt.margins(0)
-    plt.show()
+        plt.figure(figsize=(20, 10))
+        plt.plot(x_resampled, y_resampled, c='b', linewidth=0.1)
+        plt.title(f'Resampled Vibration Data. Number of Data Points: {x_resampled.shape[0]}', fontsize=20)
+        plt.xlabel('Rounds (in radians)', fontsize=16)
+        plt.ylabel('Vibration amplitude (in m/s2', fontsize=16)
+        for i, round_value in enumerate(resampled_vertical_lines):
+            plt.axvline(x=round_value, c='r', linewidth=0.3)
+        plt.margins(0)
+        plt.show()
 
     return X_values_round_domain, resampled_y_values
 

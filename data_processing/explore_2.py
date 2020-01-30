@@ -93,7 +93,7 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
     plt.figure(figsize=(20, 10))
     plt.plot(X_values_round_domain, resampled_y_values, c='b', linewidth=0.3)
     plt.title('Resampled Vibration Data')
-    plt.xlabel('Rounds (in PI)')
+    plt.xlabel('Rounds (in radians)')
     plt.ylabel('Vibration amplitude (in m/s2')
     plt.margins(0)
     plt.show()
@@ -211,7 +211,7 @@ for i, interval in enumerate(intervals):
     #print(f'Average Rotational Speed for {i}: {avg_speed}')
     time_stamps = interval.sensor_df['TimeStamp']
     vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
-    resample_signal_interp(time_stamps, vibration_signal, peak_array, 1000)
+    resample_signal_interp(time_stamps, vibration_signal, peak_array, 1500)
     #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
 
 # ------- Plot low rot speed -------------

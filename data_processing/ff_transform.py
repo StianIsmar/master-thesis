@@ -11,13 +11,13 @@ class FastFourierTransform:
 
     # Plotting in the input domain before fft
     def plot_input(self):
-        '''
+
         plt.ylabel("Amplitude")
         plt.xlabel("Shaft angle [Radians]")
         plt.plot(self.t, self.s)
         plt.margins(0)
         plt.show()
-        '''
+        
 
         '''
         The second half of this array of fft sequence have similar frequencies

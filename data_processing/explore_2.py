@@ -3,6 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import process_data
 import wt_data
+import ff_transform
+import seaborn as sns
+import matplotlib as mpl
+mpl.rcParams['agg.path.chunksize'] = 10000
+
 
 
 ''' 
@@ -81,6 +86,7 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
 
 
     # Plot original signal
+    '''
     plt.figure(figsize=(20, 10))
     plt.plot(x_interval[0], y_interval[0], c='b', linewidth=0.3)
     plt.title('Original Vibration Data')
@@ -88,15 +94,21 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
     plt.ylabel('Vibration amplitude (in m/s2)')
     plt.margins(0)
     plt.show()
+    '''
 
     # Plot resampled signal
+    '''
     plt.figure(figsize=(20, 10))
     plt.plot(X_values_round_domain, resampled_y_values, c='b', linewidth=0.3)
     plt.title('Resampled Vibration Data')
     plt.xlabel('Rounds (in radians)')
+    plt.xticks(fontsize=20)
     plt.ylabel('Vibration amplitude (in m/s2')
     plt.margins(0)
     plt.show()
+    '''
+
+    return X_values_round_domain, resampled_y_values
 
 
 def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
@@ -134,7 +146,7 @@ def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
                 break
             plt.axvline(x=x_val, c='r', linewidth=0.3)
         plt.margins(0)
-        plt.show()
+        #plt.show()
 
 
 
@@ -197,22 +209,48 @@ print(op_df.shape)
 #wt_instance_2 = wt_data.load_instance("WTG02")
 #wt_instance_3 = wt_data.load_instance("WTG03")
 #wt_instance_4 = wt_data.load_instance("WTG04")
-wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
+
+
+wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
 intervals = wt_instance.ten_second_intervals
 
 # ------- Plot high rot speed ------------
+spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 0:
-        break
-    #print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["HighSpeed:rps"][0]}')
+  #if i > 40:
+   #     break
+    # print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["HighSpeed:rps"][0]}')
     #print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
     avg_speed, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
     #print(f'Average Rotational Speed for {i}: {avg_speed}')
     time_stamps = interval.sensor_df['TimeStamp']
-    vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
-    resample_signal_interp(time_stamps, vibration_signal, peak_array, 1500)
-    #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
+    try:
+        vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
+        time_resampled, y_resampled = resample_signal_interp(time_stamps, vibration_signal, peak_array, 1500)
+        #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
+    except:
+        print("Could not find GnNDe;0,0102;m/s2")
+        continue
+
+
+    # RUN FFT
+    print("FFT")
+    fast = ff_transform.FastFourierTransform(y_resampled,time_resampled)
+    fast.plot_input()
+    fft, time, spectral_centroid = fast.fft_transform()
+    spectral_centroids.append(spectral_centroid)
+    print(spectral_centroid)
+print("plotting spectral_centroids: ")
+x = (np.arange(0,len(spectral_centroids)).tolist())
+y = (spectral_centroids)
+
+plt.ylabel("Centroid value")
+plt.xlabel('Interval number')
+plt.plot(x,y)
+plt.show()
+
+
 
 # ------- Plot low rot speed -------------
 '''
@@ -224,4 +262,6 @@ for i, interval in enumerate(intervals):
     cols = ['LssShf;1;V', 'MnBrg;0,0102;m/s2']#, 'GbxRotBrg;0,0102;m/s2']
     plot_sensor_data(interval, cols, title=f'{i}')
 '''
+
+
 

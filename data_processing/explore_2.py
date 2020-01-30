@@ -95,14 +95,12 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
 
 
     if plotting:
-            # ------ Plot original signal -------
+    # ------ Plot original signal -------
     x_original = []
     y_original = []
     for i in range(round_plots):
         x_original = np.append(x_original, x_interval[i])
         y_original = np.append(y_original, y_interval[i])
-    print(x_original)
-    print(x_interval[0])
     original_vertical_lines = peak_array[0:round_plots+1]
 
     plt.figure(figsize=(20, 10))
@@ -124,8 +122,6 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
         x_resampled = np.append(x_resampled, X_values_round_domain_list[i])
         y_resampled = np.append(y_resampled, resampled_y_values[i])
         resampled_vertical_lines.append(X_values_round_domain_list[i][0])
-    print(x_resampled)
-    print(x_interval[0])
 
     plt.figure(figsize=(20, 10))
     plt.plot(x_resampled, y_resampled, c='b', linewidth=0.1)

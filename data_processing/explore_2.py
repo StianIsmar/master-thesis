@@ -126,7 +126,7 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 0:
+    if i > 20:
         break
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
     avg_speed, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')

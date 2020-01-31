@@ -64,7 +64,7 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
         # Transform the x values from time domain to radians domain
         delta_x = resampled_x[1] - resampled_x[0]
         round_start = 2*np.pi * i
-        round_end   = 2*np.pi * i + 2*np.pi - delta_x
+        round_end = 2*np.pi * i + 2*np.pi - delta_x
         X_values_round_domain = np.linspace(round_start, round_end, number_of_resample_points)
 
         # Collect the transformed lists
@@ -139,7 +139,9 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
         plt.margins(0)
         plt.show()
 
-    return X_values_round_domain, resampled_y_values
+
+
+    return X_values_round_domain_list, resampled_y_values
 
 
 
@@ -247,8 +249,8 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-  #if i > 40:
-   #     break
+    if i > 0:
+        break
     # print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["HighSpeed:rps"][0]}')
     #print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
@@ -257,20 +259,21 @@ for i, interval in enumerate(intervals):
     time_stamps = interval.sensor_df['TimeStamp']
     try:
         vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
-        time_resampled, y_resampled = resample_signal_interp(time_stamps, vibration_signal, peak_array, 1500)
+        time_resampled, y_resampled = resample_signal_interp(time_stamps, vibration_signal, peak_array, 1500, round_plots=2, plotting=True)
         #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
     except:
         print("Could not find GnNDe;0,0102;m/s2")
         continue
 
 
-    # RUN FFT
+    # RUN FFT on resampled data
     print("FFT")
-    fast = ff_transform.FastFourierTransform(y_resampled,time_resampled)
+    fast = ff_transform.FastFourierTransform(y_resampled[0],time_resampled[0])
     fast.plot_input()
     fft, time, spectral_centroid = fast.fft_transform()
     spectral_centroids.append(spectral_centroid)
     print(spectral_centroid)
+'''    
 print("plotting spectral_centroids: ")
 x = (np.arange(0,len(spectral_centroids)).tolist())
 y = (spectral_centroids)
@@ -279,7 +282,7 @@ plt.ylabel("Centroid value")
 plt.xlabel('Interval number')
 plt.plot(x,y)
 plt.show()
-
+'''
 
 
 # ------- Plot low rot speed -------------

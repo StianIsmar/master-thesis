@@ -22,8 +22,8 @@ def get_speed_and_peaks(interval, speed_col_name):
 Resamples vibration data by using interpolation
 Input time_stamps = the x_values, vibration_signal = accelerometer measurements (y_values)
 peak_array = time stamp of a shaft revolution, number_of_resample_points = desired number of resampled ponts
+@
 '''
-
 def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_resample_points, round_plots=0, printing=False, plotting=False):
     # Convert Panda series into numpy arrays for easier data processing
     time_stamps = np.array(time_stamps)
@@ -138,9 +138,18 @@ def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_
             plt.axvline(x=round_value, c='r', linewidth=0.3)
         plt.margins(0)
         plt.show()
+    '''
+    all_resampled_y_values = []
+    all_x_round_domain = []
+    for i, y_val in enumerate(resampled_y):
+        all_resampled_y_values.append(y_val)
+        all_x_round_domain.append(X_values_round_domain_list[i])
 
-
-
+    print(f'First in small x: {X_values_round_domain_list[0][0]}')
+    print(f'First in big x: {X_values_round_domain_list[0]}')
+    print(f'Last in small x: {X_values_round_domain_list[-1][-1]}')
+    print(f'Last in big x: {X_values_round_domain_list[-1]}')
+    '''
     return X_values_round_domain_list, resampled_y_values
 
 
@@ -249,8 +258,8 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 0:
-        break
+    #if i > 10:
+        #break
     # print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["HighSpeed:rps"][0]}')
     #print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
@@ -269,7 +278,7 @@ for i, interval in enumerate(intervals):
     # RUN FFT on resampled data
     print("FFT")
     fast = ff_transform.FastFourierTransform(y_resampled[0],time_resampled[0])
-    fast.plot_input()
+    #fast.plot_input()
     fft, time, spectral_centroid = fast.fft_transform()
     spectral_centroids.append(spectral_centroid)
     print(spectral_centroid)

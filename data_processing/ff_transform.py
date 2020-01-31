@@ -40,11 +40,11 @@ class FastFourierTransform:
         y = np.abs(fft)[:N // 2] * 1 /N # Normalized
 
         # Cutting away half of the fft frequencies.
-        '''
+
         sns.lineplot(f, y)
         plt.margins(0)
         plt.show()
-        '''
+
         time = f[:N // 2]
         self.normalized_amp = y
 

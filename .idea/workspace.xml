@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data_processing/time_domain_fft.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/master-thesis.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/master-thesis.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/ff_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/ff_transform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/explore_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/explore_2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,14 +62,11 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.time_domain_fft">
+  <component name="RunManager" selected="Python.explore_2">
     <configuration name="explore_2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="master-thesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_processing" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -177,8 +172,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.time_domain_fft" />
         <item itemvalue="Python.explore_2" />
+        <item itemvalue="Python.time_domain_fft" />
         <item itemvalue="Python.explore_2" />
         <item itemvalue="Python.ff_transform" />
         <item itemvalue="Python.fft" />
@@ -366,11 +361,11 @@
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
     <state x="352" y="-866" key="MultipleFileMergeDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580397056697" />
-    <state x="614" y="-1063" key="SettingsEditor" timestamp="1580475654057">
-      <screen x="-324" y="-1177" width="1920" height="1177" />
+    <state x="-982" y="137" key="SettingsEditor" timestamp="1580479181683">
+      <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state x="614" y="-1063" key="SettingsEditor/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580475654057" />
-    <state x="-982" y="137" key="SettingsEditor/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580460546881" />
+    <state x="-982" y="137" key="SettingsEditor/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580479181683" />
     <state width="960" height="588" key="XDebugger.FullValuePopup" timestamp="1580203953044">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>

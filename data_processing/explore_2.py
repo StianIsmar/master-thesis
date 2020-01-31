@@ -139,7 +139,7 @@ for i, interval in enumerate(intervals):
     print("FFT")
     fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
     # fast.plot_input()
-    fft, time, spectral_centroid = fast.fft_transform(rot_data, avg_power, i)
+    fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i)
     spectral_centroids.append(spectral_centroid)
     print(spectral_centroid)
 

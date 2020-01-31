@@ -22,8 +22,12 @@ class FastFourierTransform:
         '''
         The second half of this array of fft sequence have similar frequencies
         since the frequency is the absolute value of this value.
+        Input:
+        avg_speed = the average speed during operation (used to print in plot)
+        avg_power = the average power generated during operation (used to print in plot)
+        interval_num = which interval is evaluated
         '''
-    def fft_transform(self):
+    def fft_transform(self, avg_speed, avg_power, interval_num):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -35,13 +39,15 @@ class FastFourierTransform:
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
+
+        plt.figure(figsize=(15, 8))
         plt.ylabel("Amplitude")
         plt.xlabel("Frequency [Hz]")
         y = np.abs(fft)[:N // 2] * 1 /N # Normalized
-
         # Cutting away half of the fft frequencies.
 
         sns.lineplot(f, y)
+        plt.title(f'FFT Transformation of interval: {interval_num} with Avg Speed: {avg_speed} and Avg Power: {avg_power}')
         plt.margins(0)
         plt.show()
 

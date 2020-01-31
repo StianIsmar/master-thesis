@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import process_data
 import wt_data
 import ff_transform
+import resample
 import seaborn as sns
 import matplotlib as mpl
 mpl.rcParams['agg.path.chunksize'] = 10000
@@ -18,139 +19,6 @@ def get_speed_and_peaks(interval, speed_col_name):
     avg_speed, peak_array = interval.calc_speed(speed_col_name)
     return avg_speed, peak_array
 
-'''
-Resamples vibration data by using interpolation
-Input time_stamps = the x_values, vibration_signal = accelerometer measurements (y_values)
-peak_array = time stamp of a shaft revolution, number_of_resample_points = desired number of resampled ponts
-@
-'''
-def resample_signal_interp(time_stamps, vibration_signal, peak_array, number_of_resample_points, round_plots=0, printing=False, plotting=False):
-    # Convert Panda series into numpy arrays for easier data processing
-    time_stamps = np.array(time_stamps)
-    vibration_signal = np.array(vibration_signal)
-    peak_array = np.array(peak_array)
-
-    # Get the index's for each shaft revolution from time_stamps
-    peak_indexes = []
-    for i, peak in enumerate(peak_array):
-        peak_indexes.append(np.where(time_stamps == peak))
-    peak_indexes = np.array(peak_indexes).flatten()
-
-    # Extract the every revolution interval, both from time_stamps and vibration_signal
-    x_interval = []
-    y_interval = []
-    for i in range(len(peak_indexes)-1):
-        one_x_interval = time_stamps[peak_indexes[i]:peak_indexes[i+1]-1]
-        one_y_interval = vibration_signal[peak_indexes[i]:peak_indexes[i + 1] - 1]
-        x_interval.append(one_x_interval)
-        y_interval.append(one_y_interval)
-
-    # Convert to numpy arrays for easier data processing
-    x_interval = np.array(x_interval)
-    y_interval = np.array(y_interval)
-
-    resampled_x_values = []
-    resampled_y_values = []
-    X_values_round_domain_list = []
-    for i, one_interval in enumerate(x_interval):
-        # Resample the x-coordinates from the beginning of a revolution to its end with the specified number of data points
-        start_peak = x_interval[i][0]
-        end_peak   = x_interval[i][-1]
-        resampled_x = np.linspace(start_peak, end_peak, number_of_resample_points)
-
-        # Resample the vibration data by linear interpolation
-        resampled_y = np.interp(resampled_x, x_interval[i], y_interval[i])
-
-        # Transform the x values from time domain to radians domain
-        delta_x = resampled_x[1] - resampled_x[0]
-        round_start = 2*np.pi * i
-        round_end = 2*np.pi * i + 2*np.pi - delta_x
-        X_values_round_domain = np.linspace(round_start, round_end, number_of_resample_points)
-
-        # Collect the transformed lists
-        resampled_x_values.append(resampled_x)
-        resampled_y_values.append(resampled_y)
-        X_values_round_domain_list.append(X_values_round_domain)
-
-    resampled_x_values = np.array(resampled_x_values)
-    resampled_y_values = np.array(resampled_y_values)
-    X_values_round_domain_list = np.array(X_values_round_domain_list)
-
-    # Print various values to check if everything is as it should
-    if printing:
-        print(f'First original x_interval value: {x_interval[0][0]}')
-        print(f'Last  original x_interval value: {x_interval[0][-1]}')
-        print(f'Whole original x_interval: {x_interval[0]}')
-        print(f'Shape of original x_interval: {x_interval[0].shape}')
-
-        print(f'\nFirst resampled x_interval value: {resampled_x_values[0][0]}')
-        print(f'Last  resampled x_interval value: {resampled_x_values[0][-1]}')
-        print(f'Shape of resampled x_interval: {resampled_x_values[0].shape}')
-
-        print(f'\nFirst original vibration value: {y_interval[0][0]}')
-        print(f'Last  original vibration value: {y_interval[0][-1]}')
-        print(f'Shape of first original vibration set: {y_interval[0].shape}')
-
-        print(f'\nFirst resampled vibration value: {resampled_y_values[0][0]}')
-        print(f'Last  resampled vibration value: {resampled_y_values[0][-1]}')
-        print(f'Shape of first resampled vibration set: {resampled_y_values[0].shape}')
-
-        print(f'\nFirst ronund domain x value: {X_values_round_domain_list[0][0]}')
-        print(f'Last  ronund domain x value: {X_values_round_domain_list[0][-1]}')
-        print(f'Shape of ronund domain x values: {X_values_round_domain_list[0].shape}')
-
-
-    if plotting:
-        # ------ Plot original signal -------
-        x_original = []
-        y_original = []
-        for i in range(round_plots):
-            x_original = np.append(x_original, x_interval[i])
-            y_original = np.append(y_original, y_interval[i])
-        original_vertical_lines = peak_array[0:round_plots+1]
-
-        plt.figure(figsize=(20, 10))
-        plt.plot(x_original, y_original, c='b', linewidth=0.1)
-        plt.title(f'Original Vibration Data. Number of Data Points: {x_original.shape[0]}', fontsize=20)
-        plt.xlabel('Time (in s)', fontsize=16)
-        plt.ylabel('Vibration amplitude (in m/s2)', fontsize=16)
-        for i, round_value in enumerate(original_vertical_lines):
-            plt.axvline(x=round_value, c='r', linewidth=0.3)
-        plt.margins(0)
-        plt.show()
-
-
-        # ------ Plot resampled signal ------
-        x_resampled = []
-        y_resampled = []
-        resampled_vertical_lines = []
-        for i in range(round_plots):
-            x_resampled = np.append(x_resampled, X_values_round_domain_list[i])
-            y_resampled = np.append(y_resampled, resampled_y_values[i])
-            resampled_vertical_lines.append(X_values_round_domain_list[i][0])
-
-        plt.figure(figsize=(20, 10))
-        plt.plot(x_resampled, y_resampled, c='b', linewidth=0.1)
-        plt.title(f'Resampled Vibration Data. Number of Data Points: {x_resampled.shape[0]}', fontsize=20)
-        plt.xlabel('Rounds (in radians)', fontsize=16)
-        plt.ylabel('Vibration amplitude (in m/s2', fontsize=16)
-        for i, round_value in enumerate(resampled_vertical_lines):
-            plt.axvline(x=round_value, c='r', linewidth=0.3)
-        plt.margins(0)
-        plt.show()
-    '''
-    all_resampled_y_values = []
-    all_x_round_domain = []
-    for i, y_val in enumerate(resampled_y):
-        all_resampled_y_values.append(y_val)
-        all_x_round_domain.append(X_values_round_domain_list[i])
-
-    print(f'First in small x: {X_values_round_domain_list[0][0]}')
-    print(f'First in big x: {X_values_round_domain_list[0]}')
-    print(f'Last in small x: {X_values_round_domain_list[-1][-1]}')
-    print(f'Last in big x: {X_values_round_domain_list[-1]}')
-    '''
-    return X_values_round_domain_list, resampled_y_values
 
 
 
@@ -258,31 +126,48 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    #if i > 10:
-        #break
-    # print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["HighSpeed:rps"][0]}')
-    #print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
+    if i > 0:
+        break
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
     avg_speed, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
+    avg_power = interval.op_df["PwrAvg;kW"][0]
     #print(f'Average Rotational Speed for {i}: {avg_speed}')
+    #print(f'Average Power Generated for {i}: {avg_power}')
+
     time_stamps = interval.sensor_df['TimeStamp']
+    vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
     try:
         vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
-        time_resampled, y_resampled = resample_signal_interp(time_stamps, vibration_signal, peak_array, 1500, round_plots=2, plotting=True)
+        time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.linear_interpolation_resampling(time_stamps,
+                                                                                                  vibration_signal,
+                                                                                                  peak_array, 1500,
+                                                                                                  round_plots=2,
+                                                                                                  plotting=False)
         #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
     except:
         print("Could not find GnNDe;0,0102;m/s2")
         continue
 
 
-    # RUN FFT on resampled data
+    # RUN FFT on resampled data for one round
+    '''
     print("FFT")
     fast = ff_transform.FastFourierTransform(y_resampled[0],time_resampled[0])
     #fast.plot_input()
     fft, time, spectral_centroid = fast.fft_transform()
     spectral_centroids.append(spectral_centroid)
     print(spectral_centroid)
-'''    
+    '''
+
+    # RUN FFT on resampled data for all rounds
+    print("FFT")
+    fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
+    # fast.plot_input()
+    fft, time, spectral_centroid = fast.fft_transform(avg_speed, avg_power, i)
+    spectral_centroids.append(spectral_centroid)
+    print(spectral_centroid)
+
+''' 
 print("plotting spectral_centroids: ")
 x = (np.arange(0,len(spectral_centroids)).tolist())
 y = (spectral_centroids)

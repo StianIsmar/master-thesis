@@ -27,7 +27,7 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform(self, avg_speed, avg_power, interval_num):
+    def fft_transform(self, rot_data, avg_power, interval_num):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -47,7 +47,9 @@ class FastFourierTransform:
         # Cutting away half of the fft frequencies.
 
         sns.lineplot(f, y)
-        plt.title(f'FFT Transformation of interval: {interval_num} with Avg Speed: {avg_speed} and Avg Power: {avg_power}')
+        plt.title(f'FFT Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
+                  f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
+                  f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]}')
         plt.margins(0)
         plt.show()
 

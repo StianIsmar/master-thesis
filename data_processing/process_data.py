@@ -96,7 +96,7 @@ class TenSecondInterval:
             x = np.array(self.sensor_df['TimeStamp'])
             data_list = np.array(self.sensor_df[col_name])
             first_pulse_time = None  # Remember when the first pulse starts
-            rotations = []  # Store the time it takes to do one revolution
+            rotations = []  # Store the time it takes to do one revolution (this is seconds per round)
             peaks = []   # Store the time for each peak
             if data_list[0] > 20:  # If the timeserie start at the peak we record its corresponding time
                 first_pulse_time = x[0]
@@ -113,17 +113,26 @@ class TenSecondInterval:
                         first_pulse_time = second_pulse_time
                         peaks.append(first_pulse_time)
 
+            # Convert the list of rotations into rounds per minute
+            rps = 1 / np.array(rotations)   # Rounds per second
+            rpm = 60 * rps                  # Rounds per minute
+
             # If the data measurements does not contain a whole rotation, set the speed to None
-            if len(rotations) > 0:
-                avg_rotation = sum(rotations) / len(rotations)  # This is seconds per rotation
-                avg_rotation_per_sec = 1 / avg_rotation  # This gives rotation per second
+            if len(rpm) > 0:
+                rot_data = {
+                    'mean' : np.mean(rpm),
+                    'std'  : np.std(rpm),
+                    'min'  : np.min(rpm),
+                    'max'  : np.max(rpm)
+                }
             else:
-                avg_rotation_per_sec = None
+                rot_data = None
 
         except Exception:
-            avg_rotation_per_sec = None
+            rot_data = None
+            peaks = None
 
-        return avg_rotation_per_sec, peaks
+        return rot_data, peaks
 
     # Finds data from sensor_df
     # Calculates the speed for the slow rotating shaft and the fast rotating shaft
@@ -131,10 +140,10 @@ class TenSecondInterval:
     # The units are rounds per second.
 
     def insert_speed(self):
-        low_rot_speed, low_peak_array = self.calc_speed('LssShf;1;V')
-        high_rot_seed, high_peak_array = self.calc_speed('Speed Sensor;1;V')
-        self.op_df.insert(len(self.op_df.columns.values), "LowSpeed:rps", low_rot_speed)
-        self.op_df.insert(len(self.op_df.columns.values), "HighSpeed:rps", high_rot_seed)
+        low_rot_data, low_peak_array = self.calc_speed('LssShf;1;V')
+        high_rot_data, high_peak_array = self.calc_speed('Speed Sensor;1;V')
+        self.op_df.insert(len(self.op_df.columns.values), "LowSpeed:rps", low_rot_data['mean'])
+        self.op_df.insert(len(self.op_df.columns.values), "HighSpeed:rps", high_rot_data['mean'])
 
 
     def save_instance(self):
@@ -149,12 +158,12 @@ def load_instance():
     return content
 
 # Example for WT01:
-# interval = TenSecondInterval()
-# interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
-# print(interval.date) # Printing date
+#interval = TenSecondInterval()
+#interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
+#print(interval.date) # Printing date
 
-# interval.insert_speed()
-# print(interval.op_df)
+#interval.insert_speed()
+#print(interval.op_df)
 #interval.plot_data(interval.sensor_df)
 #print(interval.sensor_df)
 #interval.save_df()

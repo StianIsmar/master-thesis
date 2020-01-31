@@ -16,8 +16,8 @@ Returns the avg rotational speed and an array of timestamps for each time it rot
 by calling calc_speed for an interval (from process_data.py) 
 '''
 def get_speed_and_peaks(interval, speed_col_name):
-    avg_speed, peak_array = interval.calc_speed(speed_col_name)
-    return avg_speed, peak_array
+    rot_data, peak_array = interval.calc_speed(speed_col_name)
+    return rot_data, peak_array
 
 
 
@@ -62,32 +62,6 @@ def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
 
 
 
-'''
-content = pickle.load(open('saved_dfs.p', 'rb'))
-
-op_df = content['op_df']
-sensor_data_df = content['sensor_data_df']
-
-print(sensor_data_df.columns.values)
-
-plot_data(sensor_data_df, 'Speed Sensor;1;V')
-
-plot_data(sensor_data_df, 'LssShf;1;V')
-
-low_rot_speed = calc_avg_speed(sensor_data_df, 'LssShf;1;V')
-high_rot_seed = calc_avg_speed(sensor_data_df, 'Speed Sensor;1;V')
-
-print('Low rotational speed is:   ', low_rot_speed)
-print('High rotational speed is:  ', high_rot_seed)
-print(op_df)
-print(op_df.shape)
-
-op_df.insert(len(op_df.columns.values), "LowSpeed:rps", low_rot_speed)
-op_df.insert(len(op_df.columns.values), "HighSpeed:rps", high_rot_seed)
-
-print(op_df)
-print(op_df.shape)
-'''
 
 
 
@@ -126,10 +100,12 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 20:
+    if i > 0:
         break
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
-    avg_speed, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
+    rot_data, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
+    avg_speed = rot_data['mean']
+    print(rot_data)
     avg_power = interval.op_df["PwrAvg;kW"][0]
     #print(f'Average Rotational Speed for {i}: {avg_speed}')
     #print(f'Average Power Generated for {i}: {avg_power}')
@@ -149,7 +125,7 @@ for i, interval in enumerate(intervals):
         continue
 
 
-    # RUN FFT on resampled data for one round
+    # RUN FFT on resampled data for one revolution
     '''
     print("FFT")
     fast = ff_transform.FastFourierTransform(y_resampled[0],time_resampled[0])
@@ -159,11 +135,11 @@ for i, interval in enumerate(intervals):
     print(spectral_centroid)
     '''
 
-    # RUN FFT on resampled data for all rounds
+    # RUN FFT on resampled data for all revolutions
     print("FFT")
     fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
     # fast.plot_input()
-    fft, time, spectral_centroid = fast.fft_transform(avg_speed, avg_power, i)
+    fft, time, spectral_centroid = fast.fft_transform(rot_data, avg_power, i)
     spectral_centroids.append(spectral_centroid)
     print(spectral_centroid)
 

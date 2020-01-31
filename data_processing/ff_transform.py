@@ -27,7 +27,7 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform(self, avg_speed, avg_power, interval_num):
+    def fft_transform_order(self, avg_speed, avg_power, interval_num):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -48,6 +48,7 @@ class FastFourierTransform:
 
         sns.lineplot(f, y)
         plt.title(f'FFT Transformation of interval: {interval_num} with Avg Speed: {avg_speed} and Avg Power: {avg_power}')
+        plt.title("FFT Transformation to the time domain")
         plt.margins(0)
         plt.show()
 
@@ -64,6 +65,46 @@ class FastFourierTransform:
         for i, freq in enumerate(f):
             weight_sum += freq * y[i]
         return weight_sum/np.sum(y)
+
+
+    def fft_transform_time(self):
+        mean_amplitude = np.mean(self.s)
+        self.s = self.s - mean_amplitude  # Centering around 0
+        fft = np.fft.fft(self.s)
+
+        # We now have the fft for every timestep in out plot.
+
+        # T is the sample frequency in the data set
+        T = self.t[1] - self.t[0]  # This is true when the period between each sample in the time waveform is equal
+        N = self.s.size  # size of the amplitude vector
+        f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
+        f = f[:N // 2]
+
+        plt.figure(figsize=(15, 8))
+        plt.ylabel("Amplitude")
+        plt.xlabel("Frequency [Hz]")
+        y = np.abs(fft)[:N // 2] * 1 / N  # Normalized
+        # Cutting away half of the fft frequencies.
+
+        sns.lineplot(f, y)
+        plt.title(
+            f'FFT Transformation of interval: {interval_num} with Avg Speed: {avg_speed} and Avg Power: {avg_power}')
+        plt.title("FFT Transformation to the time domain")
+        plt.margins(0)
+        plt.show()
+
+        time = f[:N // 2]
+        self.normalized_amp = y
+
+        # Calculate the spectral centroid
+        centroid = self.find_spectral_centroid(f, y)
+        return fft, time, centroid
+
+
+
+
+
+
 
 
 

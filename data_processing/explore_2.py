@@ -100,7 +100,7 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 0:
+    if i > 20:
         break
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
     rot_data, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
@@ -110,38 +110,40 @@ for i, interval in enumerate(intervals):
     #print(f'Average Rotational Speed for {i}: {avg_speed}')
     #print(f'Average Power Generated for {i}: {avg_power}')
 
-    time_stamps = interval.sensor_df['TimeStamp']
-    vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
-    try:
+    if avg_power > 2600:
+
+        time_stamps = interval.sensor_df['TimeStamp']
         vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
-        time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.linear_interpolation_resampling(time_stamps,
-                                                                                                  vibration_signal,
-                                                                                                  peak_array, 1500,
-                                                                                                  round_plots=2,
-                                                                                                  plotting=False)
-        #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
-    except:
-        print("Could not find GnNDe;0,0102;m/s2")
-        continue
+        try:
+            vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
+            time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.linear_interpolation_resampling(time_stamps,
+                                                                                                      vibration_signal,
+                                                                                                      peak_array, 1500,
+                                                                                                      round_plots=2,
+                                                                                                      plotting=False)
+            #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
+        except:
+            print("Could not find GnNDe;0,0102;m/s2")
+            continue
 
 
-    # RUN FFT on resampled data for one revolution
-    '''
-    print("FFT")
-    fast = ff_transform.FastFourierTransform(y_resampled[0],time_resampled[0])
-    #fast.plot_input()
-    fft, time, spectral_centroid = fast.fft_transform()
-    spectral_centroids.append(spectral_centroid)
-    print(spectral_centroid)
-    '''
+        # RUN FFT on resampled data for one revolution
+        '''
+        print("FFT")
+        fast = ff_transform.FastFourierTransform(y_resampled[0],time_resampled[0])
+        #fast.plot_input()
+        fft, time, spectral_centroid = fast.fft_transform()
+        spectral_centroids.append(spectral_centroid)
+        print(spectral_centroid)
+        '''
 
-    # RUN FFT on resampled data for all revolutions
-    print("FFT")
-    fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
-    # fast.plot_input()
-    fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i)
-    spectral_centroids.append(spectral_centroid)
-    print(spectral_centroid)
+        # RUN FFT on resampled data for all revolutions
+        print("FFT")
+        fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
+        # fast.plot_input()
+        fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i)
+        spectral_centroids.append(spectral_centroid)
+        print(spectral_centroid)
 
 ''' 
 print("plotting spectral_centroids: ")

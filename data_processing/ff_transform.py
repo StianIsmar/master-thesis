@@ -49,7 +49,7 @@ class FastFourierTransform:
         sns.lineplot(f, y)
         plt.title(f'FFT Order Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
                   f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
-                  f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]}')
+                  f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
         plt.margins(0)
         plt.show()
 

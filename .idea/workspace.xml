@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data_processing/time_domain_fft.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/master-thesis.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/master-thesis.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/explore_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/explore_2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/ff_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/ff_transform.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -224,7 +220,7 @@
       <workItem from="1580383437744" duration="7827000" />
       <workItem from="1580393726301" duration="2996000" />
       <workItem from="1580460368586" duration="10798000" />
-      <workItem from="1580475634857" duration="1365000" />
+      <workItem from="1580475634857" duration="1521000" />
     </task>
     <servers />
   </component>

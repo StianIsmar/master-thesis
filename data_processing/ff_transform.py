@@ -41,8 +41,8 @@ class FastFourierTransform:
         f = f[:N // 2]
 
         plt.figure(figsize=(15, 8))
-        plt.ylabel("Amplitude")
-        plt.xlabel("Frequency [Hz]")
+        plt.ylabel("Normalised Amplitude")
+        plt.xlabel("Order [X]")
         y = np.abs(fft)[:N // 2] * 1 /N # Normalized
         # Cutting away half of the fft frequencies.
 
@@ -81,14 +81,13 @@ class FastFourierTransform:
         f = f[:N // 2]
 
         plt.figure(figsize=(15, 8))
-        plt.ylabel("Amplitude")
-        plt.xlabel("Frequency [Hz]")
+        plt.ylabel("Normalised Amplitude")
+        plt.xlabel("Order [X]")
         y = np.abs(fft)[:N // 2] * 1 / N  # Normalized
         # Cutting away half of the fft frequencies.
 
         sns.lineplot(f, y)
-        plt.title(
-            f'FFT Transformation of interval: {interval_num} with Avg Speed: {avg_speed} and Avg Power: {avg_power}')
+        plt.title("FFT of time domain amplitude")
         plt.title("FFT Transformation to the time domain")
         plt.margins(0)
         plt.show()

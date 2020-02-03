@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import wt_data
 
 class FastFourierTransform:
     # Amplitudes is a row vector
@@ -17,7 +18,6 @@ class FastFourierTransform:
         plt.plot(self.t, self.s)
         plt.margins(0)
         plt.show()
-        
 
         '''
         The second half of this array of fft sequence have similar frequencies
@@ -27,7 +27,7 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform_order(self, rot_data, avg_power, interval_num):
+    def fft_transform_order(self, rot_data, avg_power, interval_num,plot=False):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -39,19 +39,17 @@ class FastFourierTransform:
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
-
-        plt.figure(figsize=(15, 8))
-        plt.ylabel("Normalised Amplitude")
-        plt.xlabel("Order [X]")
-        y = np.abs(fft)[:N // 2] * 1 /N # Normalized
-        # Cutting away half of the fft frequencies.
-
-        sns.lineplot(f, y)
-        plt.title(f'FFT Order Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
-                  f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
-                  f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
-        plt.margins(0)
-        plt.show()
+        if plot == True:
+            plt.figure(figsize=(15, 8))
+            plt.ylabel("Normalised Amplitude")
+            plt.xlabel("Order [X]")
+            y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
+            sns.lineplot(f, y)
+            plt.title(f'FFT Order Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
+                      f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
+                      f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
+            plt.margins(0)
+            plt.show()
 
         time = f[:N // 2]
         self.normalized_amp = y
@@ -68,7 +66,7 @@ class FastFourierTransform:
         return weight_sum/np.sum(y)
 
 
-    def fft_transform_time(self):
+    def fft_transform_time(self,plot=False):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -80,18 +78,20 @@ class FastFourierTransform:
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
-
-        plt.figure(figsize=(15, 8))
-        plt.ylabel("Normalised Amplitude")
-        plt.xlabel("Order [X]")
         y = np.abs(fft)[:N // 2] * 1 / N  # Normalized
         # Cutting away half of the fft frequencies.
 
-        sns.lineplot(f, y)
-        plt.title("FFT of time domain amplitude")
-        plt.title("FFT Transformation to the time domain")
-        plt.margins(0)
-        plt.show()
+        if plot == True:
+            plt.figure(figsize=(15, 8))
+            plt.ylabel("Normalised Amplitude")
+            plt.xlabel("Order [X]")
+
+
+            sns.lineplot(f, y)
+            plt.title("FFT of time domain amplitude")
+            plt.title("FFT Transformation to the time domain")
+            plt.margins(0)
+            plt.show()
 
         time = f[:N // 2]
         self.normalized_amp = y
@@ -100,27 +100,19 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y)
         return fft, time, centroid
 
-
-
-
-
-
-
-
-
-
-
-
+    def calculate_rms(self):
+        return ''
 
 '''
-t = np.linspace(0, 0.5, 500)
+wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
+intervals = wt_instance.ten_second_intervals
 
-amplitudes = np.sin(40 * 2 * np.pi * t) + 0.5 * np.sin(90 * 2 * np.pi * t)
-
-fast = FastFourierTransform(amplitudes, t)
-fast.plot_input()
-transform, time = fast.fft_transform()
+for i, interval in enumerate(intervals):
+    # CHECK IF WE WANT INTERVAL
+    interval1 = interval
+    time_stamps = interval.sensor_df['TimeStamp']
+    vibration = interval.sensor_df['GnNDe;0,0102;m/s2']
+    fast = FastFourierTransform(vibration, time_stamps)
+    fast.fft_transform_time(True)
 
 '''
-
-

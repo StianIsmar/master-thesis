@@ -19,6 +19,11 @@ class TenSecondInterval:
         self.op_df = None # Dataframe for operational data
         self.date = None
         self.turbine = None
+        self.low_speed_rot_data = None
+        self.high_speed_rot_data = None
+        self.low_speed_peak_array = None
+        self.high_speed_peak_array = None
+
 
     def load_data(self, path):
         pp = pprint.PrettyPrinter(indent=4)
@@ -114,7 +119,12 @@ class TenSecondInterval:
                         peaks.append(first_pulse_time)
 
             # Convert the list of rotations into rounds per minute
-            rps = 1 / np.array(rotations)   # Rounds per second
+
+            if rotations[0] == 0:   # Check if the fist element is zero to avoid division by zero
+                rps = 1 / np.array(rotations[1:])   # Rounds per second
+            else :
+                rps = 1 / np.array(rotations)
+
             rpm = 60 * rps                  # Rounds per minute
 
             # If the data measurements does not contain a whole rotation, set the speed to None
@@ -134,16 +144,17 @@ class TenSecondInterval:
 
         return rot_data, peaks
 
-    # Finds data from sensor_df
-    # Calculates the speed for the slow rotating shaft and the fast rotating shaft
-    # inserts the calculations into op_df with column names "LowSpeed:rps" and "HighSpeed:rps"
-    # The units are rounds per second.
-
+    '''
+    Calculates the speed data (mean, max, min and std) for the slow rotating shaft and the fast rotating shaft
+    Extracts the peak array (time for each rotational pulse)
+    '''
     def insert_speed(self):
         low_rot_data, low_peak_array = self.calc_speed('LssShf;1;V')
         high_rot_data, high_peak_array = self.calc_speed('Speed Sensor;1;V')
-        self.op_df.insert(len(self.op_df.columns.values), "LowSpeed:rps", low_rot_data['mean'])
-        self.op_df.insert(len(self.op_df.columns.values), "HighSpeed:rps", high_rot_data['mean'])
+        self.low_speed_rot_data = low_rot_data
+        self.low_speed_peak_array = low_peak_array
+        self.high_speed_rot_data = high_rot_data
+        self.high_speed_peak_array = high_peak_array
 
 
     def save_instance(self):
@@ -151,19 +162,21 @@ class TenSecondInterval:
         path = '/Volumes/OsvikExtra/VibrationData/'
         pickle.dump(content, open(path + 'saved_instance.p', 'wb'))
 
+
 def load_instance():
     content = TenSecondInterval()
     path = '/Volumes/OsvikExtra/VibrationData/'
     content = pickle.load(open(path + 'saved_instance.p', 'rb'))
     return content
 
-# Example for WT01:
+# ------ Example for WT01 -------
 #interval = TenSecondInterval()
 #interval.load_data('/Volumes/OsvikExtra/VibrationData/WTG01/209633-WTG01-2018-08-04-20-52-48_PwrAvg_543.uff')
 #print(interval.date) # Printing date
 
 #interval.insert_speed()
 #print(interval.op_df)
+#print(interval.low_speed_peak_array)
 #interval.plot_data(interval.sensor_df)
 #print(interval.sensor_df)
 #interval.save_df()

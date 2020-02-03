@@ -11,17 +11,6 @@ mpl.rcParams['agg.path.chunksize'] = 10000
 
 
 
-''' 
-Returns the avg rotational speed and an array of timestamps for each time it rotates a whole round
-by calling calc_speed for an interval (from process_data.py) 
-'''
-def get_speed_and_peaks(interval, speed_col_name):
-    rot_data, peak_array = interval.calc_speed(speed_col_name)
-    return rot_data, peak_array
-
-
-
-
 def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
     x_values  = interval.sensor_df['TimeStamp']
     dataframe = interval.sensor_df.drop(columns=['TimeStamp'])
@@ -94,21 +83,21 @@ def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
 #wt_instance_2 = wt_data.load_instance("WTG02")
 #wt_instance_3 = wt_data.load_instance("WTG03")
 #wt_instance_4 = wt_data.load_instance("WTG04")
+#wt_instance_1 = wt_data.create_wt_data("WTG01", True)
 wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
 intervals = wt_instance.ten_second_intervals
 
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 20:
+    if i > 30:
         break
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
-    rot_data, peak_array = get_speed_and_peaks(interval, 'Speed Sensor;1;V')
+    rot_data = interval.high_speed_rot_data
+    peak_array = interval.high_speed_peak_array
     avg_speed = rot_data['mean']
     print(rot_data)
     avg_power = interval.op_df["PwrAvg;kW"][0]
-    #print(f'Average Rotational Speed for {i}: {avg_speed}')
-    #print(f'Average Power Generated for {i}: {avg_power}')
 
     if avg_power > 2600:
 

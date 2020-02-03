@@ -34,7 +34,7 @@ class Wt_data():
         loop_count = 0
         for filename in os.listdir(path + wt_name):
             if (save_minimal == True):
-                if loop_count > 10:
+                if loop_count > 30:
                     break
             if filename.endswith(".uff") and not filename[0] == ".":
                 loop_count+=1
@@ -71,7 +71,7 @@ class Wt_data():
         path = '/Volumes/OsvikExtra/VibrationData/'
 
         if (save_minimal == True):
-            pickle.dump(content, open(path + 'saved_instance_MINIMAL' + self.name + '.p', 'wb'))
+            pickle.dump(content, open(path + 'saved_instance_MINIMAL_' + self.name + '.p', 'wb'))
             print(f'Saved **MINIMAL INTEVALS** to file')
         else:
 
@@ -84,7 +84,7 @@ def load_instance(name, load_minimal=False):
     wt_01 = Wt_data(name)
     path = '/Volumes/OsvikExtra/VibrationData/'
     if (load_minimal == True):
-        wt_01 = pickle.load(open(path + 'saved_instance_MINIMAL' + name + '.p', 'rb'))
+        wt_01 = pickle.load(open(path + 'saved_instance_MINIMAL_' + name + '.p', 'rb'))
     else:
         wt_01 = pickle.load(open(path + 'saved_instance_' + name + '.p', 'rb'))
         print(f'\nLoaded {name}')
@@ -102,7 +102,7 @@ def create_wt_data(name, save_minimal=False):
     return wt_01
 
 #create_wt_data()
-# wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
+#wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
 
 # wt_02 = Wt_data()
 

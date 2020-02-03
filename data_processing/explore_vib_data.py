@@ -83,7 +83,7 @@ def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
 #wt_instance_2 = wt_data.load_instance("WTG02")
 #wt_instance_3 = wt_data.load_instance("WTG03")
 #wt_instance_4 = wt_data.load_instance("WTG04")
-wt_instance_1 = wt_data.create_wt_data("WTG01", True)
+# wt_instance_1 = wt_data.create_wt_data("WTG01", True)
 
 '''
 wt_instance = wt_data.load_instance("WTG01",load_minimal=True)

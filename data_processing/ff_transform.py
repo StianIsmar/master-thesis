@@ -82,25 +82,27 @@ class FastFourierTransform:
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
-        y = np.abs(fft)[:N // 2] * 1 / N  # Normalized
+        y = np.abs(fft)[:N // 2]* 1 / N
+        y_norm = np.abs(fft)[:N // 2] * 1 / N  # Normalized
+
 
         rms = self.calculate_rms(f,y)
 
         if plot == True:
             plt.figure(figsize=(15, 8))
             plt.ylabel("Normalised Amplitude")
-            plt.xlabel("Order [X]")
-            sns.lineplot(f, y)
+            plt.xlabel("Frequency [Hz]")
+            sns.lineplot(f, y_norm)
             plt.title("FFT of time domain amplitude")
             plt.title("FFT Transformation to the time domain")
             plt.margins(0)
             plt.show()
 
         time = f[:N // 2]
-        self.normalized_amp = y
+        self.normalized_amp = y_norm
 
         # Calculate the spectral centroid
-        centroid = self.find_spectral_centroid(f, y)
+        centroid = self.find_spectral_centroid(f, y_norm)
         return fft, time, centroid, rms
 
     # Siemens implementation
@@ -108,6 +110,27 @@ class FastFourierTransform:
         rms = np.sqrt(np.mean(amplitudes**2))
         print(f"RMS value = {rms}")
         return rms
+
+    def calculate_rms1(self, fft):
+        K=0
+        Y1 = abs(fft)/(len(fft)//2)
+        sum = 0
+        for i in range(K, len(Y1)//2):
+            if (abs(fft)[i] < 5000 and abs(fft)[i] > 10):
+                sum += Y1[i]**2
+            else:
+                continue
+        RMS = np.sqrt(0.5*sum)
+
+        # rms = np.sqrt(np.mean(amplitudes ** 2))
+        #print(f"RMS value = {rms}")
+        return RMS
+    ''' 
+    Need to get rms for the following frequencies (RMS Acceleration m/s^2)
+     -- Nacelle and tower: Range(0.1 to 10) Hz
+     -- 
+    
+    '''
 
 ''' ************ EXAMPLE FOR WT01 ******************'''
 wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
@@ -123,7 +146,10 @@ for i, interval in enumerate(intervals):
     except:
         continue
     fast = FastFourierTransform(vibration, time_stamps)
-    fft, time, centroid, rms = fast.fft_transform_time(False)
+    fft, time, centroid, rms = fast.fft_transform_time(True)
+    RMS = fast.calculate_rms1(fft)
+    print(" ")
+    print(f"RMS new:: {RMS}")
     rms_arr.append(rms) # This can be plotted
     # LAG FOR LAV FREKVENS
     # LAG FOR HØY FREKVENS
@@ -135,11 +161,3 @@ sns.lineplot(range(len(rms_arr)), rms_arr)
 plt.title("RMS PLOT")
 plt.margins(0)
 plt.show()
-
-
-
-
-
-
-
-

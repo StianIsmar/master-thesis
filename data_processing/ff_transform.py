@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -9,6 +10,9 @@ class FastFourierTransform:
         self.s = amplitudes
         self.t = t
         self.normalized_amp = None
+        self.rms_time = None
+        self.rms_order = None
+
 
     # Plotting in the input domain before fft
     def plot_input(self):
@@ -79,14 +83,13 @@ class FastFourierTransform:
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
         y = np.abs(fft)[:N // 2] * 1 / N  # Normalized
-        # Cutting away half of the fft frequencies.
+
+        rms = self.calculate_rms(f,y)
 
         if plot == True:
             plt.figure(figsize=(15, 8))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Order [X]")
-
-
             sns.lineplot(f, y)
             plt.title("FFT of time domain amplitude")
             plt.title("FFT Transformation to the time domain")
@@ -98,21 +101,45 @@ class FastFourierTransform:
 
         # Calculate the spectral centroid
         centroid = self.find_spectral_centroid(f, y)
-        return fft, time, centroid
+        return fft, time, centroid, rms
 
-    def calculate_rms(self):
-        return ''
+    # Siemens implementation
+    def calculate_rms(self,freq,amplitudes):
+        rms = np.sqrt(np.mean(amplitudes**2))
+        print(f"RMS value = {rms}")
+        return rms
 
-'''
+''' ************ EXAMPLE FOR WT01 ******************'''
 wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
 intervals = wt_instance.ten_second_intervals
 
+rms_arr = []
 for i, interval in enumerate(intervals):
     # CHECK IF WE WANT INTERVAL
     interval1 = interval
     time_stamps = interval.sensor_df['TimeStamp']
-    vibration = interval.sensor_df['GnNDe;0,0102;m/s2']
+    try:
+        vibration = interval.sensor_df['GnNDe;0,0102;m/s2']
+    except:
+        continue
     fast = FastFourierTransform(vibration, time_stamps)
-    fast.fft_transform_time(True)
+    fft, time, centroid, rms = fast.fft_transform_time(False)
+    rms_arr.append(rms) # This can be plotted
+    # LAG FOR LAV FREKVENS
+    # LAG FOR HØY FREKVENS
 
-'''
+plt.figure(figsize=(15, 8))
+plt.ylabel("RMS value")
+plt.xlabel("Interval nr.")
+sns.lineplot(range(len(rms_arr)), rms_arr)
+plt.title("RMS PLOT")
+plt.margins(0)
+plt.show()
+
+
+
+
+
+
+
+

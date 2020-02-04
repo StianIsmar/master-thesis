@@ -82,11 +82,12 @@ class FastFourierTransform:
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
-        y = np.abs(fft)[:N // 2]* 1 / N
+        y = np.abs(fft)[:N // 2]
         y_norm = np.abs(fft)[:N // 2] * 1 / N  # Normalized
+        fft_modulus_norm = y_norm
 
-
-        rms = self.calculate_rms(f,y)
+        rms = self.rms(f,fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
+        self.rms_time = rms
 
         if plot == True:
             plt.figure(figsize=(15, 8))
@@ -105,39 +106,45 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y_norm)
         return fft, time, centroid, rms
 
-    # Siemens implementation
-    def calculate_rms(self,freq,amplitudes):
-        rms = np.sqrt(np.mean(amplitudes**2))
-        print(f"RMS value = {rms}")
+    # Function returns rms as a float. Called in the fft_transform_time function
+    def rms(self, freq, fft_modulus_norm, type="generator"):
+        # Filtering the frequency spectrum based on what component is being analysed
+        if (type=="generator"):
+            filter_indexes = [(freq > 10) & (freq < 5000)]
+        if type == "gearbox":
+            filter_indexes = [(freq > 10) & (freq < 2000)]
+        if type == "nacelle":
+            filter_indexes = [(freq > 0.1) & (freq < 10)]
+
+        freq = freq[filter_indexes]
+        amp = fft_modulus_norm[filter_indexes]
+
+        sum=0
+        for a in amp:
+            sum+=a**2
+        rms=np.sqrt(2*sum)
         return rms
 
-    def calculate_rms1(self, fft):
-        K=0
-        Y1 = abs(fft)/(len(fft)//2)
-        sum = 0
-        for i in range(K, len(Y1)//2):
-            if (abs(fft)[i] < 5000 and abs(fft)[i] > 10):
-                sum += Y1[i]**2
-            else:
-                continue
-        RMS = np.sqrt(0.5*sum)
 
-        # rms = np.sqrt(np.mean(amplitudes ** 2))
-        #print(f"RMS value = {rms}")
-        return RMS
-    ''' 
-    Need to get rms for the following frequencies (RMS Acceleration m/s^2)
-     -- Nacelle and tower: Range(0.1 to 10) Hz
-     -- 
-    
-    '''
+    # Siemens implementation
+    def calculate_rms(self,freq, fft_modulus_norm):
+        filter_indexes=[(freq > 10) & (freq<5000)]
+        freq = freq[filter_indexes]
+        fft_modulus_norm = fft_modulus_norm[filter_indexes]
+        Y1 = fft_modulus_norm*2
+        sum=0
+        for a in Y1:
+            sum+=a**2
+        rms = np.sqrt(0.5*sum)
+        return rms
 
 ''' ************ EXAMPLE FOR WT01 ******************'''
-wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
+wt_instance = wt_data.load_instance("WTG01",load_minimal = True)
 intervals = wt_instance.ten_second_intervals
 
 rms_arr = []
 for i, interval in enumerate(intervals):
+    print(f"Interval number {i} started..")
     # CHECK IF WE WANT INTERVAL
     interval1 = interval
     time_stamps = interval.sensor_df['TimeStamp']
@@ -146,10 +153,11 @@ for i, interval in enumerate(intervals):
     except:
         continue
     fast = FastFourierTransform(vibration, time_stamps)
-    fft, time, centroid, rms = fast.fft_transform_time(True)
-    RMS = fast.calculate_rms1(fft)
+    fft, time, centroid,rms = fast.fft_transform_time(True)
+    #RMS = fast.calculate_rms1(fft)
+    # RMS = fast.calc_rms(fft)
     print(" ")
-    print(f"RMS new:: {RMS}")
+    # print(f"RMS new:: {RMS}")
     rms_arr.append(rms) # This can be plotted
     # LAG FOR LAV FREKVENS
     # LAG FOR HØY FREKVENS

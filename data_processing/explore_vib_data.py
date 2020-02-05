@@ -130,7 +130,7 @@ for i, interval in enumerate(intervals):
         # fast.plot_input()
         fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i, plot=True)
         spectral_centroids.append(spectral_centroid)
-        #print(spectral_centroid)
+        print(spectral_centroid)
 
 ''' 
 print("plotting spectral_centroids: ")

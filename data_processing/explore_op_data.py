@@ -208,7 +208,7 @@ def remove_rows_with_wild_noise(df):
 
 
 def load_and_build_df(name):
-    wt_instance_1 = wt_data.load_instance(name, False)  # True for loading minimal
+    wt_instance_1 = wt_data.load_instance(name, True)  # True for loading minimal
     gc.collect()
     op_df = build_op_df_for_wt(wt_instance_1)
     del wt_instance_1

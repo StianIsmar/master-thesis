@@ -1,15 +1,18 @@
 import numpy as np
 import pandas as pd
 import pickle
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 import wt_data
 import ff_transform
+import data_statistics
 
 
 def create_rms_datasets(wt_instance):
     intervals = wt_instance.ten_second_intervals
     all_rms_data = []
+    all
     for i, interval in enumerate(intervals):
         #if i > 40:
             #break
@@ -67,20 +70,19 @@ def save_dataframe(dataframe, name):
 def load_dataframe(name):
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
     dataframe = pickle.load(open(path + name + '.p', 'rb'))
-    print(f'Loaded dataframe.')
+    print('Loaded')
     return dataframe
 
 def plot_column(df):
     x_values = np.arange(0, df.shape[0])
     for i, col_name in enumerate(df.columns.values):
         plt.figure(figsize=(15, 8))
-        plt.plot(x_values, df[col_name])
+        sns.lineplot(x_values, df[col_name])
         plt.title(f'Plot of {col_name}')
         plt.xlabel('Interval')
         plt.ylabel(col_name)
         plt.margins(0)
         plt.show()
-
 
 
 
@@ -91,3 +93,6 @@ df = load_dataframe('WTG01_RMS')
 train, test = train_test_split(df, 0.8)
 
 plot_column(train)
+
+data_statistics.boxplot_rms(train, name='Training Set')
+data_statistics.boxplot_rms(test, name='Testing Set')

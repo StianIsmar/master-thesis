@@ -6,12 +6,13 @@ import wt_data
 
 class FastFourierTransform:
     # Amplitudes is a row vector
-    def __init__(self, amplitudes, t):
+    def __init__(self, amplitudes, t,type):
         self.s = amplitudes
         self.t = t
         self.normalized_amp = None
         self.rms_time = None
         self.rms_order = None
+        self.type = type
 
 
     # Plotting in the input domain before fft
@@ -107,13 +108,13 @@ class FastFourierTransform:
         return fft, time, centroid, rms
 
     # Function returns rms as a float. Called in the fft_transform_time function
-    def rms(self, freq, fft_modulus_norm, type="generator"):
+    def rms(self, freq, fft_modulus_norm):
         # Filtering the frequency spectrum based on what component is being analysed
-        if (type=="generator"):
+        if (self.type=="generator"):
             filter_indexes = [(freq > 10) & (freq < 5000)]
-        if type == "gearbox":
+        if self.type == "gearbox":
             filter_indexes = [(freq > 10) & (freq < 2000)]
-        if type == "nacelle":
+        if self.type == "nacelle":
             filter_indexes = [(freq > 0.1) & (freq < 10)]
 
         freq = freq[filter_indexes]
@@ -138,7 +139,8 @@ class FastFourierTransform:
         rms = np.sqrt(0.5*sum)
         return rms
 
-''' ************ EXAMPLE FOR WT01 ******************'''
+'''
+ ************ EXAMPLE FOR WT01 ******************
 wt_instance = wt_data.load_instance("WTG01",load_minimal = True)
 intervals = wt_instance.ten_second_intervals
 
@@ -149,10 +151,13 @@ for i, interval in enumerate(intervals):
     interval1 = interval
     time_stamps = interval.sensor_df['TimeStamp']
     try:
+        feature = 'GnNDe;0,0102;m/s2'
         vibration = interval.sensor_df['GnNDe;0,0102;m/s2']
+        if feature == 'GnNDe;0,0102;m/s2':
+            type = "generator"
     except:
         continue
-    fast = FastFourierTransform(vibration, time_stamps)
+    fast = FastFourierTransform(vibration, time_stamps, type)
     fft, time, centroid,rms = fast.fft_transform_time(True)
     #RMS = fast.calculate_rms1(fft)
     # RMS = fast.calc_rms(fft)
@@ -169,3 +174,7 @@ sns.lineplot(range(len(rms_arr)), rms_arr)
 plt.title("RMS PLOT")
 plt.margins(0)
 plt.show()
+
+
+
+'''

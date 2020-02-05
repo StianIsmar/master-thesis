@@ -79,7 +79,7 @@ def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
 
 # ---------  TO LOAD WT INSTANCES --------------
 
-#wt_instance_1 = wt_data.load_instance("WTG01")
+#wt_instance = wt_data.load_instance("WTG01")
 #wt_instance_2 = wt_data.load_instance("WTG02")
 #wt_instance_3 = wt_data.load_instance("WTG03")
 #wt_instance_4 = wt_data.load_instance("WTG04")
@@ -90,21 +90,20 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 30:
+    if i > 20:
         break
+    print(f'Checking interval: {i}', end='\r')
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']
     rot_data = interval.high_speed_rot_data
     peak_array = interval.high_speed_peak_array
     avg_speed = rot_data['mean']
-    print(rot_data)
     avg_power = interval.op_df["PwrAvg;kW"][0]
 
-    if avg_power > 2600:
-
+    if avg_power > 2500:
+        print(f'Calc FFT for interval: {i}', end='\r')
         time_stamps = interval.sensor_df['TimeStamp']
-        vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
         try:
-            vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
+            vibration_signal = interval.sensor_df['GbxHssRr;0,0102;m/s2']
             time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.linear_interpolation_resampling(time_stamps,
                                                                                                       vibration_signal,
                                                                                                       peak_array, 1500,
@@ -127,12 +126,11 @@ for i, interval in enumerate(intervals):
         '''
 
         # RUN FFT on resampled data for all revolutions
-        print("FFT")
         fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
         # fast.plot_input()
-        fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i)
+        fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i, plot=True)
         spectral_centroids.append(spectral_centroid)
-        print(spectral_centroid)
+        #print(spectral_centroid)
 
 ''' 
 print("plotting spectral_centroids: ")
@@ -144,16 +142,3 @@ plt.xlabel('Interval number')
 plt.plot(x,y)
 plt.show()
 '''
-
-
-# ------- Plot low rot speed -------------
-'''
-for i, interval in enumerate(intervals):
-    if i > 9:
-        break
-    print(f'\nAverage Rotational Shaft Speed for {i}: {interval.op_df["LowSpeed:rps"][0]}')
-    print(f'Average Power Generated for {i}: {interval.op_df["PwrAvg;kW"][0]}')
-    cols = ['LssShf;1;V', 'MnBrg;0,0102;m/s2']#, 'GbxRotBrg;0,0102;m/s2']
-    plot_sensor_data(interval, cols, title=f'{i}')
-'''
-

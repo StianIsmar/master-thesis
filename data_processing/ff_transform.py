@@ -27,7 +27,7 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform_order(self, rot_data, avg_power, interval_num,plot=False):
+    def fft_transform_order(self, rot_data, avg_power, interval_num, plot=False):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -39,11 +39,12 @@ class FastFourierTransform:
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
+        y = np.abs(fft)[:N // 2] * 1 / N  # Normalized. Cutting away half of the fft frequencies.
+
         if plot == True:
             plt.figure(figsize=(15, 8))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Order [X]")
-            y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
             sns.lineplot(f, y)
             plt.title(f'FFT Order Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
                       f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '

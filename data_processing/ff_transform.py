@@ -88,7 +88,7 @@ class FastFourierTransform:
         y_norm = np.abs(fft)[:N // 2] * 1 / N  # Normalized
         fft_modulus_norm = y_norm
 
-        rms = self.rms(f,fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
+        rms = self.rms(f, fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
 
         if plot == True:

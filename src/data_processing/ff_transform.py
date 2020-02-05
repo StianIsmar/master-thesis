@@ -4,6 +4,30 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import wt_data
 
+
+# import external modules
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import sys, os
+ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
+print("ROOT", ROOT_PATH)
+module_path = os.path.abspath(os.path.join(ROOT_PATH+"/utils/"))
+if module_path not in sys.path:
+    print("appended")
+    sys.path.append(module_path)
+
+import functions as f
+
+
+c, p = f.color_palette()
+sns.set(context='paper', style='whitegrid', palette=np.array(p))
+print(ROOT_PATH)
+plt.style.use('file://' + ROOT_PATH + "/utils/plotparams.rc")
+
+
+
+
 class FastFourierTransform:
     # Amplitudes is a row vector
     def __init__(self, amplitudes, t,type):
@@ -45,11 +69,13 @@ class FastFourierTransform:
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
         f = f[:N // 2]
         if plot == True:
-            plt.figure(figsize=(15, 8))
+            plt.figure(figsize=(15, 5))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Order [X]")
             y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
-            sns.lineplot(f, y)
+            plt.plot(f, y, markersize=0.5, marker="o", lw=2)
+            xticks = f
+            plt.xticks(range(1, len(xticks) + 1), f, rotation=90)
             plt.title(f'FFT Order Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
                       f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
                       f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
@@ -91,10 +117,10 @@ class FastFourierTransform:
         self.rms_time = rms
 
         if plot == True:
-            plt.figure(figsize=(15, 8))
+            plt.figure(figsize=(15, 5))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Frequency [Hz]")
-            sns.lineplot(f, y_norm)
+            plt.plot(f, y_norm, markersize=0.5, marker="o", lw=2)
             plt.title("FFT of time domain amplitude")
             plt.title("FFT Transformation to the time domain")
             plt.margins(0)
@@ -139,8 +165,8 @@ class FastFourierTransform:
         rms = np.sqrt(0.5*sum)
         return rms
 
-'''
- ************ EXAMPLE FOR WT01 ******************
+
+# ************ EXAMPLE FOR WT01 ******************
 wt_instance = wt_data.load_instance("WTG01",load_minimal = True)
 intervals = wt_instance.ten_second_intervals
 
@@ -167,14 +193,10 @@ for i, interval in enumerate(intervals):
     # LAG FOR LAV FREKVENS
     # LAG FOR HØY FREKVENS
 
-plt.figure(figsize=(15, 8))
+plt.figure(figsize=(15, 5))
 plt.ylabel("RMS value")
 plt.xlabel("Interval nr.")
-sns.lineplot(range(len(rms_arr)), rms_arr)
+plt.plot(range(len(rms_arr)), rms_arr,marker="o", markersize=4)
 plt.title("RMS PLOT")
 plt.margins(0)
 plt.show()
-
-
-
-'''

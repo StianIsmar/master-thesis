@@ -34,7 +34,7 @@ class Wt_data():
         loop_count = 0
         for filename in os.listdir(path + wt_name):
             if (save_minimal == True):
-                if loop_count > 30:
+                if loop_count > 10:
                     break
             if filename.endswith(".uff") and not filename[0] == ".":
                 loop_count+=1

@@ -98,22 +98,23 @@ for i, interval in enumerate(intervals):
     peak_array = interval.high_speed_peak_array
     avg_speed = rot_data['mean']
     avg_power = interval.op_df["PwrAvg;kW"][0]
+    vibration_name = 'GnNDe'
 
     if avg_power > 2500:
         print(f'Calc FFT for interval: {i}', end='\r')
         time_stamps = interval.sensor_df['TimeStamp']
         try:
-            vibration_signal = interval.sensor_df['GbxHssRr;0,0102;m/s2']
+            vibration_signal = interval.sensor_df['GnNDe;0,0102;m/s2']
             time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.linear_interpolation_resampling(time_stamps,
                                                                                                       vibration_signal,
                                                                                                       peak_array, 1500,
-                                                                                                      round_plots=2,
-                                                                                                      plotting=False)
+                                                                                                      round_plots=3,
+                                                                                                      plotting=True,
+                                                                                                      name=vibration_name)
             #plot_sensor_data(interval, cols, avg_speed, peak_array, title=f'{i}')
         except:
             print("Could not find GnNDe;0,0102;m/s2")
             continue
-
 
         # RUN FFT on resampled data for one revolution
         '''
@@ -126,11 +127,11 @@ for i, interval in enumerate(intervals):
         '''
 
         # RUN FFT on resampled data for all revolutions
-        fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled)
+
+        fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled, 'gearbox')
         # fast.plot_input()
-        fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i, plot=True)
+        fft, time, spectral_centroid = fast.fft_transform_order(rot_data, avg_power, i, plot=True, name=vibration_name)
         spectral_centroids.append(spectral_centroid)
-        print(spectral_centroid)
 
 ''' 
 print("plotting spectral_centroids: ")

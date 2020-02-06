@@ -8,16 +8,15 @@ import wt_data
 import ff_transform
 import data_statistics
 
-
+# Creates a dataframe with rms, skew and curtosis
 def create_rms_datasets(wt_instance):
     intervals = wt_instance.ten_second_intervals
     all_rms_data = []
-    all
     for i, interval in enumerate(intervals):
         #if i > 40:
             #break
         if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > 0):
-            print(f'Checking interval: {i} / {len(intervals)}', end='\r')
+            print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
             rot_data = interval.high_speed_rot_data
             peak_array = interval.high_speed_peak_array
             avg_speed = rot_data['mean']
@@ -25,6 +24,7 @@ def create_rms_datasets(wt_instance):
             time_stamps = interval.sensor_df['TimeStamp']
 
             interval_rms_data = []
+            interval_skew_data = []
             interval_rms_data.append(avg_power)
             for i, column_name in enumerate(interval.sensor_df.columns.values):
                 vibration_signal = interval.sensor_df[column_name]
@@ -50,9 +50,22 @@ def create_rms_datasets(wt_instance):
             all_rms_data.append(interval_rms_data)
 
     # Crete a dataframe for all rms_data
-    df = pd.DataFrame(all_rms_data, columns=['AvgPower', 'GnDe_RMS', 'GnNDe_RMS', 'MnBrg_RMS', 'GbxRotBrg_RMS',
-                                             'Gbx1Ps_RMS','GbxHssFr_RMS','GbxHssRr_RMS', 'Gbx2Ps_RMS', 'GbxIss_RMS',
-                                             'NacZdir_RMS', 'NacXdir_RMS'])
+
+    df = pd.DataFrame(all_rms_data, columns=['AvgPower',
+                                             'GnDe_RMS',
+                                             'GnNDe_RMS',
+                                             'MnBrg_RMS',
+                                             'GbxRotBrg_RMS',
+                                             'Gbx1Ps_RMS',
+                                             'GbxHssFr_RMS',
+                                             'GbxHssRr_RMS',
+                                             'Gbx2Ps_RMS',
+                                             'GbxIss_RMS',
+                                             'NacZdir_RMS',
+                                             'NacXdir_RMS',
+                                             ])
+
+
     return df
 
 def train_test_split(dataframe, percentage):
@@ -85,14 +98,16 @@ def plot_column(df):
         plt.show()
 
 
+wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
+df = create_rms_datasets(wt_instance)
+#df = load_dataframe('WTG01_RMS')
+#train, test = train_test_split(df, 0.8)
 
+print(df)
 
-#wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
-#df = create_rms_datasets(wt_instance)
-df = load_dataframe('WTG01_RMS')
-train, test = train_test_split(df, 0.8)
+#plot_column(train)
+#train.hist()
+#data_statistics.plot_histograms(train)
 
-plot_column(train)
-
-data_statistics.boxplot_rms(train, name='Training Set')
-data_statistics.boxplot_rms(test, name='Testing Set')
+#data_statistics.boxplot_rms(train, name='Training Set')
+#data_statistics.boxplot_rms(test, name='Testing Set')

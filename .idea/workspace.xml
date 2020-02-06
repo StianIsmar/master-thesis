@@ -3,8 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/build_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/build_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/data_statistics.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_statistics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/build_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/build_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/data_statistics.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/data_statistics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_processing/explore_vib_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/explore_vib_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_processing/ff_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/ff_transform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_processing/resample.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/resample.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,18 +61,23 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.build_dataset">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/data_processing" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.explore_vib_data">
     <configuration name="build_dataset" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="master-thesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_processing" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/data_processing" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_processing/build_dataset.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/data_processing/build_dataset.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -78,20 +86,17 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="explore_2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="explore_vib_data" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="master-thesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_processing" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/data_processing" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_processing/explore_2.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/data_processing/explore_vib_data.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -168,11 +173,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.explore_vib_data" />
         <item itemvalue="Python.build_dataset" />
         <item itemvalue="Python.build_dataset" />
         <item itemvalue="Python.build_dataset" />
         <item itemvalue="Python.build_dataset" />
-        <item itemvalue="Python.explore_2" />
       </list>
     </recent_temporary>
   </component>
@@ -220,7 +225,7 @@
       <workItem from="1580460368586" duration="10798000" />
       <workItem from="1580475634857" duration="1521000" />
       <workItem from="1580726484791" duration="2296000" />
-      <workItem from="1580906950839" duration="4174000" />
+      <workItem from="1580906950839" duration="15615000" />
     </task>
     <servers />
   </component>
@@ -275,90 +280,90 @@
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
     <state x="-124" y="-1115" width="1348" height="910" key="DiffContextDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580396763638" />
-    <state width="444" height="412" key="GridCell.Tab.0.bottom" timestamp="1580907501357">
+    <state width="740" height="658" key="GridCell.Tab.0.bottom" timestamp="1580983515022">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="939" height="353" key="GridCell.Tab.0.bottom/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580477228232" />
     <state width="1238" height="199" key="GridCell.Tab.0.bottom/0.23.1280.777/-324.-1177.1920.1177@0.23.1280.777" timestamp="1580393972198" />
     <state width="1878" height="319" key="GridCell.Tab.0.bottom/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563877" />
     <state width="1238" height="200" key="GridCell.Tab.0.bottom/0.23.1280.777@0.23.1280.777" timestamp="1580383226945" />
-    <state width="444" height="412" key="GridCell.Tab.0.bottom/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501357" />
+    <state width="740" height="658" key="GridCell.Tab.0.bottom/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515022" />
     <state width="918" height="379" key="GridCell.Tab.0.bottom/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319398085" />
-    <state width="444" height="412" key="GridCell.Tab.0.center" timestamp="1580907501356">
+    <state width="740" height="658" key="GridCell.Tab.0.center" timestamp="1580983515018">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="939" height="353" key="GridCell.Tab.0.center/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580477228231" />
     <state width="1238" height="199" key="GridCell.Tab.0.center/0.23.1280.777/-324.-1177.1920.1177@0.23.1280.777" timestamp="1580393972197" />
     <state width="1878" height="319" key="GridCell.Tab.0.center/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563876" />
     <state width="1238" height="200" key="GridCell.Tab.0.center/0.23.1280.777@0.23.1280.777" timestamp="1580383226944" />
-    <state width="444" height="412" key="GridCell.Tab.0.center/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501356" />
+    <state width="740" height="658" key="GridCell.Tab.0.center/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515018" />
     <state width="918" height="379" key="GridCell.Tab.0.center/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319398084" />
-    <state width="444" height="412" key="GridCell.Tab.0.left" timestamp="1580907501355">
+    <state width="740" height="658" key="GridCell.Tab.0.left" timestamp="1580983515015">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="939" height="353" key="GridCell.Tab.0.left/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580477228229" />
     <state width="1238" height="199" key="GridCell.Tab.0.left/0.23.1280.777/-324.-1177.1920.1177@0.23.1280.777" timestamp="1580393972197" />
     <state width="1878" height="319" key="GridCell.Tab.0.left/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563876" />
     <state width="1238" height="200" key="GridCell.Tab.0.left/0.23.1280.777@0.23.1280.777" timestamp="1580383226944" />
-    <state width="444" height="412" key="GridCell.Tab.0.left/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501355" />
+    <state width="740" height="658" key="GridCell.Tab.0.left/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515015" />
     <state width="918" height="379" key="GridCell.Tab.0.left/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319398084" />
-    <state width="444" height="412" key="GridCell.Tab.0.right" timestamp="1580907501356">
+    <state width="740" height="658" key="GridCell.Tab.0.right" timestamp="1580983515020">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="939" height="353" key="GridCell.Tab.0.right/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580477228232" />
     <state width="1238" height="199" key="GridCell.Tab.0.right/0.23.1280.777/-324.-1177.1920.1177@0.23.1280.777" timestamp="1580393972198" />
     <state width="1878" height="319" key="GridCell.Tab.0.right/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563877" />
     <state width="1238" height="200" key="GridCell.Tab.0.right/0.23.1280.777@0.23.1280.777" timestamp="1580383226945" />
-    <state width="444" height="412" key="GridCell.Tab.0.right/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501356" />
+    <state width="740" height="658" key="GridCell.Tab.0.right/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515020" />
     <state width="918" height="379" key="GridCell.Tab.0.right/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319398085" />
-    <state width="444" height="412" key="GridCell.Tab.1.bottom" timestamp="1580907501360">
+    <state width="740" height="658" key="GridCell.Tab.1.bottom" timestamp="1580983515029">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="1878" height="319" key="GridCell.Tab.1.bottom/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580393135187" />
     <state width="1878" height="319" key="GridCell.Tab.1.bottom/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563879" />
     <state width="1238" height="191" key="GridCell.Tab.1.bottom/0.23.1280.777@0.23.1280.777" timestamp="1580310679602" />
-    <state width="444" height="412" key="GridCell.Tab.1.bottom/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501360" />
+    <state width="740" height="658" key="GridCell.Tab.1.bottom/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515029" />
     <state width="1238" height="191" key="GridCell.Tab.1.bottom/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319075273" />
-    <state width="444" height="412" key="GridCell.Tab.1.center" timestamp="1580907501358">
+    <state width="740" height="658" key="GridCell.Tab.1.center" timestamp="1580983515028">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="1878" height="319" key="GridCell.Tab.1.center/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580393135186" />
     <state width="1878" height="319" key="GridCell.Tab.1.center/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563878" />
     <state width="1238" height="191" key="GridCell.Tab.1.center/0.23.1280.777@0.23.1280.777" timestamp="1580310679600" />
-    <state width="444" height="412" key="GridCell.Tab.1.center/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501358" />
+    <state width="740" height="658" key="GridCell.Tab.1.center/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515028" />
     <state width="1238" height="191" key="GridCell.Tab.1.center/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319075273" />
-    <state width="444" height="412" key="GridCell.Tab.1.left" timestamp="1580907501358">
+    <state width="740" height="658" key="GridCell.Tab.1.left" timestamp="1580983515025">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="1878" height="319" key="GridCell.Tab.1.left/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580393135185" />
     <state width="1878" height="319" key="GridCell.Tab.1.left/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563878" />
     <state width="1238" height="191" key="GridCell.Tab.1.left/0.23.1280.777@0.23.1280.777" timestamp="1580310679599" />
-    <state width="444" height="412" key="GridCell.Tab.1.left/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501358" />
+    <state width="740" height="658" key="GridCell.Tab.1.left/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515025" />
     <state width="1238" height="191" key="GridCell.Tab.1.left/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319075272" />
-    <state width="444" height="412" key="GridCell.Tab.1.right" timestamp="1580907501359">
+    <state width="740" height="658" key="GridCell.Tab.1.right" timestamp="1580983515029">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state width="1878" height="319" key="GridCell.Tab.1.right/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580393135186" />
     <state width="1878" height="319" key="GridCell.Tab.1.right/0.23.1280.777/1280.-583.1920.1177@1280.-583.1920.1177" timestamp="1580732563879" />
     <state width="1238" height="191" key="GridCell.Tab.1.right/0.23.1280.777@0.23.1280.777" timestamp="1580310679601" />
-    <state width="444" height="412" key="GridCell.Tab.1.right/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501359" />
+    <state width="740" height="658" key="GridCell.Tab.1.right/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515029" />
     <state width="1238" height="191" key="GridCell.Tab.1.right/281.1223.1280.777/0.23.1920.1177@0.23.1920.1177" timestamp="1580319075273" />
-    <state width="444" height="412" key="GridCell.Tab.2.bottom" timestamp="1580907501362">
+    <state width="740" height="658" key="GridCell.Tab.2.bottom" timestamp="1580983515032">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
-    <state width="444" height="412" key="GridCell.Tab.2.bottom/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501362" />
-    <state width="444" height="412" key="GridCell.Tab.2.center" timestamp="1580907501361">
+    <state width="740" height="658" key="GridCell.Tab.2.bottom/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515032" />
+    <state width="740" height="658" key="GridCell.Tab.2.center" timestamp="1580983515030">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
-    <state width="444" height="412" key="GridCell.Tab.2.center/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501361" />
-    <state width="444" height="412" key="GridCell.Tab.2.left" timestamp="1580907501361">
+    <state width="740" height="658" key="GridCell.Tab.2.center/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515030" />
+    <state width="740" height="658" key="GridCell.Tab.2.left" timestamp="1580983515030">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
-    <state width="444" height="412" key="GridCell.Tab.2.left/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501361" />
-    <state width="444" height="412" key="GridCell.Tab.2.right" timestamp="1580907501362">
+    <state width="740" height="658" key="GridCell.Tab.2.left/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515030" />
+    <state width="740" height="658" key="GridCell.Tab.2.right" timestamp="1580983515031">
       <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
-    <state width="444" height="412" key="GridCell.Tab.2.right/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580907501362" />
+    <state width="740" height="658" key="GridCell.Tab.2.right/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1580983515031" />
     <state x="-324" y="-1177" width="1920" height="1177" key="MergeDialog" timestamp="1580397056648">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>
@@ -406,13 +411,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/data_processing/build_dataset.py</url>
-          <line>70</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -424,5 +422,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/master_thesis$build_dataset.coverage" NAME="build_dataset Coverage Results" MODIFIED="1580907297694" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_processing" />
+    <SUITE FILE_PATH="coverage/master_thesis$explore_vib_data.coverage" NAME="explore_vib_data Coverage Results" MODIFIED="1580983487484" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/data_processing" />
   </component>
 </project>

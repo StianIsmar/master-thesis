@@ -1,7 +1,4 @@
 from __future__ import division
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import wt_data
 
 
@@ -10,6 +7,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import sys, os
+from scipy.stats import skew
+from scipy.stats import kurtosis
+
+
 ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
 print("ROOT", ROOT_PATH)
 module_path = os.path.abspath(os.path.join(ROOT_PATH+"/utils/"))
@@ -24,7 +25,6 @@ c, p = f.color_palette()
 sns.set(context='paper', style='whitegrid', palette=np.array(p))
 print(ROOT_PATH)
 plt.style.use('file://' + ROOT_PATH + "/utils/plotparams.rc")
-
 
 
 
@@ -56,7 +56,7 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform_order(self, rot_data, avg_power, interval_num, plot=False):
+    def fft_transform_order(self, rot_data, avg_power, interval_num, plot=False, name=''):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -77,8 +77,8 @@ class FastFourierTransform:
             y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
             plt.plot(f, y, markersize=0.5, marker="o", lw=2)
             xticks = f
-            plt.xticks(range(1, len(xticks) + 1), f, rotation=90)
-            plt.title(f'FFT Order Transformation of INTERVAL: {interval_num} \nAvg Power: {avg_power:.2f}     '
+            #plt.xticks(range(1, len(xticks) + 1), f, rotation=90)
+            plt.title(f'FFT Order Transformation of {name} Interval: {interval_num} \nAvg Power: {avg_power:.2f}     '
                       f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
                       f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
             plt.margins(0)
@@ -135,6 +135,9 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y_norm)
         return fft, time, centroid, rms
 
+
+
+
     # Function returns rms as a float. Called in the fft_transform_time function
     def rms(self, freq, fft_modulus_norm):
         # Filtering the frequency spectrum based on what component is being analysed
@@ -169,6 +172,7 @@ class FastFourierTransform:
 
 
 # ************ EXAMPLE FOR WT01 ******************
+'''
 wt_instance = wt_data.load_instance("WTG01",load_minimal = True)
 intervals = wt_instance.ten_second_intervals
 
@@ -202,3 +206,5 @@ plt.plot(range(len(rms_arr)), rms_arr,marker="o", markersize=4)
 plt.title("RMS PLOT")
 plt.margins(0)
 plt.show()
+
+'''

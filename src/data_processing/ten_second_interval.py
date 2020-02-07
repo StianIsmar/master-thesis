@@ -95,6 +95,7 @@ class TenSecondInterval:
             plt.xlabel('Time')
             plt.show()
 
+
     def calc_speed(self, col_name):
         # Use try/except to deal with not finding the right column
         try:

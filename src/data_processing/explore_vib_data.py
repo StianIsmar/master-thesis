@@ -1,15 +1,13 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import process_data
+import ten_second_interval
 import wt_data
 import ff_transform
 import resample
 import seaborn as sns
 import matplotlib as mpl
 mpl.rcParams['agg.path.chunksize'] = 10000
-
-
 
 def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
     x_values  = interval.sensor_df['TimeStamp']
@@ -47,12 +45,6 @@ def plot_sensor_data(interval, colName, avg_speed, peak_array, title=""):
             plt.axvline(x=x_val, c='r', linewidth=0.3)
         plt.margins(0)
         plt.show()
-
-
-
-
-
-
 
 #instance = process_data.TenSecondInterval()
 

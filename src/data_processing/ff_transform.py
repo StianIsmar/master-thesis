@@ -1,4 +1,7 @@
 from __future__ import division
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 import wt_data
 
 
@@ -92,6 +95,10 @@ class FastFourierTransform:
         return fft, time, centroid
 
     # Skew, Kortoisi
+    '''
+     f is the half spectrum frequencies in the fft
+     y is the normalized magnitude of the fft
+    '''
     def find_spectral_centroid(self, f,y):
         weight_sum = 0
         for i, freq in enumerate(f):
@@ -160,9 +167,6 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y_norm)
         return fft, time, centroid, rms, frequency_bins
 
-
-
-
     # Function returns rms as a float. Called in the fft_transform_time function
     def rms(self, freq, fft_modulus_norm):
         # Filtering the frequency spectrum based on what component is being analysed
@@ -230,6 +234,7 @@ plt.xlabel("Interval nr.")
 plt.plot(range(len(rms_arr)), rms_arr,marker="o", markersize=4)
 plt.title("RMS PLOT")
 plt.margins(0)
+plt.ylim(0, 7.5)
 plt.show()
 
 '''

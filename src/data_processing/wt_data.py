@@ -4,7 +4,7 @@ four wind turbines at Skomakerfjellet.
 '''
 
 import os
-from process_data import TenSecondInterval
+from ten_second_interval import TenSecondInterval
 import pandas as pd
 import pickle
 import os.path
@@ -102,8 +102,17 @@ def create_wt_data(name, save_minimal=False):
     return wt_01
 
 #create_wt_data()
-#wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
+'''
+wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
+saved = False
+for i, instance in enumerate(wt_instance_1.ten_second_intervals):
 
+    if (not (saved == True)):
+        print("saved")
+        df = instance.sensor_df
+        df.to_csv(r'instance.sensor_df.csv')
+        saved = True
+'''
 # wt_02 = Wt_data()
 
 # wt_03 = Wt_data()

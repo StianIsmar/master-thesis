@@ -34,7 +34,7 @@ class Wt_data():
         loop_count = 0
         for filename in os.listdir(path + wt_name):
             if (save_minimal == True):
-                if loop_count > 10:
+                if loop_count > 30:
                     break
             if filename.endswith(".uff") and not filename[0] == ".":
                 loop_count+=1
@@ -101,7 +101,7 @@ def create_wt_data(name, save_minimal=False):
         wt_01.save_instance()
     return wt_01
 
-#create_wt_data()
+#create_wt_data('WTG01', save_minimal=True)
 '''
 wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
 saved = False

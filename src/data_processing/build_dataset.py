@@ -76,18 +76,24 @@ def create_rms_datasets_for_ISO_frequencies(wt_instance):
 
     return df
 
+
+
 ''' 
 Creates a dataframe for each vibration measurement. Splits the frequency domain into different a set of bins,
 calculates rms for each bin and stores it as a feature in the dataframe.
 Input: 
 wt_instance = a wind turbine instace (object)
 sensor_name = name of the sensor to analyse (string)
-type = which component is measured (string) either gearbox, nacelle, or generator
 bins = number of bins (int) default is 25
+calc_rms_for_bins = calculates rms for each bin (boolean)
+plot = plots the FFT transformation (boolean)
+plot_vertical_lines = blots a separation line between each bin (boolean)
 Output:
 df = pandas dataframe with rms value for each bin
 '''
-def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25):
+def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25,
+                                          calc_rms_for_bins=True, plot=False,
+                                          plot_vertical_lines=False):
     intervals = wt_instance.ten_second_intervals
     whole_dataset = []
     type = ''
@@ -110,7 +116,7 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25):
 
     for i, interval in enumerate(intervals):
         interval_data = []
-        if i > 0:
+        if i > 50:
             break
         # We only want to use data which has measurement for all signals and positive average power
         if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > 0):
@@ -128,17 +134,26 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25):
 
             vibration_signal = interval.sensor_df[sensor_name]
             fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
-            fft, time, centroid, rms = fast.fft_transform_time(calc_rms_for_bins=True, plot=True, bins=bins)
-            interval_data.append(rms)
+            fft, time, centroid, rms, rms_bins = fast.fft_transform_time(calc_rms_for_bins=calc_rms_for_bins,
+                                                                               plot=plot,
+                                                                               bins=bins,
+                                                                               plot_vertical_lines=plot_vertical_lines)
+            # Add each rms value for all bins into interval_data
+            for i, rms_val in enumerate(rms_bins):
+                interval_data.append(rms_val)
+
             whole_dataset.append(interval_data)
 
-    signal_rms_name = sensor_name.split(';')[0]
+    df_column_names = ['AvgPower', 'ActPower', 'WindSpeed', 'NacelleDirection']
+    for i in range(len(rms_bins)):
+        signal_rms_name = f"{sensor_name.split(';')[0]}_RMS_{i}"
+        df_column_names.append(signal_rms_name)
 
     # Crete a dataframe for all rms_data
-    df_column_names = ['AvgPower', 'ActPower', 'WindSpeed', 'NacelleDirection', signal_rms_name]
-    df = pd.DataFrame(whole_dataset, columns=df_column_names)
 
+    df = pd.DataFrame(whole_dataset, columns=df_column_names)
     return df
+
 
 def train_test_split(dataframe, percentage):
     split_index = int(np.floor(df.shape[0]) * percentage)
@@ -169,13 +184,13 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
-
 wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
-df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2')
+df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2',
+                                           plot=True, bins=50, plot_vertical_lines=False)
+
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)
 
-print(df)
 
 #plot_column(train)
 #train.hist()

@@ -106,7 +106,7 @@ class FastFourierTransform:
         return weight_sum/np.sum(y)
 
 
-    def fft_transform_time(self, calc_rms_for_bins=False, plot=False, bins=0):
+    def fft_transform_time(self, calc_rms_for_bins=False, plot=False, bins=0, plot_vertical_lines=False):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -123,40 +123,54 @@ class FastFourierTransform:
         fft_modulus_norm = y_norm
 
         rms_bins = []
+        frequency_bins = np.linspace(0, max(f), bins + 1)
         if calc_rms_for_bins:
             delta_f = f[1] - f[0]
-            frequency_bins = np.linspace(0, max(f), bins)
 
-            bin_indexes = [f[0]]
-            bin_limit = 1
+            # Finding the correct indices to separate frequency and amplitude correctly.
+            bin_indexes = [0]
+            # Since the firs idex is already added to bin_indexes we start frequency_bins_index at 1
+            frequency_bins_index = 1
             for i in range(len(f)):
-                if f[i] >= frequency_bins[bin_limit]:
-                    bin_limit += 1
-                    bin_indexes.append(f[i])
+                if f[i] >= frequency_bins[frequency_bins_index]:
+                    frequency_bins_index += 1
+                    bin_indexes.append(i)
 
-            bin_indexes = np.where(f == frequency_bins)
-            print(f)
-            print(bin_indexes[0])
-            for i in range(len(frequency_bins) + delta_f):
-                rms_bin = self.rms([f])
+            for i in range(len(bin_indexes)-1):
+                amp = y_norm[bin_indexes[i]:bin_indexes[i+1]]
+                rms_bins.append(self.rms_bin(amp))
+
 
         rms = self.rms(f, fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
 
-
-
         if plot == True:
-            plt.figure(figsize=(15, 5))
-            plt.ylabel("Normalised Amplitude")
-            plt.xlabel("Frequency [Hz]")
-            plt.plot(f, y_norm, markersize=0.5, marker="o", lw=2)
-            plt.title("FFT of time domain amplitude")
-            plt.title("FFT Transformation to the time domain")
+            fig, ax1 = plt.subplots(figsize=(15, 5))
+            ax1.set_xlabel("Frequency [Hz]")
+            ax1.set_ylabel("Normalised amplitude")
+            ax1.set_ylim(min(y_norm), max(y_norm)*1.05)
+            #plt.xlabel("Frequency [Hz]")
+            # plt.ylabel("Normalised Amplitude")
+            ax1.plot(f, y_norm, markersize=0.5, marker="o", lw=2, label='FFT transformation')
 
-            # Plot vertical lines
+            # Plot RMS bin values in the same figure
             if calc_rms_for_bins:
+                ax2 = ax1.twinx()
+                ax2.set_ylim(min(rms_bins), max(rms_bins)*1.05)
+                ax2.set_ylabel("Average RMS for each bin")
+                # Plot each RMS value at the average frequency for each bin
+                x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)]
+                ax2.plot(x, rms_bins, c='g', label='RMS for each bin')
+                plt.title(f"FFT Transformation to the time domain with RMS for {bins} bins")
+                fig.legend(loc='upper right', bbox_to_anchor=(0.55, 0.5, 0.4, 0.4))
+            else:
+                # Use another title if we don't plot RMS values
+                plt.title("FFT Transformation to the time domain")
+
+            # Plot vertical lines in the same plot
+            if plot_vertical_lines:
                 for i, bin in enumerate(frequency_bins):
-                    plt.axvline(x=bin, c='r', linewidth=0.8)
+                    plt.axvline(x=bin, c='r', linewidth=0.5)
             plt.margins(0)
             plt.show()
 
@@ -165,7 +179,16 @@ class FastFourierTransform:
 
         # Calculate the spectral centroid
         centroid = self.find_spectral_centroid(f, y_norm)
-        return fft, time, centroid, rms, frequency_bins
+        return fft, time, centroid, rms, rms_bins
+
+
+    def rms_bin(self, amp):
+        sum = 0
+        for a in amp:
+            sum += a**2
+        rms = np.sqrt(2*sum)
+        return rms
+
 
     # Function returns rms as a float. Called in the fft_transform_time function
     def rms(self, freq, fft_modulus_norm):

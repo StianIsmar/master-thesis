@@ -110,8 +110,8 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25):
 
     for i, interval in enumerate(intervals):
         interval_data = []
-        #if i > 0:
-            #break
+        if i > 0:
+            break
         # We only want to use data which has measurement for all signals and positive average power
         if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > 0):
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
@@ -128,7 +128,7 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25):
 
             vibration_signal = interval.sensor_df[sensor_name]
             fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
-            fft, time, centroid, rms = fast.fft_transform_time(plot=True)
+            fft, time, centroid, rms = fast.fft_transform_time(calc_rms_for_bins=True, plot=True, bins=bins)
             interval_data.append(rms)
             whole_dataset.append(interval_data)
 

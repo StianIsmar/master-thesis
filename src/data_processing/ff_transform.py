@@ -99,7 +99,7 @@ class FastFourierTransform:
         return weight_sum/np.sum(y)
 
 
-    def fft_transform_time(self,plot=False):
+    def fft_transform_time(self, calc_rms_for_bins=False, plot=False, bins=0):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -109,25 +109,47 @@ class FastFourierTransform:
         # T is the sample frequency in the data set
         T = self.t[1] - self.t[0]  # This is true when the period between each sample in the time waveform is equal
         N = self.s.size  # size of the amplitude vector
-        f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the bigges freq
+        f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the biggest freq
         f = f[:N // 2]
         y = np.abs(fft)[:N // 2]
         y_norm = np.abs(fft)[:N // 2] * 1 / N  # Normalized
         fft_modulus_norm = y_norm
 
+        rms_bins = []
+        if calc_rms_for_bins:
+            delta_f = f[1] - f[0]
+            frequency_bins = np.linspace(0, max(f), bins)
+
+            bin_indexes = [f[0]]
+            bin_limit = 1
+            for i in range(len(f)):
+                if f[i] >= frequency_bins[bin_limit]:
+                    bin_limit += 1
+                    bin_indexes.append(f[i])
+
+            bin_indexes = np.where(f == frequency_bins)
+            print(f)
+            print(bin_indexes[0])
+            for i in range(len(frequency_bins) + delta_f):
+                rms_bin = self.rms([f])
+
         rms = self.rms(f, fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
 
+
+
         if plot == True:
-            vertical_lines = np.linspace(0, 12800, 25)
             plt.figure(figsize=(15, 5))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Frequency [Hz]")
             plt.plot(f, y_norm, markersize=0.5, marker="o", lw=2)
             plt.title("FFT of time domain amplitude")
             plt.title("FFT Transformation to the time domain")
-            for i, bin in enumerate(vertical_lines):
-                plt.axvline(x=bin, c='r', linewidth=0.8)
+
+            # Plot vertical lines
+            if calc_rms_for_bins:
+                for i, bin in enumerate(frequency_bins):
+                    plt.axvline(x=bin, c='r', linewidth=0.8)
             plt.margins(0)
             plt.show()
 
@@ -136,7 +158,7 @@ class FastFourierTransform:
 
         # Calculate the spectral centroid
         centroid = self.find_spectral_centroid(f, y_norm)
-        return fft, time, centroid, rms
+        return fft, time, centroid, rms, frequency_bins
 
 
 

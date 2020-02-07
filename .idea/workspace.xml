@@ -222,7 +222,7 @@
       <workItem from="1580460368586" duration="10798000" />
       <workItem from="1580475634857" duration="1521000" />
       <workItem from="1580726484791" duration="2296000" />
-      <workItem from="1580906950839" duration="22364000" />
+      <workItem from="1580906950839" duration="25230000" />
     </task>
     <servers />
   </component>
@@ -384,10 +384,11 @@
     <state x="152" y="-842" key="com.intellij.ide.util.TipDialog/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580378920840" />
     <state x="313" y="-756" key="com.intellij.ide.util.TipDialog/0.23.1280.777/-324.-1177.1920.1177@0.23.1280.777" timestamp="1580393743768" />
     <state x="317" y="244" key="com.intellij.ide.util.TipDialog/0.23.1280.777@0.23.1280.777" timestamp="1580304884190" />
-    <state x="-39" y="-665" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1580126553089">
-      <screen x="-324" y="-1177" width="1920" height="1177" />
+    <state x="-1635" y="535" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1581067424067">
+      <screen x="-1920" y="23" width="1920" height="1177" />
     </state>
     <state x="-39" y="-665" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.23.1280.777/-324.-1177.1920.1177@-324.-1177.1920.1177" timestamp="1580126553089" />
+    <state x="-1635" y="535" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.23.1680.1027/-3840.23.1920.1177/-1920.23.1920.1177@-1920.23.1920.1177" timestamp="1581067424067" />
     <state x="-180" y="-1177" width="960" height="1177" key="dock-window-1" timestamp="1580395633950">
       <screen x="-324" y="-1177" width="1920" height="1177" />
     </state>

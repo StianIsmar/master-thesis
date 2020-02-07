@@ -102,6 +102,7 @@ def create_wt_data(name, save_minimal=False):
     return wt_01
 
 #create_wt_data()
+'''
 wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
 saved = False
 for i, instance in enumerate(wt_instance_1.ten_second_intervals):
@@ -109,8 +110,9 @@ for i, instance in enumerate(wt_instance_1.ten_second_intervals):
     if (not (saved == True)):
         print("saved")
         df = instance.sensor_df
-        df.to_csv(r'.\instance.sensor_df.csv')
-
+        df.to_csv(r'instance.sensor_df.csv')
+        saved = True
+'''
 # wt_02 = Wt_data()
 
 # wt_03 = Wt_data()

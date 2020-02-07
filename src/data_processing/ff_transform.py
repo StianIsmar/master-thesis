@@ -119,12 +119,15 @@ class FastFourierTransform:
         self.rms_time = rms
 
         if plot == True:
+            vertical_lines = np.linspace(0, 12800, 25)
             plt.figure(figsize=(15, 5))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Frequency [Hz]")
             plt.plot(f, y_norm, markersize=0.5, marker="o", lw=2)
             plt.title("FFT of time domain amplitude")
             plt.title("FFT Transformation to the time domain")
+            for i, bin in enumerate(vertical_lines):
+                plt.axvline(x=bin, c='r', linewidth=0.8)
             plt.margins(0)
             plt.show()
 
@@ -148,7 +151,7 @@ class FastFourierTransform:
         if self.type == "nacelle":
             filter_indexes = [(freq > 0.1) & (freq < 10)]
 
-        freq = freq[filter_indexes]
+        #freq = freq[filter_indexes]
         amp = fft_modulus_norm[filter_indexes]
 
         sum=0

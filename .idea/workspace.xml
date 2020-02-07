@@ -3,11 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ad5ae626-1742-4de0-acbc-4b0197e92ed0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/build_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/build_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/data_statistics.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/data_statistics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data_processing/explore_vib_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/explore_vib_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_processing/build_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/build_dataset.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/data_processing/ff_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/ff_transform.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data_processing/resample.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_processing/resample.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +63,7 @@
       <recent name="$PROJECT_DIR$/src/data_processing" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.explore_vib_data">
+  <component name="RunManager" selected="Python.build_dataset">
     <configuration name="build_dataset" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="master-thesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -173,8 +170,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.explore_vib_data" />
         <item itemvalue="Python.build_dataset" />
+        <item itemvalue="Python.explore_vib_data" />
         <item itemvalue="Python.build_dataset" />
         <item itemvalue="Python.build_dataset" />
         <item itemvalue="Python.build_dataset" />
@@ -225,7 +222,7 @@
       <workItem from="1580460368586" duration="10798000" />
       <workItem from="1580475634857" duration="1521000" />
       <workItem from="1580726484791" duration="2296000" />
-      <workItem from="1580906950839" duration="15615000" />
+      <workItem from="1580906950839" duration="22364000" />
     </task>
     <servers />
   </component>

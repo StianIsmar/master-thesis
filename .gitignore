@@ -10,4 +10,9 @@
 */ipynb_checkpoints
 /ipynb_checkpoints
 *.csv
+reconstruct_lstm_autoencoder.png
+text.txt
+test.py
+merged_dataset_BearingTest_2.csv
+
 .idea

@@ -8,7 +8,6 @@ import wt_data
 import ff_transform
 import data_statistics
 
-# Creates a dataframe with rms, skew and curtosis
 def create_rms_datasets_for_ISO_frequencies(wt_instance):
     intervals = wt_instance.ten_second_intervals
     all_rms_data = []

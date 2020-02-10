@@ -90,7 +90,7 @@ plot_vertical_lines = blots a separation line between each bin (boolean)
 Output:
 df = pandas dataframe with rms value for each bin
 '''
-def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25,
+def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_threshold=0, bins=25,
                                           calc_rms_for_bins=True, plot=False,
                                           plot_vertical_lines=False):
     intervals = wt_instance.ten_second_intervals
@@ -113,13 +113,16 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25,
         # Run RMS Calculation on Nacelle vibration data
         type = 'nacelle'
 
+    counter = 0
     for i, interval in enumerate(intervals):
         interval_data = []
         if i > 50:
             break
         # We only want to use data which has measurement for all signals and positive average power
-        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > 0):
+
+        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
+            counter += 1
             avg_power = interval.op_df["PwrAvg;kW"][0]
             active_power = interval.op_df["PwrAct;kW"][0]
             wind_speed = interval.op_df["WdSpdAct;m/s"][0]
@@ -149,7 +152,7 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, bins=25,
         df_column_names.append(signal_rms_name)
 
     # Crete a dataframe for all rms_data
-
+    print(f'{counter} / {len(intervals)-1} intervals added to dataframe')
     df = pd.DataFrame(whole_dataset, columns=df_column_names)
     return df
 
@@ -183,10 +186,12 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
+wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
 wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
-df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2',
-                                           plot=True, bins=50, plot_vertical_lines=False)
+df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
+                                           plot=False, bins=50, plot_vertical_lines=False)
 
+save_dataframe(df, 'GnDe_RMS_power>2500')
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)
 

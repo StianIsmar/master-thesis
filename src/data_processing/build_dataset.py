@@ -187,11 +187,12 @@ def plot_column(df):
         plt.show()
 
 wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
-wt_instance = wt_data.load_instance("WTG01",load_minimal=True)
+wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
 df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
                                            plot=False, bins=50, plot_vertical_lines=False)
 
 save_dataframe(df, 'GnDe_RMS_power>2500')
+
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)
 

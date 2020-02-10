@@ -82,7 +82,7 @@ intervals = wt_instance.ten_second_intervals
 # ------- Plot high rot speed ------------
 spectral_centroids = []
 for i, interval in enumerate(intervals):
-    if i > 20:
+    if i > 2:
         break
     print(f'Checking interval: {i}', end='\r')
     cols = ['Speed Sensor;1;V', 'GnNDe;0,0102;m/s2']

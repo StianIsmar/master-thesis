@@ -116,8 +116,8 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     counter = 0
     for i, interval in enumerate(intervals):
         interval_data = []
-        if i > 50:
-            break
+        #if i > 50:
+            #break
         # We only want to use data which has measurement for all signals and positive average power
 
         if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
@@ -157,23 +157,37 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     return df
 
 
-def train_test_split(dataframe, percentage):
+def train_test_split(df, percentage):
     split_index = int(np.floor(df.shape[0]) * percentage)
-    train = dataframe[:split_index]
-    test = dataframe[split_index:].reset_index(drop=True)
+    train = df[:split_index]
+    test = df[split_index:].reset_index(drop=True)
     return train, test
 
 
-def save_dataframe(dataframe, name):
+def save_dataframe_pickle(dataframe, name):
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
     pickle.dump(dataframe, open(path + name + '.p', 'wb'))
     print(f'Saved {name}.')
 
-def load_dataframe(name):
+def load_dataframe_pickle(name):
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
     dataframe = pickle.load(open(path + name + '.p', 'rb'))
-    print('Loaded')
+    print(f'Loaded {name}')
     return dataframe
+
+
+def save_dataframe_to_csv(df, name):
+    path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
+    df.to_csv(path + name, index=False)
+    print(f'Saved {name}.')
+
+
+def load_dataframe_from_csv(name):
+    path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
+    df = pd.read_csv(path + name)
+    print(f'Loaded {name}')
+    return df
+
 
 def plot_column(df):
     x_values = np.arange(0, df.shape[0])
@@ -186,12 +200,15 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
-wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
-wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
-df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
-                                           plot=False, bins=50, plot_vertical_lines=False)
+#wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
+#wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
+#df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
+#                                           plot=False, bins=50, plot_vertical_lines=False)
 
-save_dataframe(df, 'GnDe_RMS_power>2500')
+#save_dataframe_pickle(df, 'GnDe_RMS_power>2500')
+
+df = load_dataframe_pickle('GnDe_RMS_power>2500')
+save_dataframe_to_csv(df, 'GnDe_RMS_power>2500.csv')
 
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)

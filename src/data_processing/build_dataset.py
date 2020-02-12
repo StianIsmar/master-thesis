@@ -167,10 +167,10 @@ def train_test_split(dataframe, percentage):
 
 
 def save_dataframe(dataframe, name):
-    name.replace('/','_')
+    name = name.replace('/', '_')
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
     # dataframe.to_csv(path,index=False)
-    dataframe.to_csv(path+name, encoding='utf-8', index=False,sep=",")
+    dataframe.to_csv(path+name, encoding='utf-8', index=False, sep=",")
 
     #pickle.dump(dataframe, open(path + name + '.p', 'wb'))
     print(f'Saved {name}.')

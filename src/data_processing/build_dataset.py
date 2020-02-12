@@ -3,6 +3,8 @@ import pandas as pd
 import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pyuff
+import gc
 
 import wt_data
 import ff_transform
@@ -116,8 +118,8 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     counter = 0
     for i, interval in enumerate(intervals):
         interval_data = []
-        #if i > 50:
-            #break
+        if i > 50:
+            break
         # We only want to use data which has measurement for all signals and positive average power
 
         if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
@@ -157,37 +159,27 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     return df
 
 
-def train_test_split(df, percentage):
-    split_index = int(np.floor(df.shape[0]) * percentage)
-    train = df[:split_index]
-    test = df[split_index:].reset_index(drop=True)
+def train_test_split(dataframe, percentage):
+    split_index = int(np.floor(dataframe.shape[0]) * percentage)
+    train = dataframe[:split_index]
+    test = dataframe[split_index:].reset_index(drop=True)
     return train, test
 
 
-def save_dataframe_pickle(dataframe, name):
+def save_dataframe(dataframe, name):
+    name.replace('/','_')
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
-    pickle.dump(dataframe, open(path + name + '.p', 'wb'))
+    # dataframe.to_csv(path,index=False)
+    dataframe.to_csv(path+name, encoding='utf-8', index=False,sep=",")
+
+    #pickle.dump(dataframe, open(path + name + '.p', 'wb'))
     print(f'Saved {name}.')
 
-def load_dataframe_pickle(name):
+def load_dataframe(name):
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
     dataframe = pickle.load(open(path + name + '.p', 'rb'))
-    print(f'Loaded {name}')
+    print('Loaded')
     return dataframe
-
-
-def save_dataframe_to_csv(df, name):
-    path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
-    df.to_csv(path + name, index=False)
-    print(f'Saved {name}.')
-
-
-def load_dataframe_from_csv(name):
-    path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
-    df = pd.read_csv(path + name)
-    print(f'Loaded {name}')
-    return df
-
 
 def plot_column(df):
     x_values = np.arange(0, df.shape[0])
@@ -200,23 +192,45 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
-#wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
-#wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
+
+gc.collect()
+wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
+del wt_instance
+wt_instance = wt_data.create_wt_data('WTG02', save_minimal=False)
+del wt_instance
+wt_instance = wt_data.create_wt_data('WTG03', save_minimal=False)
+del wt_instance
+wt_instance = wt_data.create_wt_data('WTG04', save_minimal=False)
+del wt_instance
+
+# wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
+#wt_instance = wt_data.load_instance("WTG02",load_minimal=False)
+#wt_instance = wt_data.load_instance("WTG03",load_minimal=False)
+#wt_instance = wt_data.load_instance("WTG04",load_minimal=False)
+
 #df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
-#                                           plot=False, bins=50, plot_vertical_lines=False)
+                                           #plot=False, bins=50, plot_vertical_lines=False)
 
-#save_dataframe_pickle(df, 'GnDe_RMS_power>2500')
 
-df = load_dataframe_pickle('GnDe_RMS_power>2500')
-save_dataframe_to_csv(df, 'GnDe_RMS_power>2500.csv')
+# GENERATOR 'GnDe;0,0102;m/s2'
+# GEARBOX 'GbxHssRr;0,0102;m/s2'
+
+def save_all_df_for_component(component_name,bins,power_threshold=2500):
+
+    for i in range(3):
+        i = i + 2
+        turbine_name = f"WTG0{i}"
+        wt_instance = wt_data.load_instance(turbine_name, load_minimal=False)
+        df = create_rms_datasets_for_one_component(wt_instance, component_name, power_threshold=2500,
+                                                   plot=False, bins=bins, plot_vertical_lines=False)
+        save_dataframe(df, f'{turbine_name}_{component_name}_RMS_power>2500.csv')
+        del wt_instance
+
+save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
+
+
+
+
 
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)
-
-
-#plot_column(train)
-#train.hist()
-#data_statistics.plot_histograms(train)
-
-#data_statistics.boxplot_rms(train, name='Training Set')
-#data_statistics.boxplot_rms(test, name='Testing Set')

@@ -33,7 +33,7 @@ plt.style.use('file://' + ROOT_PATH + "/utils/plotparams.rc")
 
 class FastFourierTransform:
     # Amplitudes is a row vector
-    def __init__(self, amplitudes, t,type):
+    def __init__(self, amplitudes, t, type):
         self.s = amplitudes
         self.t = t
         self.normalized_amp = None
@@ -139,11 +139,9 @@ class FastFourierTransform:
             for i in range(len(bin_indexes)-1):
                 amp = y_norm[bin_indexes[i]:bin_indexes[i+1]]
                 rms_bins.append(self.rms_bin(amp))
-
-
+        x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)] # The frequency index for the bins!
         rms = self.rms(f, fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
-
         if plot == True:
             fig, ax1 = plt.subplots(figsize=(15, 5))
             ax1.set_xlabel("Frequency [Hz]")
@@ -179,7 +177,7 @@ class FastFourierTransform:
 
         # Calculate the spectral centroid
         centroid = self.find_spectral_centroid(f, y_norm)
-        return fft, time, centroid, rms, rms_bins
+        return fft, time, centroid, rms, rms_bins, x
 
 
     def rms_bin(self, amp):

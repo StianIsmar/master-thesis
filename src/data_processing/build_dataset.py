@@ -3,6 +3,8 @@ import pandas as pd
 import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pyuff
+import gc
 
 import wt_data
 import ff_transform
@@ -207,17 +209,31 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
-#wt_instance = wt_data.create_wt_data('WTG03', save_minimal=False)
-#wt_instance = wt_data.load_instance("WTG03",load_minimal=False)
+#wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
+#wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
 #df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
-#                                           plot=True, bins=50, plot_vertical_lines=True)
+#                                           plot=False, bins=50, plot_vertical_lines=False)
 
 
-#save_dataframe_pickle(df, 'GnDe_RMS_power>2500')
+# GENERATOR 'GnDe;0,0102;m/s2'
+# GEARBOX 'GbxHssRr;0,0102;m/s2'
 
-#df = load_dataframe_pickle('GnDe_RMS_power>2500')
+def save_all_df_for_component(component_name,bins,power_threshold=2500):
 
-#save_dataframe_to_csv(df, 'GnDe_RMS_power>2500_WTG04.csv')
+    for i in range(3):
+        i = i + 2
+        turbine_name = f"WTG0{i}"
+        wt_instance = wt_data.load_instance(turbine_name, load_minimal=False)
+        df = create_rms_datasets_for_one_component(wt_instance, component_name, power_threshold=2500,
+                                                   plot=False, bins=bins, plot_vertical_lines=False)
+        save_dataframe_to_csv(df, f'{turbine_name}_{component_name}_RMS_power>2500.csv')
+        del wt_instance
+
+save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
+
+
+
+
 
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)

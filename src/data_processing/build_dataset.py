@@ -120,10 +120,15 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
             #break
         # We only want to use data which has measurement for all signals and positive average power
 
-        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
+        print_int = 0
+        if interval.op_df["PwrAvg;kW"][0] == 2593.107421875:
+            print_int = i
+
+        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold) and i >= print_int and i <= print_int+3:
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
             counter += 1
             avg_power = interval.op_df["PwrAvg;kW"][0]
+            rot_data = interval.high_speed_rot_data
             active_power = interval.op_df["PwrAct;kW"][0]
             wind_speed = interval.op_df["WdSpdAct;m/s"][0]
             nacelle_direction = interval.op_df["NacDirAct;deg"][0]
@@ -136,10 +141,12 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
 
             vibration_signal = interval.sensor_df[sensor_name]
             fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
-            fft, time, centroid, rms, rms_bins = fast.fft_transform_time(calc_rms_for_bins=calc_rms_for_bins,
-                                                                               plot=plot,
-                                                                               bins=bins,
-                                                                               plot_vertical_lines=plot_vertical_lines)
+            fft, time, centroid, rms, rms_bins = fast.fft_transform_time(rot_data,
+                                                                         avg_power,
+                                                                         calc_rms_for_bins=calc_rms_for_bins,
+                                                                         plot=plot,
+                                                                         bins=bins,
+                                                                         plot_vertical_lines=plot_vertical_lines)
             # Add each rms value for all bins into interval_data
             for i, rms_val in enumerate(rms_bins):
                 interval_data.append(rms_val)
@@ -200,15 +207,17 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
-#wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
-#wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
+#wt_instance = wt_data.create_wt_data('WTG03', save_minimal=False)
+#wt_instance = wt_data.load_instance("WTG03",load_minimal=False)
 #df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
-#                                           plot=False, bins=50, plot_vertical_lines=False)
+#                                           plot=True, bins=50, plot_vertical_lines=True)
+
 
 #save_dataframe_pickle(df, 'GnDe_RMS_power>2500')
 
-df = load_dataframe_pickle('GnDe_RMS_power>2500')
-save_dataframe_to_csv(df, 'GnDe_RMS_power>2500.csv')
+#df = load_dataframe_pickle('GnDe_RMS_power>2500')
+
+#save_dataframe_to_csv(df, 'GnDe_RMS_power>2500_WTG04.csv')
 
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)

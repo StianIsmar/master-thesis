@@ -118,14 +118,19 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     counter = 0
     for i, interval in enumerate(intervals):
         interval_data = []
-        if i > 50:
-            break
+        #if i > 50:
+            #break
         # We only want to use data which has measurement for all signals and positive average power
 
-        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
+        print_int = 0
+        if interval.op_df["PwrAvg;kW"][0] == 2593.107421875:
+            print_int = i
+
+        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold) and i >= print_int and i <= print_int+3:
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
             counter += 1
             avg_power = interval.op_df["PwrAvg;kW"][0]
+            rot_data = interval.high_speed_rot_data
             active_power = interval.op_df["PwrAct;kW"][0]
             wind_speed = interval.op_df["WdSpdAct;m/s"][0]
             nacelle_direction = interval.op_df["NacDirAct;deg"][0]
@@ -138,10 +143,12 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
 
             vibration_signal = interval.sensor_df[sensor_name]
             fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
-            fft, time, centroid, rms, rms_bins = fast.fft_transform_time(calc_rms_for_bins=calc_rms_for_bins,
-                                                                               plot=plot,
-                                                                               bins=bins,
-                                                                               plot_vertical_lines=plot_vertical_lines)
+            fft, time, centroid, rms, rms_bins = fast.fft_transform_time(rot_data,
+                                                                         avg_power,
+                                                                         calc_rms_for_bins=calc_rms_for_bins,
+                                                                         plot=plot,
+                                                                         bins=bins,
+                                                                         plot_vertical_lines=plot_vertical_lines)
             # Add each rms value for all bins into interval_data
             for i, rms_val in enumerate(rms_bins):
                 interval_data.append(rms_val)
@@ -159,27 +166,37 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     return df
 
 
-def train_test_split(dataframe, percentage):
-    split_index = int(np.floor(dataframe.shape[0]) * percentage)
-    train = dataframe[:split_index]
-    test = dataframe[split_index:].reset_index(drop=True)
+def train_test_split(df, percentage):
+    split_index = int(np.floor(df.shape[0]) * percentage)
+    train = df[:split_index]
+    test = df[split_index:].reset_index(drop=True)
     return train, test
 
 
-def save_dataframe(dataframe, name):
-    name = name.replace('/', '_')
+def save_dataframe_pickle(dataframe, name):
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
-    # dataframe.to_csv(path,index=False)
-    dataframe.to_csv(path+name, encoding='utf-8', index=False, sep=",")
-
-    #pickle.dump(dataframe, open(path + name + '.p', 'wb'))
+    pickle.dump(dataframe, open(path + name + '.p', 'wb'))
     print(f'Saved {name}.')
 
-def load_dataframe(name):
+def load_dataframe_pickle(name):
     path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
     dataframe = pickle.load(open(path + name + '.p', 'rb'))
-    print('Loaded')
+    print(f'Loaded {name}')
     return dataframe
+
+
+def save_dataframe_to_csv(df, name):
+    path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
+    df.to_csv(path + name, index=False)
+    print(f'Saved {name}.')
+
+
+def load_dataframe_from_csv(name):
+    path = '/Volumes/OsvikExtra/VibrationData/RMS_dataset/'
+    df = pd.read_csv(path + name)
+    print(f'Loaded {name}')
+    return df
+
 
 def plot_column(df):
     x_values = np.arange(0, df.shape[0])
@@ -192,24 +209,10 @@ def plot_column(df):
         plt.margins(0)
         plt.show()
 
-
-gc.collect()
-wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
-del wt_instance
-wt_instance = wt_data.create_wt_data('WTG02', save_minimal=False)
-del wt_instance
-wt_instance = wt_data.create_wt_data('WTG03', save_minimal=False)
-del wt_instance
-wt_instance = wt_data.create_wt_data('WTG04', save_minimal=False)
-del wt_instance
-
-# wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
-#wt_instance = wt_data.load_instance("WTG02",load_minimal=False)
-#wt_instance = wt_data.load_instance("WTG03",load_minimal=False)
-#wt_instance = wt_data.load_instance("WTG04",load_minimal=False)
-
+#wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
+#wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
 #df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
-                                           #plot=False, bins=50, plot_vertical_lines=False)
+#                                           plot=False, bins=50, plot_vertical_lines=False)
 
 
 # GENERATOR 'GnDe;0,0102;m/s2'
@@ -223,7 +226,7 @@ def save_all_df_for_component(component_name,bins,power_threshold=2500):
         wt_instance = wt_data.load_instance(turbine_name, load_minimal=False)
         df = create_rms_datasets_for_one_component(wt_instance, component_name, power_threshold=2500,
                                                    plot=False, bins=bins, plot_vertical_lines=False)
-        save_dataframe(df, f'{turbine_name}_{component_name}_RMS_power>2500.csv')
+        save_dataframe_to_csv(df, f'{turbine_name}_{component_name}_RMS_power>2500.csv')
         del wt_instance
 
 save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
@@ -234,3 +237,11 @@ save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
 
 #df = load_dataframe('WTG01_RMS')
 #train, test = train_test_split(df, 0.8)
+
+
+#plot_column(train)
+#train.hist()
+#data_statistics.plot_histograms(train)
+
+#data_statistics.boxplot_rms(train, name='Training Set')
+#data_statistics.boxplot_rms(test, name='Testing Set')

@@ -3,8 +3,7 @@ import pandas as pd
 import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pyuff
-import gc
+
 
 import wt_data
 import ff_transform
@@ -93,11 +92,12 @@ Output:
 df = pandas dataframe with rms value for each bin
 '''
 def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_threshold=0, bins=25,
-                                          calc_rms_for_bins=True, plot=False,
-                                          plot_vertical_lines=False):
+                                          calc_rms_for_bins=True, plot=True,
+                                          plot_vertical_lines=True, avg_pwr_values=[]):
     intervals = wt_instance.ten_second_intervals
     whole_dataset = []
     type = ''
+    rms_bins = []
 
     if (sensor_name == 'TimeStamp') or (sensor_name == 'Speed Sensor;1;V') or (sensor_name == 'LssShf;1;V'):
         # Skip TimeStamp
@@ -116,17 +116,22 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
         type = 'nacelle'
 
     counter = 0
+    print_int = -1000
     for i, interval in enumerate(intervals):
         interval_data = []
         #if i > 50:
             #break
-        # We only want to use data which has measurement for all signals and positive average power
 
-        print_int = 0
-        if interval.op_df["PwrAvg;kW"][0] == 2593.107421875:
+        if interval.op_df["PwrAvg;kW"][0] in avg_pwr_values:
             print_int = i
+            print(print_int)
 
-        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold) and i >= print_int and i <= print_int+3:
+        # We only want to use data which has measurement for all signals and positive average power
+        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
+
+            if (len(avg_pwr_values) != 0) and (i != print_int):
+                continue
+
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
             counter += 1
             avg_power = interval.op_df["PwrAvg;kW"][0]
@@ -138,13 +143,16 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
 
             interval_data.append(avg_power)
             interval_data.append(active_power)
+            interval_data.append(rot_data['mean'])
             interval_data.append(wind_speed)
             interval_data.append(nacelle_direction)
 
             vibration_signal = interval.sensor_df[sensor_name]
+            title_name = sensor_name.split(';')[0]
             fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
-            fft, time, centroid, rms, rms_bins = fast.fft_transform_time(rot_data,
+            fft, time, centroid, rms, rms_bins, x = fast.fft_transform_time(rot_data,
                                                                          avg_power,
+                                                                         name=title_name,
                                                                          calc_rms_for_bins=calc_rms_for_bins,
                                                                          plot=plot,
                                                                          bins=bins,
@@ -155,7 +163,7 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
 
             whole_dataset.append(interval_data)
 
-    df_column_names = ['AvgPower', 'ActPower', 'WindSpeed', 'NacelleDirection']
+    df_column_names = ['AvgPower', 'ActPower', 'AvgRotSpeed', 'WindSpeed', 'NacelleDirection']
     for i in range(len(rms_bins)):
         signal_rms_name = f"{sensor_name.split(';')[0]}_RMS_{i}"
         df_column_names.append(signal_rms_name)
@@ -212,7 +220,7 @@ def plot_column(df):
 #wt_instance = wt_data.create_wt_data('WTG01', save_minimal=False)
 #wt_instance = wt_data.load_instance("WTG01",load_minimal=False)
 #df = create_rms_datasets_for_one_component(wt_instance, 'GnDe;0,0102;m/s2', power_threshold=2500,
-#                                           plot=False, bins=50, plot_vertical_lines=False)
+#                                           plot=True, bins=50, plot_vertical_lines=True)
 
 
 # GENERATOR 'GnDe;0,0102;m/s2'
@@ -229,7 +237,7 @@ def save_all_df_for_component(component_name,bins,power_threshold=2500):
         save_dataframe_to_csv(df, f'{turbine_name}_{component_name}_RMS_power>2500.csv')
         del wt_instance
 
-save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
+#save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
 
 
 

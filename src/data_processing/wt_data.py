@@ -11,7 +11,7 @@ import os.path
 import os
 
 
-class Wt_data():
+class Wt_data:
     # Takes on of the following as wt_name: WTG01, WTG02, WTG03, WTG04.
     def __init__(self, wt_name):
         self.name = wt_name
@@ -33,8 +33,9 @@ class Wt_data():
 
         loop_count = 0
         for filename in os.listdir(path + wt_name):
-            if (save_minimal == True):
-                if loop_count > 30:
+            print(loop_count)
+            if save_minimal == True:
+                if loop_count > 10:
                     break
             if filename.endswith(".uff") and not filename[0] == ".":
                 loop_count+=1
@@ -43,6 +44,7 @@ class Wt_data():
                 interval_object = TenSecondInterval()
                 interval_object.load_data(path + wt_name + "/" + filename)
                 interval_object.insert_speed()
+                print(loop_count)
 
                 # Added object to list of objects for particular wind turbine
                 self.add_interval(interval_object)
@@ -102,6 +104,9 @@ def create_wt_data(name, save_minimal=False):
     return wt_01
 
 #create_wt_data('WTG01', save_minimal=True)
+
+# wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
+
 '''
 wt_instance_1 = create_wt_data("WTG01", True) # Only loading 10 of the intervals with True argument
 saved = False

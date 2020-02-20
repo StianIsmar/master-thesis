@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
     path_to_csv [String]: Path to csv you want to build the correlation plot from
     Filename [String]: Name you would like to save the correlation plot as
 '''
-def create_save_correlation_plot(path_to_csv, save_as_filename):
+def create_save_correlation_plot(path_to_csv, save_as_filename,plot_title):
 
     df = pd.read_csv(path_to_csv)
     sns.set(style="white")
@@ -22,7 +22,7 @@ def create_save_correlation_plot(path_to_csv, save_as_filename):
 
     # Set up the matplotlib figure
     f, ax = plt.subplots(figsize=(11, 9))
-
+    ax.set_title(plot_title)
     # Generate a custom diverging colormap
     cmap = sns.diverging_palette(220, 10, as_cmap=True)
 
@@ -32,4 +32,4 @@ def create_save_correlation_plot(path_to_csv, save_as_filename):
 
     # Saving the file
     f.tight_layout()
-    f.savefig(f'../plots/correlation_plot_{save_as_filename}.eps', format='eps')
+    f.savefig(f'../../plots/correlation_plot_{save_as_filename}.eps', format='eps')

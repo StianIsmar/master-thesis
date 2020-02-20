@@ -106,7 +106,7 @@ class FastFourierTransform:
         return weight_sum/np.sum(y)
 
 
-    def fft_transform_time(self, rot_data, avg_power, calc_rms_for_bins=False, plot=False, bins=0, plot_vertical_lines=False):
+    def fft_transform_time(self, rot_data, avg_power, name="", calc_rms_for_bins=False, plot=False, bins=0, plot_vertical_lines=False):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -142,6 +142,7 @@ class FastFourierTransform:
         x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)] # The frequency index for the bins!
         rms = self.rms(f, fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
+
         if plot == True:
             title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}'
             fig, ax1 = plt.subplots(figsize=(15, 5))
@@ -160,11 +161,11 @@ class FastFourierTransform:
                 # Plot each RMS value at the average frequency for each bin
                 x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)]
                 ax2.plot(x, rms_bins, c='g', label='RMS for each bin')
-                plt.title(f"FFT Transformation to the time domain with RMS for {bins} bins\n" + title)
-                fig.legend(loc='upper right', bbox_to_anchor=(0.55, 0.5, 0.4, 0.4))
+                plt.title(f"FFT Transformation of {name} to the time domain with RMS for {bins} bins\n" + title)
+                fig.legend(loc='upper right', bbox_to_anchor=(0.32, 0.35, 0.5, 0.5))
             else:
                 # Use another title if we don't plot RMS values
-                plt.title("FFT Transformation to the time domain\n" + title)
+                plt.title(f"FFT Transformation of {name} to the time domain\n" + title)
 
             # Plot vertical lines in the same plot
             if plot_vertical_lines:

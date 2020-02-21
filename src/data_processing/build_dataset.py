@@ -99,22 +99,24 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     type = ''
     rms_bins = []
 
+    print(f"This is sensor name {sensor_name}")
+
     if (sensor_name == 'TimeStamp') or (sensor_name == 'Speed Sensor;1;V') or (sensor_name == 'LssShf;1;V'):
         # Skip TimeStamp
         return
-    elif sensor_name.find('Gbx'):
+    elif sensor_name.find('Gbx') != -1:
         # Run RMS Calculation on Gearbox vibration data
         type = 'gearbox'
-    elif sensor_name.find('MnBrg'):
+    elif sensor_name.find('MnBrg') != -1:
         # Run RMS Calculation on Main Bearing vibration data
-        type = 'nacelle'
-    elif sensor_name.find('Gn'):
+        type = 'nacelle' # same as bearing
+    elif sensor_name.find('Gn') != -1:
         # Run RMS Calculation on Generator vibration data
         type = 'generator'
-    elif sensor_name.find('Nac'):
+    elif sensor_name.find('Nac') != -1:
         # Run RMS Calculation on Nacelle vibration data
         type = 'nacelle'
-
+    print(f"Type of component registered when building dataset is {type}.")
     counter = 0
     print_int = -1000
     for i, interval in enumerate(intervals):
@@ -157,13 +159,15 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
                                                                          plot=plot,
                                                                          bins=bins,
                                                                          plot_vertical_lines=plot_vertical_lines)
+
+            interval_data.append(fast.rms_time) # Appending the rms for the relevant interval
             # Add each rms value for all bins into interval_data
             for i, rms_val in enumerate(rms_bins):
                 interval_data.append(rms_val)
 
             whole_dataset.append(interval_data)
 
-    df_column_names = ['AvgPower', 'ActPower', 'AvgRotSpeed', 'WindSpeed', 'NacelleDirection']
+    df_column_names = ['AvgPower', 'ActPower', 'AvgRotSpeed', 'WindSpeed', 'NacelleDirection', 'RMS_component_interval']
     for i in range(len(rms_bins)):
         signal_rms_name = f"{sensor_name.split(';')[0]}_RMS_{i}"
         df_column_names.append(signal_rms_name)

@@ -134,6 +134,7 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
             if (len(avg_pwr_values) != 0) and (i != print_int):
                 continue
 
+
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
             counter += 1
             avg_power = interval.op_df["PwrAvg;kW"][0]

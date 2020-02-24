@@ -59,7 +59,7 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform_order(self, rot_data, avg_power, interval_num, plot=False, name=''):
+    def fft_transform_order(self, rot_data, avg_power, interval_num, plot=False, name='', x_lim=None, y_lim=None):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -73,20 +73,32 @@ class FastFourierTransform:
         f = f[:N // 2]
         y = np.abs(fft)[:N // 2] * 1 / N  # Normalized. Cutting away half of the fft frequencies.
 
+        if y_lim != None:
+            if max(y) > y_lim:
+                plot = False
+
         if plot == True:
             plt.figure(figsize=(15, 5))
             plt.ylabel("Normalised Amplitude")
             plt.xlabel("Order [X]")
             y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
             plt.plot(f, y, markersize=0.5, marker="o", lw=2)
-            xticks = f
+            plt.axvline(x=4.5, c='g', linewidth=1)
+            plt.axvline(x=8.9, c='r', linewidth=1)
+            plt.axvline(x=13.4, c='y', linewidth=1)
+            plt.axhline(y=0.2, c='y', linewidth=1)
+
             #plt.xticks(range(1, len(xticks) + 1), f, rotation=90)
             plt.title(f'FFT Order Transformation of {name} Interval: {interval_num} \nAvg Power: {avg_power:.2f}     '
                       f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
                       f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
+
+            plt.ylim(min(y), max(y) * 1.05)
+            if x_lim != None:
+                plt.xlim(0,x_lim)
             plt.margins(0)
             plt.show()
-
+            f = np.array(f)
         time = f[:N // 2]
         self.normalized_amp = y
 

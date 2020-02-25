@@ -168,6 +168,9 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
 
             whole_dataset.append(interval_data)
 
+            # ---- TO FIGURE OUT THE FREQUENCY RANGE AROUND BIN 5 -------
+            #print(f'Bin 5 is centered at {x[5]}. Delta is {x[1] - x[0]}. It spans the frequencies from {x[5] - (x[1] - x[0])} to {x[5] + (x[1] - x[0])}')
+
     df_column_names = ['AvgPower', 'ActPower', 'AvgRotSpeed', 'WindSpeed', 'NacelleDirection', 'RMS_component_interval']
     for i in range(len(rms_bins)):
         signal_rms_name = f"{sensor_name.split(';')[0]}_RMS_{i}"

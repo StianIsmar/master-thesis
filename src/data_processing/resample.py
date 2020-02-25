@@ -54,8 +54,8 @@ def linear_interpolation_resampling(time_stamps, vibration_signal, peak_array, n
 
         # Transform the x values from time domain to radians domain
         delta_x = resampled_x[1] - resampled_x[0]
-        round_start = 2*np.pi * i
-        round_end = 2*np.pi * i + 2*np.pi - delta_x
+        round_start = i #2*np.pi * i
+        round_end = i + 1 - delta_x #2*np.pi * i + 2*np.pi - delta_x
         X_values_round_domain = np.linspace(round_start, round_end, number_of_resample_points)
 
         # Collect the transformed lists
@@ -123,7 +123,7 @@ def linear_interpolation_resampling(time_stamps, vibration_signal, peak_array, n
         plt.figure(figsize=(15, 5))
         plt.plot(x_resampled, y_resampled, linewidth=0.2)
         plt.title(f'Resampled Vibration Data: {name} \nNumber of Data Points: {x_resampled.shape[0]}')
-        plt.xlabel('Rounds (in radians)', fontsize=16)
+        plt.xlabel('Rotations', fontsize=16)
         plt.ylabel('Vibration amplitude (in m/s2', fontsize=16)
         for i, round_value in enumerate(resampled_vertical_lines):
             plt.axvline(x=round_value, c='r', linewidth=0.8)

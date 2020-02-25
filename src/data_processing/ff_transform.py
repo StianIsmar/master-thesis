@@ -83,9 +83,9 @@ class FastFourierTransform:
             plt.xlabel("Order [X]")
             y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
             plt.plot(f, y, markersize=0.5, marker="o", lw=2)
-            plt.axvline(x=4.5, c='g', linewidth=1)
-            plt.axvline(x=8.9, c='r', linewidth=1)
-            plt.axvline(x=13.4, c='y', linewidth=1)
+            plt.axvline(x=28, c='r', linewidth=0.7)
+            plt.axvline(x=56, c='r', linewidth=0.7)
+            plt.axvline(x=84, c='r', linewidth=0.7)
             plt.axhline(y=0.2, c='y', linewidth=1)
 
             #plt.xticks(range(1, len(xticks) + 1), f, rotation=90)

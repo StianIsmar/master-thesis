@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 
 import wt_data
+import resample
 import ff_transform
 import data_statistics
 
@@ -91,18 +92,38 @@ plot_vertical_lines = blots a separation line between each bin (boolean)
 Output:
 df = pandas dataframe with rms value for each bin
 '''
-def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_threshold=0, bins=25,
-                                          calc_rms_for_bins=True, plot=True,
-                                          plot_vertical_lines=True, avg_pwr_values=[]):
+def create_rms_datasets_for_one_component(wt_instance,
+                                          sensor_name,
+                                          power_threshold=0,
+                                          rpm_threshold=0,
+                                          spectrum_type='time',
+                                          interpolation_method='linear',
+                                          bins=25,
+                                          get_rms_for_bins=True,
+                                          plot=True,
+                                          plot_bin_lines=True,
+                                          x_lim=None,
+                                          frequency_lines=[],
+                                          horisontal_lines=[],
+                                          avg_pwr_values=[],
+                                          interval_range=[],
+                                          plot_resampling=False):
+
     intervals = wt_instance.ten_second_intervals
     whole_dataset = []
     type = ''
     rms_bins = []
+    title_name = f"{wt_instance.name} {sensor_name.split(';')[0]}"
+    fast=None
+
+    if (spectrum_type != 'time') and (spectrum_type != 'order'):
+        print('Input variable spectrum_type must either be "order" or "time"! \n')
+        return None
 
     print(f"This is sensor name {sensor_name}")
 
     if (sensor_name == 'TimeStamp') or (sensor_name == 'Speed Sensor;1;V') or (sensor_name == 'LssShf;1;V'):
-        # Skip TimeStamp
+        # Do nothing for TimeStamp, SpeedSensor or LssShft
         return
     elif sensor_name.find('Gbx') != -1:
         # Run RMS Calculation on Gearbox vibration data
@@ -116,23 +137,19 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
     elif sensor_name.find('Nac') != -1:
         # Run RMS Calculation on Nacelle vibration data
         type = 'nacelle'
-    print(f"Type of component registered when building dataset is {type}.")
+    print(f"Type of component registered when building dataset is {type}.\n")
     counter = 0
     print_int = -1000
     for i, interval in enumerate(intervals):
         interval_data = []
-        #if i > 50:
-            #break
 
-        if interval.op_df["PwrAvg;kW"][0] in avg_pwr_values:
-            print_int = i
-            print(print_int)
+        avg_power = interval.op_df["PwrAvg;kW"][0]
+        rot_data = interval.high_speed_rot_data
+        mean_rpm = rot_data['mean']
 
         # We only want to use data which has measurement for all signals and positive average power
-        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > power_threshold):
-
-            if (len(avg_pwr_values) != 0) and (i != print_int):
-                continue
+        if (interval.sensor_df.shape[1]) == 14 and (avg_power > power_threshold) and (mean_rpm > rpm_threshold) and \
+                ((interval.op_df["PwrAvg;kW"][0] in avg_pwr_values) or (i in interval_range)):
 
 
             print(f'Checking interval: {i} / {len(intervals)-1}', end='\r')
@@ -143,23 +160,80 @@ def create_rms_datasets_for_one_component(wt_instance, sensor_name, power_thresh
             wind_speed = interval.op_df["WdSpdAct;m/s"][0]
             nacelle_direction = interval.op_df["NacDirAct;deg"][0]
             time_stamps = interval.sensor_df['TimeStamp']
+            peak_array = interval.high_speed_peak_array
 
             interval_data.append(avg_power)
             interval_data.append(active_power)
-            interval_data.append(rot_data['mean'])
+            interval_data.append(mean_rpm)
             interval_data.append(wind_speed)
             interval_data.append(nacelle_direction)
 
             vibration_signal = interval.sensor_df[sensor_name]
-            title_name = sensor_name.split(';')[0]
-            fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
-            fft, time, centroid, rms, rms_bins, x = fast.fft_transform_time(rot_data,
-                                                                         avg_power,
-                                                                         name=title_name,
-                                                                         calc_rms_for_bins=calc_rms_for_bins,
-                                                                         plot=plot,
-                                                                         bins=bins,
-                                                                         plot_vertical_lines=plot_vertical_lines)
+            if spectrum_type == 'time':
+                fast = ff_transform.FastFourierTransform(vibration_signal, time_stamps, type)
+                fft, time, centroid, rms, rms_bins, x = fast.fft_transform_time(rot_data,
+                                                                                avg_power,
+                                                                                name=title_name,
+                                                                                interval_num=i,
+                                                                                plot=plot,
+                                                                                get_rms_for_bins=get_rms_for_bins,
+                                                                                bins=bins,
+                                                                                plot_bin_lines=plot_bin_lines,
+                                                                                x_lim=x_lim,
+                                                                                frequency_lines=frequency_lines,
+                                                                                horisontal_lines=horisontal_lines
+                                                                                )
+            elif spectrum_type == 'order':
+                if interpolation_method == 'linear':
+                    time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.linear_interpolation_resampling(
+                        time_stamps,
+                        vibration_signal,
+                        peak_array, 1500,
+                        round_plots=3,
+                        plotting=plot_resampling,
+                        printing=False,
+                        name=f'     {title_name}     Interval: {i}',
+                        interpolation_method=interpolation_method)
+
+                    fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled, type)
+                    fft, time, centroid, rms_bins, x = fast.fft_transform_order(rot_data,
+                                                                                avg_power,
+                                                                                name=title_name,
+                                                                                interval_num=i,
+                                                                                get_rms_for_bins=get_rms_for_bins,
+                                                                                plot=plot,
+                                                                                bins=bins,
+                                                                                plot_bin_lines=plot_bin_lines,
+                                                                                x_lim=x_lim,
+                                                                                order_lines=frequency_lines,
+                                                                                horisontal_lines=horisontal_lines,
+                                                                                interpolation_method=interpolation_method
+                                                                                )
+                elif interpolation_method == 'cubic':
+                    time_resampled, y_resampled, all_time_resampled, all_y_resampled = resample.cubic_interpolation_resampling(
+                        time_stamps,
+                        vibration_signal,
+                        peak_array, 1500,
+                        round_plots=3,
+                        plotting=plot_resampling,
+                        printing=False,
+                        name=f'     {title_name}     Interval: {i}',
+                        interpolation_method=interpolation_method)
+
+                    fast = ff_transform.FastFourierTransform(all_y_resampled, all_time_resampled, type)
+                    fft, time, centroid, rms_bins, x = fast.fft_transform_order(rot_data,
+                                                                                avg_power,
+                                                                                name=title_name,
+                                                                                interval_num=i,
+                                                                                get_rms_for_bins=get_rms_for_bins,
+                                                                                plot=plot,
+                                                                                bins=bins,
+                                                                                plot_bin_lines=plot_bin_lines,
+                                                                                x_lim=x_lim,
+                                                                                order_lines=frequency_lines,
+                                                                                horisontal_lines=horisontal_lines,
+                                                                                interpolation_method=interpolation_method
+                                                                                )
 
             interval_data.append(fast.rms_time) # Appending the rms for the relevant interval
             # Add each rms value for all bins into interval_data
@@ -241,7 +315,7 @@ def save_all_df_for_component(component_name,bins,power_threshold=2500):
         turbine_name = f"WTG0{i}"
         wt_instance = wt_data.load_instance(turbine_name, load_minimal=False)
         df = create_rms_datasets_for_one_component(wt_instance, component_name, power_threshold=2500,
-                                                   plot=False, bins=bins, plot_vertical_lines=False)
+                                                   plot=False, bins=bins, plot_bin_lines=False)
         save_dataframe_to_csv(df, f'{turbine_name}_{component_name}_RMS_power>2500.csv')
         del wt_instance
 

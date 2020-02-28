@@ -1,7 +1,4 @@
 from __future__ import division
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import wt_data
 
 
@@ -10,8 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import sys, os
-from scipy.stats import skew
-from scipy.stats import kurtosis
+
 
 
 ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
@@ -59,7 +55,9 @@ class FastFourierTransform:
         avg_power = the average power generated during operation (used to print in plot)
         interval_num = which interval is evaluated
         '''
-    def fft_transform_order(self, rot_data, avg_power, interval_num, plot=False, name='', x_lim=None, y_lim=None):
+    def fft_transform_order(self, rot_data, avg_power, interval_num='unknown', plot=False, get_rms_for_bins = False,
+                            bins = 0, name='', plot_bin_lines = False, x_lim=None, order_lines=[], horisontal_lines=[],
+                            interpolation_method=''):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude # Centering around 0
         fft = np.fft.fft(self.s)
@@ -73,44 +71,78 @@ class FastFourierTransform:
         f = f[:N // 2]
         y = np.abs(fft)[:N // 2] * 1 / N  # Normalized. Cutting away half of the fft frequencies.
 
-        if y_lim != None:
-            if max(y) > y_lim:
-                plot = False
+        # Calculate the bins
+        rms_bins = []
+        frequency_bins = np.linspace(0, max(f), bins + 1)
+        x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)]  # The frequency index for the bins!
+        if get_rms_for_bins:
+            delta_f = f[1] - f[0]
+
+            # Finding the correct indices to separate frequency and amplitude correctly.
+            bin_indexes = [0]
+            # Since the firs idex is already added to bin_indexes we start frequency_bins_index at 1
+            frequency_bins_index = 1
+            for i in range(len(f)):
+                if f[i] >= frequency_bins[frequency_bins_index]:
+                    frequency_bins_index += 1
+                    bin_indexes.append(i)
+
+            for i in range(len(bin_indexes) - 1):
+                amp = y[bin_indexes[i]:bin_indexes[i + 1]]
+                rms_bins.append(self.rms_bin(amp))
 
         if plot == True:
-            plt.figure(figsize=(15, 5))
-            plt.ylabel("Normalised Amplitude")
-            plt.xlabel("Order [X]")
-            y = np.abs(fft)[:N // 2] * 1 /N # Normalized. Cutting away half of the fft frequencies.
-            plt.plot(f, y, markersize=0.5, marker="o", lw=2)
-            plt.axvline(x=4.5, c='g', linewidth=1)
-            plt.axvline(x=8.9, c='r', linewidth=1)
-            plt.axvline(x=13.4, c='y', linewidth=1)
-            plt.axhline(y=0.2, c='y', linewidth=1)
+            title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' +\
+                    f'Max RPM: {rot_data["max"]:.2f},     Min RPM: {rot_data["min"]:.2f},     ' +\
+                    f'STD RPM: {rot_data["std"]:.2f}'
+            fig, ax1 = plt.subplots(figsize=(15, 5))
+            ax1.set_xlabel("Order [X]")
+            ax1.set_ylabel("Normalised amplitude")
+            ax1.set_ylim(min(y), max(y) * 1.05)
+            ax1.plot(f, y, markersize=0.5, marker="o", lw=2, label='FFT transformation')
 
-            #plt.xticks(range(1, len(xticks) + 1), f, rotation=90)
-            plt.title(f'FFT Order Transformation of {name} Interval: {interval_num} \nAvg Power: {avg_power:.2f}     '
-                      f'Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     '
-                      f'Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}')
+            # Plot RMS bin values in the same figure
+            if get_rms_for_bins:
+                ax2 = ax1.twinx()
+                ax2.set_ylim(min(rms_bins), max(rms_bins) * 1.05)
+                ax2.set_ylabel("RMS value")
+                # Plot each RMS value at the average frequency for each bin
+                x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)]  # The frequency index for the bins!
+                ax2.plot(x, rms_bins, c='g', label='RMS for each bin')
+                plt.title(f"Order Domain FFT Transformation     {interpolation_method} Interpolation     " +
+                          f"{bins} RMS bins     {name}     Interval: {interval_num}\n" + title)
+                fig.legend(loc='upper right', bbox_to_anchor=(0.32, 0.35, 0.5, 0.5))
+            else:
+                # Use another title if we don't plot RMS values
+                plt.title(f"Order Domain FFT Transformation     {name}     Interval: {interval_num}\n" + title)
 
-            plt.ylim(min(y), max(y) * 1.05)
+            # Plot vertical lines in the same plot
+            if plot_bin_lines:
+                for i, bin in enumerate(frequency_bins):
+                    plt.axvline(x=bin, c='r', linewidth=0.5)
+
+            if len(order_lines) != 0:
+                for order in order_lines:
+                    plt.axvline(x=order, c='r', linewidth=0.5)
+
+            if len(horisontal_lines) != 0:
+                for line in horisontal_lines:
+                    plt.axhline(y=line, c='y', linewidth=0.5)
+
             if x_lim != None:
                 plt.xlim(0,x_lim)
+
             plt.margins(0)
             plt.show()
-            f = np.array(f)
+
+        f = np.array(f)
         time = f[:N // 2]
         self.normalized_amp = y
 
         # Calculate the spectral centroid
         centroid = self.find_spectral_centroid(f,y)
-        return fft, time, centroid
+        return fft, time, centroid, rms_bins, x
 
-    # Skew, Kortoisi
-    '''
-     f is the half spectrum frequencies in the fft
-     y is the normalized magnitude of the fft
-    '''
     def find_spectral_centroid(self, f,y):
         weight_sum = 0
         for i, freq in enumerate(f):
@@ -118,7 +150,9 @@ class FastFourierTransform:
         return weight_sum/np.sum(y)
 
 
-    def fft_transform_time(self, rot_data, avg_power, name="", calc_rms_for_bins=False, plot=False, bins=0, plot_vertical_lines=False):
+    def fft_transform_time(self, rot_data, avg_power, name="", interval_num = 'unknown',  plot=False,
+                           get_rms_for_bins=False, bins=0, plot_bin_lines=False, x_lim=None, frequency_lines=[],
+                           horisontal_lines=[]):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -134,14 +168,15 @@ class FastFourierTransform:
         y_norm = np.abs(fft)[:N // 2] * 1 / N  # Normalized
         fft_modulus_norm = y_norm
 
+        # Calculate the bins
         rms_bins = []
         frequency_bins = np.linspace(0, max(f), bins + 1)
-        if calc_rms_for_bins:
+        if get_rms_for_bins:
             delta_f = f[1] - f[0]
 
             # Finding the correct indices to separate frequency and amplitude correctly.
             bin_indexes = [0]
-            # Since the firs idex is already added to bin_indexes we start frequency_bins_index at 1
+            # Since the first index is already added to bin_indexes we start frequency_bins_index at 1
             frequency_bins_index = 1
             for i in range(len(f)):
                 if f[i] >= frequency_bins[frequency_bins_index]:
@@ -152,37 +187,52 @@ class FastFourierTransform:
                 amp = y_norm[bin_indexes[i]:bin_indexes[i+1]]
                 rms_bins.append(self.rms_bin(amp))
         x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)] # The frequency index for the bins!
+
+        # Calculate RMS for the ISO interval
         rms = self.rms(f, fft_modulus_norm) # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
 
         if plot == True:
-            title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     Max RPM: {rot_data["max"]:.2f},     Min RPM: {rot_data["min"]:.2f},     STD RPM: {rot_data["std"]:.2f}'
+            title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' +\
+                    f'Max RPM: {rot_data["max"]:.2f},     Min RPM: {rot_data["min"]:.2f},     ' +\
+                    f'STD RPM: {rot_data["std"]:.2f}'
             fig, ax1 = plt.subplots(figsize=(15, 5))
             ax1.set_xlabel("Frequency [Hz]")
             ax1.set_ylabel("Normalised amplitude")
             ax1.set_ylim(min(y_norm), max(y_norm)*1.05)
-            #plt.xlabel("Frequency [Hz]")
-            # plt.ylabel("Normalised Amplitude")
             ax1.plot(f, y_norm, markersize=0.5, marker="o", lw=2, label='FFT transformation')
 
             # Plot RMS bin values in the same figure
-            if calc_rms_for_bins:
+            if get_rms_for_bins:
                 ax2 = ax1.twinx()
                 ax2.set_ylim(min(rms_bins), max(rms_bins)*1.05)
-                ax2.set_ylabel("Average RMS for each bin")
+                ax2.set_ylabel("RMS value")
                 # Plot each RMS value at the average frequency for each bin
                 x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)]
                 ax2.plot(x, rms_bins, c='g', label='RMS for each bin')
-                plt.title(f"FFT Transformation of {name} to the time domain with RMS for {bins} bins\n" + title)
+                plt.title(f"Time Domain FFT Transformation     {bins} RMS bins     {name}     Interval: {interval_num}\n"
+                          + title)
                 fig.legend(loc='upper right', bbox_to_anchor=(0.32, 0.35, 0.5, 0.5))
             else:
                 # Use another title if we don't plot RMS values
-                plt.title(f"FFT Transformation of {name} to the time domain\n" + title)
+                plt.title(f"Time Domain FFT Transformation     {name}     Interval: {interval_num}\n" + title)
 
-            # Plot vertical lines in the same plot
-            if plot_vertical_lines:
+            # Plot bin lines in the same plot
+            if plot_bin_lines:
                 for i, bin in enumerate(frequency_bins):
                     plt.axvline(x=bin, c='r', linewidth=0.5)
+
+            if len(frequency_lines) != 0:
+                for order in frequency_lines:
+                    plt.axvline(x=order, c='r', linewidth=0.5)
+
+            if len(horisontal_lines) != 0:
+                for line in horisontal_lines:
+                    plt.axhline(y=line, c='y', linewidth=0.5)
+
+            if x_lim != None:
+                plt.xlim(0,x_lim)
+
             plt.margins(0)
             plt.show()
 
@@ -194,12 +244,14 @@ class FastFourierTransform:
         return fft, time, centroid, rms, rms_bins, x
 
 
+
     def rms_bin(self, amp):
         sum = 0
         for a in amp:
             sum += a**2
         rms = np.sqrt(2*sum)
         return rms
+
 
 
     # Function returns rms as a float. Called in the fft_transform_time function
@@ -222,6 +274,7 @@ class FastFourierTransform:
         return rms
 
 
+
     # Siemens implementation
     def calculate_rms(self,freq, fft_modulus_norm):
         filter_indexes=[(freq > 10) & (freq<5000)]
@@ -235,41 +288,3 @@ class FastFourierTransform:
         return rms
 
 
-# ************ EXAMPLE FOR WT01 ******************
-'''
-wt_instance = wt_data.load_instance("WTG01",load_minimal = True)
-intervals = wt_instance.ten_second_intervals
-
-rms_arr = []
-for i, interval in enumerate(intervals):
-    print(f"Interval number {i} started..")
-    # CHECK IF WE WANT INTERVAL
-    interval1 = interval
-    time_stamps = interval.sensor_df['TimeStamp']
-    try:
-        feature = 'GnNDe;0,0102;m/s2'
-        vibration = interval.sensor_df['GnNDe;0,0102;m/s2']
-        if feature == 'GnNDe;0,0102;m/s2':
-            type = "generator"
-    except:
-        continue
-    fast = FastFourierTransform(vibration, time_stamps, type)
-    fft, time, centroid,rms = fast.fft_transform_time(True)
-    #RMS = fast.calculate_rms1(fft)
-    # RMS = fast.calc_rms(fft)
-    print(" ")
-    # print(f"RMS new:: {RMS}")
-    rms_arr.append(rms) # This can be plotted
-    # LAG FOR LAV FREKVENS
-    # LAG FOR HØY FREKVENS
-
-plt.figure(figsize=(15, 5))
-plt.ylabel("RMS value")
-plt.xlabel("Interval nr.")
-plt.plot(range(len(rms_arr)), rms_arr,marker="o", markersize=4)
-plt.title("RMS PLOT")
-plt.margins(0)
-plt.ylim(0, 7.5)
-plt.show()
-
-'''

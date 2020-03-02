@@ -148,7 +148,7 @@ class FastFourierTransform:
 
     def fft_transform_time(self, rot_data, avg_power, name="", interval_num='unknown', plot=False,
                            get_rms_for_bins=False, bins=0, plot_bin_lines=False, x_lim=None, frequency_lines=[],
-                           horisontal_lines=[], spectrum_lower_range=-1, spectrum_highter_range=1):
+                           horisontal_lines=[], spectrum_lower_range=-1, spectrum_higher_range=1):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -191,7 +191,7 @@ class FastFourierTransform:
         self.rms_time = rms
 
         if spectrum_lower_range != -1:
-            self.fft_transform_time_specified_range(y_norm, f, bins, spectrum_lower_range, spectrum_highter_range)
+            self.fft_transform_time_specified_range(y_norm, f, bins, spectrum_lower_range, spectrum_higher_range)
 
         if plot == True:
             title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' + \
@@ -245,10 +245,10 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y_norm)
         return fft, time, centroid, rms, rms_bins, x
 
-    def fft_transform_time_specified_range(self, y_norm, f, bins, spectrum_lower_range, spectrum_highter_range):
+    def fft_transform_time_specified_range(self, y_norm, f, bins, spectrum_lower_range, spectrum_higher_range):
         rms_bins_range_magnitude = []
         if self.type == "gearbox":
-            filter_indexes = [(f > spectrum_lower_range) & (f < spectrum_highter_range)]
+            filter_indexes = [(f > spectrum_lower_range) & (f < spectrum_higher_range)]
             f = f[filter_indexes]
             y_norm = y_norm[filter_indexes]
             frequency_bins_range = np.linspace(0, 2200, bins + 1)

@@ -87,24 +87,12 @@ from sklearn.preprocessing import minmax_scale
 from matplotlib import cm, pyplot as plt
 import math
 def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
-    # y = np.arange(0,len(average_powers))    
-    #print(y)
-    #print(len(average_powers))
-    #print("remove_indexes_01: ", remove_indexes_wt01)
-    
-    # print("y.shape", y[400])
-    
+
     # Delete from the avg_powers and average_rot_speed array
     for i, index in enumerate(remove_indexes_01):
         y = np.delete(y, [index], axis=0)
         x = np.delete(x, [index], axis=0)
         z = np.delete(z, [index], axis=0)
-            
-    print("len(x): ", len(x))
-    print("len(y): ", len(y))
-    print("len(z): ", len(z))
-
-    print(len(average_powers))
     if filter == True:
         z = filter_RMS_spikes(x,y,z)
     
@@ -151,15 +139,20 @@ def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_pow
     # correct radius value.
     ax.add_collection3d(poly, zs=rad_data, zdir='y')
     ax.set_xlim3d(freq_data.min(), freq_data.max())
+    ticks = np.arange(0, freq_data.max(), 250)
+    ax.set_xticks(ticks)
+    
+    # ax.set_xticks(np.arange(0,freq_data.max(),10))
     ax.set_xlabel('Frequency [Hz]',labelpad=10)
     ax.set_ylim3d(rad_data.min(), rad_data.max())
+
+
     ax.set_ylabel('Interval number',labelpad=10)
     # ax.set_zlim3d(amp_data.min(), amp_data.max())
     ax.set_zlim3d(amp_data.min(), 8)
     ax.set_zlabel('RMS amplitude')
 
     # Colourbar
-    print(max(average_powers)) # 3314.455810547
     sm = plt.cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
     mn=int(np.floor(min(average_powers)))  

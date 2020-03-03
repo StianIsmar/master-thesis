@@ -117,7 +117,8 @@ def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_pow
     # Colors:
     
     if color_alt == 'color_alt4':
-        cmap="Blues"
+        # cmap="coolwarm"
+        cmap="copper"
         cmap = cmx.get_cmap(cmap)
         scaled = minmax_scale(average_powers)
         #print(f"MIN: {min(norm)}. MAX: {max(norm)}")
@@ -263,7 +264,7 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every
     plt.xticks(np.arange(0, int(math.ceil(max(avg_powers) / 100.0)) * 100, 200))
 
     plt.ylabel("RMS")
-    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*every_bin_range},{bin_list[-1]*every_bin_range}] Hz")
+    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
     
     
 def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based on the really avg low power values
@@ -330,7 +331,7 @@ def scatter_plot_rms_rot_speed(bin_list, wt_num,two_d_plot_tw,avg_rot_speeds,eve
     ax.legend(labels=legend_labels,loc='upper left',
              markerscale=2.,fontsize=10)
     plt.margins(0)
-    plt.title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*every_bin_range},{bin_list[-1]*every_bin_range}] Hz")
+    plt.title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
 
     plt.ylim(0,max_rms_val+1)
     plt.xlim(0,1650)
@@ -390,7 +391,7 @@ def scatter_plot_rms_rot_speed_time(bin_list, wt_num, two_d_plot_tw, avg_rot_spe
     plt.margins(0)
     ax.set_title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*freq_in_bins},{bin_list[-1]*freq_in_bins}] Hz")
 
-    ax.set_ylim(0,max_rms_val+0.001)
+    ax.set_ylim(0,max_rms_val*1.01)
     ax.set_xlim(0,np.ceil(len(two_d_plot_tw[bin_num])))
     
     ax.set_xlabel("Interval Number")
@@ -443,7 +444,7 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every
     plt.xticks(np.arange(0, int(math.ceil(max(avg_powers) / 100.0)) * 100, 200))
 
     plt.ylabel("RMS")
-    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*every_bin_range},{bin_list[-1]*every_bin_range}] Hz")
+    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
     
     
 def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based on the really avg low power values

@@ -118,6 +118,43 @@ for i, instance in enumerate(wt_instance_1.ten_second_intervals):
         df.to_csv(r'instance.sensor_df.csv')
         saved = True
 '''
+
+
+'''
+WIND_TURBINE = 'WTG01'
+SENSOR_NAME = 'GbxHssRr;0,0102;m/s2'
+wt_instance = load_instance(WIND_TURBINE, load_minimal=True)
+interval = wt_instance.ten_second_intervals[0]
+
+rot_data = interval.high_speed_rot_data
+avg_power = interval.op_df["PwrAvg;kW"][0]
+BINS = 50
+lower_range_freq = 0
+higher_range_freq = 2200
+comp_type = 'gearbox'
+ts = interval.sensor_df['TimeStamp']  # Have this as the y-axis to see how the RMS/frequencies develop
+
+
+vibration_signal = interval.sensor_df[SENSOR_NAME]
+
+fast = ff_transform.FastFourierTransform(vibration_signal, ts, comp_type)
+fft, time, centroid, rms, rms_bins, bin_freq = fast.fft_transform_time(
+    rot_data,
+    avg_power,
+    get_rms_for_bins=True,
+    plot=False,
+    bins=BINS,
+    plot_bin_lines=False,
+    x_lim=False,
+    frequency_lines=[],
+    horisontal_lines=[],
+    spectrum_lower_range=lower_range_freq,
+    spectrum_higher_range=higher_range_freq
+)
+'''
+
+
+
 # wt_02 = Wt_data()
 
 # wt_03 = Wt_data()

@@ -1,16 +1,15 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 import numpy as np
 from matplotlib.collections import PolyCollection
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import random
 import sys, os
-
-import matplotlib
-import matplotlib.cm as cmx
-from sklearn.preprocessing import minmax_scale
-
-from matplotlib import cm, pyplot as plt
-import math
 
 ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
 print("ROOT", ROOT_PATH)
@@ -31,6 +30,10 @@ import wt_data
 import ff_transform
 
 
+# In[ ]:
+
+
+## 2D plotting function
 # Plotting 2d bins
 def plot_2d_bins(bin_values):
     num_intervals = len(bin_values[0])
@@ -61,12 +64,127 @@ def plot_2d_bins(bin_values):
     plt.show()
 
 
+# In[ ]:
+
+
+## Creating a 3d plot using PolyCollection (X: Frequency, Y: Interval number, Z: RMS)
 '''
     Create a 3d-plot using the poly collection module from matplotlib.
 '''
+from matplotlib import cm, pyplot as plt
+import math
+def print3d_with_poly_collection1(t,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
 
+    if filter == True:
+        z = filter_RMS_spikes(x,y,z)
+    
+    fig = plt.figure(figsize=(15,6))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_title(f"FFT development over time for WT {t}", pad=20)
+
+    
+    # Get the numpy arrays on the correct shape
+    freq_data = x.T
+    amp_data = z.T
+    rad_data = np.linspace(0,amp_data.shape[1],amp_data.shape[1])
+    
+    verts = []
+
+    for irad in range(len(rad_data)):
+        # I'm adding a zero amplitude at the beginning and the end to get a nice
+        # flat bottom on the polygons
+        xs = np.concatenate([[freq_data[0,irad]], freq_data[:,irad], [freq_data[-1,irad]]])
+        ys = np.concatenate([[0],amp_data[:,irad],[0]])
+        verts.append(list(zip(xs, ys)))
+
+    # Colors:
+    
+    if color_alt == 'color_alt4':
+        cmap = cm.get_cmap(cm_style)
+        # inferno
+        
+        #norm = [float(i)/sum(average_powers) for i in average_powers]
+        #col = [cmap(x) for x in norm]
+        # print(np.random.rand(amp_data.shape[1]))
+        col = [cmap(x) for x in np.random.rand(amp_data.shape[1])]
+        print("col.shape", col.shape)
+        poly = PolyCollection(verts, facecolors = col)
+
+    else:
+        
+        poly = PolyCollection(verts)
+
+
+    # facecolors = col
+    # facecolors = ['r', 'g', 'c', 'y','r', 'g', 'c', 'y','r', 'g', 'c']
+    poly.set_alpha(0.7)
+    # poly.set_cmap('blues')
+
+    # The zdir keyword makes it plot the "z" vertex dimension (radius)
+    # along the y axis. The zs keyword sets each polygon at the
+    # correct radius value.
+    ax.add_collection3d(poly, zs=rad_data, zdir='y')
+
+    ax.set_xlim3d(freq_data.min(), freq_data.max())
+    
+    ax.set_xlabel('Frequency [Hz]',labelpad=10)
+    ax.set_ylim3d(rad_data.min(), rad_data.max())
+    ax.set_ylabel('Interval number',labelpad=10)
+    # ax.set_zlim3d(amp_data.min(), amp_data.max())
+    ax.set_zlim3d(amp_data.min(), 8)
+    ax.set_zlabel('RMS amplitude')
+
+    # Colourbar
+    print(max(average_powers)) # 3314.455810547
+    sm = plt.cm.ScalarMappable(cmap=cmap)
+    sm.set_array([])
+    mn=int(np.floor(0))  
+    mx=int(np.ceil(max(average_powers)))
+    md=(mx-mn)/2
+    cb = plt.colorbar(sm)
+    cb.set_ticks([0, 0.5, 1])
+    cb.set_ticklabels([mn,md,mx],update_ticks=True)
+    
+    cb.set_label('Magnitude of Average Power for turbine')
+
+    # fig.clim(vmin = 0,vmax = [0, max_val])
+
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+    ax.tick_params(axis='both', which='major', pad=1)
+    # plt.zticks(fontsize=10)
+    
+    
+    cmap="Blues"
+    norm = matplotlib.colors.Normalize(vmin=min(average_rpm_filtered_wt01),vmax=max(average_rpm_filtered_wt01))
+    scat = ax.scatter(xs, ys, zs,c=c,cmap=cmap,norm=norm)
+    scat.update_scalarmappable()
+    scat.set_facecolors('k')
+    scat.set_cmap(cmap)
+    scat.set_norm(norm)
+    plt.show()
+
+
+# In[ ]:
+
+
+import matplotlib
+import matplotlib.cm as cmx
+from sklearn.preprocessing import minmax_scale
+'''
+    Create a 3d-plot using the poly collection module from matplotlib.
+'''
+from matplotlib import cm, pyplot as plt
+import math
 def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
-
+    # y = np.arange(0,len(average_powers))    
+    #print(y)
+    #print(len(average_powers))
+    #print("remove_indexes_01: ", remove_indexes_wt01)
+    
+    # print("y.shape", y[400])
+    
+    # Delete from the avg_powers and average_rot_speed array
     for i, index in enumerate(remove_indexes_01):
         y = np.delete(y, [index], axis=0)
         x = np.delete(x, [index], axis=0)
@@ -104,9 +222,16 @@ def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_pow
         cmap="Blues"
         cmap = cmx.get_cmap(cmap)
         scaled = minmax_scale(average_powers)
+        #print(f"MIN: {min(norm)}. MAX: {max(norm)}")
         col = [cmap(x) for x in scaled]
+        # print(col)
         poly = PolyCollection(verts,facecolors=col)
-
+        # poly.set_cmap(cmap)
+        # poly.set_norm(norm)
+        # poly.update_scalarmappable()
+        # poly.set_facecolors('k')
+        # poly.set_cmap(cmap)
+        # poly.set_norm(norm)
     else:
         poly = PolyCollection(verts)
     poly.set_alpha(0.7)
@@ -140,12 +265,70 @@ def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_pow
     # plt.zticks(fontsize=10)
     plt.show()
     
+'''print3d_with_poly_collection("1",remove_indexes_wt01,
+                             freqs_wt01,
+                             interval_nums_wt01, 
+                             rms_amplitudes_wt01,
+                             'color_alt4',
+                             avg_powers_filtered_wt01,
+                             'Blues',
+                             False)
+                             
+'''
+
+
+# In[ ]:
+
+
+### Remove spikes that seem unnaturally large (by inspection). From the 3D plots,
+### one can see that the spikes show up "randomly". They are therefore filtered away
+def filter_RMS_spikes(x,y,z):
+    for i, array in enumerate(z):
+        for j, rms_val in enumerate(array):
+            if rms_val > 10:
+                # divide it by 2
+                z[i][j] = rms_val/2
+                print(f"Previous value: {rms_val}. New value: {z[i][j]}")
+                
+    return z
+
+
+# In[ ]:
+
+
+## Creating surface 3d plots with axes3d
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
+def print3d_with_axes3d(x,y,z,cm_style='Blues'):
+    X = np.array(x)
+    Y = np.array(y)
+    Z = np.array(z)
+    
+    X = X.T
+    Y = Y.T
+    Z = Z.T
+    
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    cmap = cm.get_cmap(cm_style)
+    surf = ax.plot_surface(X, Y, Z, cmap=cmap,
+                           linewidth=0, antialiased=False)
+    plt.title("Frequency development over intervals for WT")
+    plt.show()
+
+
+# In[ ]:
+
+
+## Filtering away the noise (some of the avg. power values were at -1*10^37)
 '''
     Takes in the amount of bins to be plotted (bin_amount),
     the average powers list for each interval, and
     the bin_rms_values
 '''
-def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num):
+def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every_bin_range=256):
     try:
         wt_num = wt_num.split('0')[1]
         
@@ -177,7 +360,7 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num):
     plt.xticks(np.arange(0, int(math.ceil(max(avg_powers) / 100.0)) * 100, 200))
 
     plt.ylabel("RMS")
-    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*256},{bin_list[-1]*256}] Hz")
+    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*every_bin_range},{bin_list[-1]*every_bin_range}] Hz")
     
     
 def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based on the really avg low power values
@@ -214,26 +397,18 @@ def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based o
         return avg_powers_filtered, RMS_per_bin_filtered, average_rpm_filtered, remove_indexes
 
 
-# Plotting RMS (y-axis) agains ROT speed (x-axis)
-def scatter_plot_rms_rot_speed(bin_list, wt_num): # Takes in how many bin you want to have studied
+# In[ ]:
+
+
+## Plotting RMS (y-axis) agains ROT speed (x-axis)
+def scatter_plot_rms_rot_speed(bin_list, wt_num,two_d_plot_tw,avg_rot_speeds,every_bin_range=256): # Takes in how many bin you want to have studied
     try:
         wt_num = wt_num.split('0')[1]
         
     except:
         print("wt_num is not the wrong format")
     
-    if wt_num == "1":
-        two_d_plot_tw = two_d_plot_tw01
-        avg_rot_speeds = avg_rot_speeds1
-    if wt_num == "2":
-        two_d_plot_tw = two_d_plot_tw02
-        avg_rot_speeds = avg_rot_speeds2
-    if wt_num == "3":
-        two_d_plot_tw = two_d_plot_tw03
-        avg_rot_speeds = avg_rot_speeds3
-    if wt_num == "4":
-        two_d_plot_tw = two_d_plot_tw04
-        avg_rot_speeds = avg_rot_speeds4
+
         
     fig = plt.figure()
     
@@ -252,7 +427,7 @@ def scatter_plot_rms_rot_speed(bin_list, wt_num): # Takes in how many bin you wa
     ax.legend(labels=legend_labels,loc='upper left',
              markerscale=2.,fontsize=10)
     plt.margins(0)
-    plt.title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*256},{bin_list[-1]*256}] Hz")
+    plt.title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*every_bin_range},{bin_list[-1]*every_bin_range}] Hz")
 
     plt.ylim(0,max_rms_val+1)
     plt.xlim(0,1650)
@@ -261,27 +436,17 @@ def scatter_plot_rms_rot_speed(bin_list, wt_num): # Takes in how many bin you wa
     plt.show()
 
 
+# In[ ]:
+
+
 import warnings
 warnings.simplefilter('ignore')
 
-def scatter_plot_rms_rot_speed_time(bin_list, wt_num): # Takes in how many bin you want to have studied
+def scatter_plot_rms_rot_speed_time(bin_list, wt_num, two_d_plot_tw, avg_rot_speeds, freq_in_bins = 256): # Takes in how many bin you want to have studied
     try:
         wt_num = wt_num.split('0')[1]
     except:
         print("wt_num is not the wrong format")
-    
-    if wt_num == "1":
-        two_d_plot_tw = two_d_plot_tw01
-        avg_rot_speeds = avg_rot_speeds1
-    if wt_num == "2":
-        two_d_plot_tw = two_d_plot_tw02
-        avg_rot_speeds = avg_rot_speeds2
-    if wt_num == "3":
-        two_d_plot_tw = two_d_plot_tw03
-        avg_rot_speeds = avg_rot_speeds3
-    if wt_num == "4":
-        two_d_plot_tw = two_d_plot_tw04
-        avg_rot_speeds = avg_rot_speeds4
         
     fig = plt.figure()
     fig1 = plt.figure()
@@ -320,7 +485,7 @@ def scatter_plot_rms_rot_speed_time(bin_list, wt_num): # Takes in how many bin y
     ax1.legend(labels=legend_labels,loc='upper left',
              markerscale=2.,fontsize=10)
     plt.margins(0)
-    ax.set_title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*256},{bin_list[-1]*256}] Hz")
+    ax.set_title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*freq_in_bins},{bin_list[-1]*freq_in_bins}] Hz")
 
     ax.set_ylim(0,max_rms_val+0.001)
     ax.set_xlim(0,np.ceil(len(two_d_plot_tw[bin_num])))
@@ -334,14 +499,16 @@ def scatter_plot_rms_rot_speed_time(bin_list, wt_num): # Takes in how many bin y
     plt.show()
 
 
-    ## Plotting RMS (y-axis) agains Average power (x-axis)
+# In[ ]:
 
-    '''
+
+## Plotting RMS (y-axis) agains Average power (x-axis)
+'''
     Takes in the amount of bins to be plotted (bin_amount),
     the average powers list for each interval, and
     the bin_rms_values
 '''
-def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num):
+def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every_bin_range=256):
     try:
         wt_num = wt_num.split('0')[1]
         
@@ -373,7 +540,7 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num):
     plt.xticks(np.arange(0, int(math.ceil(max(avg_powers) / 100.0)) * 100, 200))
 
     plt.ylabel("RMS")
-    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*256},{bin_list[-1]*256}] Hz")
+    plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{bin_list[0]*every_bin_range},{bin_list[-1]*every_bin_range}] Hz")
     
     
 def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based on the really avg low power values
@@ -408,4 +575,22 @@ def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based o
         print("New min power value", np.min(avg_powers_filtered))
         remove_indexes = indexes
         return avg_powers_filtered, RMS_per_bin_filtered, average_rpm_filtered, remove_indexes
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 

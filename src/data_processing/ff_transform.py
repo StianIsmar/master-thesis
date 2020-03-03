@@ -31,6 +31,8 @@ class FastFourierTransform:
         self.rms_time = None
         self.rms_order = None
         self.type = type
+        self.bin_indexes_range = None
+        self.rms_bins_range_magnitude = None
 
     # Plotting in the input domain before fft
     def plot_input(self):
@@ -190,8 +192,14 @@ class FastFourierTransform:
                        fft_modulus_norm)  # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
 
+        bin_indexes_range = []
+        rms_bins_range_magnitude = []
+
         if spectrum_lower_range != -1:
-            self.fft_transform_time_specified_range(y_norm, f, bins, spectrum_lower_range, spectrum_higher_range)
+            bin_indexes_range, rms_bins_range_magnitude = \
+                self.fft_transform_time_specified_range(y_norm, f, bins, spectrum_lower_range, spectrum_higher_range)
+            self.bin_indexes_range = bin_indexes_range
+            self.rms_bins_range_magnitude = rms_bins_range_magnitude
 
         if plot == True:
             title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' + \
@@ -251,23 +259,26 @@ class FastFourierTransform:
             filter_indexes = [(f > spectrum_lower_range) & (f < spectrum_higher_range)]
             f = f[filter_indexes]
             y_norm = y_norm[filter_indexes]
-            frequency_bins_range = np.linspace(0, 2200, bins + 1)
+            maxx = max(f)
+            frequency_bins_range = np.linspace(0, max(f), bins + 1)
             bin_indexes = [0]
             frequency_bins_index = 1
             for i in range(len(f)):
-                if f[i] >= frequency_bins_range[frequency_bins_index]:
+                check = f[i]
+                this = frequency_bins_range[frequency_bins_index]
+                if check >= this:
                     frequency_bins_index += 1
                     bin_indexes.append(i)
             bin_indexes_range = [(frequency_bins_range[a] + frequency_bins_range[a + 1]) / 2 for a in
                                 range(len(frequency_bins_range) - 1)]  # The frequency index for the bins!
 
-            for i in range(len(bin_indexes) - 1):
+            for i in range(len(bin_indexes)-1):
                 amp = y_norm[bin_indexes[i]:bin_indexes[i + 1]]  # Calculating the rms between two indexes
                 rms_bins_range_magnitude.append(self.rms_bin(amp))
-            fig = plt.figure()
-            plt.plot(bin_indexes_range,rms_bins_range_magnitude)
-            plt.show()
 
+            #plt.plot(bin_indexes_range, rms_bins_range_magnitude)
+            #plt.show()
+            return bin_indexes_range, rms_bins_range_magnitude
     def rms_bin(self, amp):
         sum = 0
         for a in amp:
@@ -305,3 +316,36 @@ class FastFourierTransform:
             sum += a ** 2
         rms = np.sqrt(0.5 * sum)
         return rms
+
+
+# Debugging:
+'''
+WIND_TURBINE = 'WTG01'
+SENSOR_NAME = 'GbxHssRr;0,0102;m/s2'
+wt_instance = wt_data.load_instance(WIND_TURBINE, load_minimal=False)
+interval = wt_instance.ten_second_intervals[0]
+
+rot_data = interval.high_speed_rot_data
+avg_power = interval.op_df["PwrAvg;kW"][0]
+BINS = 50
+lower_range_freq = 0
+higher_range_freq = 2300
+comp_type = 'gearbox'
+ts = interval.sensor_df['TimeStamp']  # Have this as the y-axis to see how the RMS/frequencies develop
+vibration_signal = interval.sensor_df[SENSOR_NAME]
+
+fast = FastFourierTransform(vibration_signal, ts, comp_type)
+fft, time, centroid, rms, rms_bins, bin_freq = fast.fft_transform_time(
+    rot_data,
+    avg_power,
+    get_rms_for_bins=True,
+    plot=True,
+    bins=BINS,
+    plot_bin_lines=False,
+    x_lim=None,
+    frequency_lines=[],
+    horisontal_lines=[],
+    spectrum_lower_range=lower_range_freq,
+    spectrum_higher_range=higher_range_freq
+)
+'''

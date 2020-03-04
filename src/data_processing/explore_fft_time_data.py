@@ -86,10 +86,10 @@ from sklearn.preprocessing import minmax_scale
 '''
 from matplotlib import cm, pyplot as plt
 import math
-def print3d_with_poly_collection(t,sensor_name, remove_indexes_01,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
+def print3d_with_poly_collection(t,sensor_name, remove_indexes,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
 
     # Delete from the avg_powers and average_rot_speed array
-    for i, index in enumerate(remove_indexes_01):
+    for i, index in enumerate(remove_indexes):
         y = np.delete(y, [index], axis=0)
         x = np.delete(x, [index], axis=0)
         z = np.delete(z, [index], axis=0)
@@ -267,9 +267,18 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every
     plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
     
     
-def filter_data(avg_powers, RMS_per_bin, average_rpm, wind_speeds): # filter the data based on the really avg low power values
+def filter_data(avg_powers, RMS_per_bin, average_rpm, wind_speeds, rms_amplitudes): # filter the data based on the really avg low power values
     
     print("Old min power value: ", np.min(avg_powers))
+
+    return_dict = {
+    "avg_powers_filtered": None,
+    "RMS_per_bin_filtered": None,
+    "average_rpm_filtered": None,
+    "remove_indexes": None,
+    "wind_speeds_filtered": None,
+    'rms_amplitudes': None
+    }
 
     avg_powers_filtered = avg_powers
     RMS_per_bin_filtered = RMS_per_bin
@@ -286,12 +295,14 @@ def filter_data(avg_powers, RMS_per_bin, average_rpm, wind_speeds): # filter the
     
     if (len(indexes) == 0):
         print("Already ran.. ")
+        return return_dict
     else:
         # Delete from the avg_powers and average_rot_speed array
         for i, index in enumerate(indexes):
             del avg_powers_filtered[index]
             del average_rpm_filtered[index]
             del wind_speeds_filtered[index]
+            rms_amplitudes = np.delete(rms_amplitudes, [index], axis=0)
 
         # Delete from the RMS bin lists
         for index in indexes:
@@ -300,7 +311,15 @@ def filter_data(avg_powers, RMS_per_bin, average_rpm, wind_speeds): # filter the
 
         print("New min power value", np.min(avg_powers_filtered))
         remove_indexes = indexes
-        return avg_powers_filtered, RMS_per_bin_filtered, average_rpm_filtered, remove_indexes
+        
+        return_dict["avg_powers_filtered"] = avg_powers_filtered
+        return_dict["RMS_per_bin_filtered"] = RMS_per_bin_filtered
+        return_dict["average_rpm_filtered"] = average_rpm_filtered
+        return_dict["remove_indexes"] = remove_indexes
+        return_dict["wind_speeds_filtered"] = wind_speeds_filtered
+        return_dict['rms_amplitudes'] = rms_amplitudes
+
+        return return_dict
 
 
 # In[ ]:

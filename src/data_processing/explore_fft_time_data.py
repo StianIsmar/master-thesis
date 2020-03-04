@@ -86,7 +86,7 @@ from sklearn.preprocessing import minmax_scale
 '''
 from matplotlib import cm, pyplot as plt
 import math
-def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
+def print3d_with_poly_collection(t,sensor_name, remove_indexes_01,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
 
     # Delete from the avg_powers and average_rot_speed array
     for i, index in enumerate(remove_indexes_01):
@@ -151,7 +151,7 @@ def print3d_with_poly_collection(t,remove_indexes_01,x,y,z,color_alt,average_pow
     ax.set_ylabel('Interval number',labelpad=10)
     # ax.set_zlim3d(amp_data.min(), amp_data.max())
     ax.set_zlim3d(amp_data.min(), 8)
-    ax.set_zlabel('RMS amplitude')
+    ax.set_zlabel(f' {sensor_name} RMS amplitude')
 
     # Colourbar
     sm = plt.cm.ScalarMappable(cmap=cmap)
@@ -449,38 +449,7 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every
     plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
     
     
-def filter_data(avg_powers, RMS_per_bin, average_rpm): # filter the data based on the really avg low power values
-    
-    print("Old min power value: ", np.min(avg_powers))
 
-    avg_powers_filtered = avg_powers
-    RMS_per_bin_filtered = RMS_per_bin
-    average_rpm_filtered = average_rpm
-
-    indexes = []
-
-    # Find out where these extreme values lie in the average powers array
-    for i, val in enumerate(avg_powers_filtered):
-        if val <= 0:
-            indexes.append(i)
-    indexes.reverse() # reverse list in order to delete the low powers
-    
-    if (len(indexes) == 0):
-        print("Already ran.. ")
-    else:
-        # Delete from the avg_powers and average_rot_speed array
-        for i, index in enumerate(indexes):
-            del avg_powers_filtered[index]
-            del average_rpm_filtered[index]
-
-        # Delete from the RMS bin lists
-        for index in indexes:
-            for i, rms_bin in enumerate(RMS_per_bin_filtered):
-                del rms_bin[index]
-
-        print("New min power value", np.min(avg_powers_filtered))
-        remove_indexes = indexes
-        return avg_powers_filtered, RMS_per_bin_filtered, average_rpm_filtered, remove_indexes
 
 
 # In[ ]:

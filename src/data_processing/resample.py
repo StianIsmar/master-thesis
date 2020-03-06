@@ -72,7 +72,7 @@ def linear_interpolation_resampling(time_stamps, vibration_signal, peak_array, n
     # Print various values to check if everything is as it should
     if printing:
         print(f'First original x_interval value: {x_interval[0][0]}')
-        print(f'Last  original x_interval value: {x_interval[0][-1]}')
+        print(f'Last  original x_interval value: {x_interval[-1][-1]}')
         print(f'Whole original x_interval: {x_interval[0]}')
         print(f'Shape of original x_interval: {x_interval[0].shape}')
 
@@ -136,12 +136,13 @@ def linear_interpolation_resampling(time_stamps, vibration_signal, peak_array, n
 
     all_resampled_y_values = np.array([])
     all_x_round_domain = np.array([])
+    all_x_time_domain = np.array([])
     for i, y_val in enumerate(resampled_y_values):
         all_resampled_y_values = np.append(all_resampled_y_values, np.array(y_val))
         all_x_round_domain = np.append(all_x_round_domain, np.array(X_values_round_domain_list[i]))
+        all_x_time_domain = np.append(all_x_time_domain, np.array(resampled_x_values[i]))
 
-
-    return X_values_round_domain_list, resampled_y_values, all_x_round_domain, all_resampled_y_values
+    return X_values_round_domain_list, resampled_y_values, all_x_round_domain, all_resampled_y_values, all_x_time_domain
 
 
 
@@ -168,7 +169,7 @@ resampled_y_values = list of lists of resampled signal values (each nested list 
 all_x_round_domain = one list of round time for all rounds
 all_resampled_y_values = one list of all resampled signal values
 '''
-def cubic_interpolation_resampling(time_stamps, vibration_signal, peak_array, number_of_resample_points,
+def cubic_interpolation_resampling(time_stamps, vibration_signal, peak_array, number_of_resample_points=1500,
                                     round_plots=0, printing=False, plotting=False, name="",interpolation_method=''):
     # Convert Panda series into numpy arrays for easier data processing
     time_stamps = np.array(time_stamps)
@@ -289,9 +290,11 @@ def cubic_interpolation_resampling(time_stamps, vibration_signal, peak_array, nu
 
     all_resampled_y_values = np.array([])
     all_x_round_domain = np.array([])
+    all_x_time_domain = np.array([])
     for i, y_val in enumerate(resampled_y_values):
         all_resampled_y_values = np.append(all_resampled_y_values, np.array(y_val))
         all_x_round_domain = np.append(all_x_round_domain, np.array(X_values_round_domain_list[i]))
+        all_x_time_domain = np.append(all_x_time_domain, np.array(resampled_x_values[i]))
 
 
-    return X_values_round_domain_list, resampled_y_values, all_x_round_domain, all_resampled_y_values
+    return X_values_round_domain_list, resampled_y_values, all_x_round_domain, all_resampled_y_values, all_x_time_domain

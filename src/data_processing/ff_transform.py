@@ -100,7 +100,9 @@ class FastFourierTransform:
             ax1.set_ylabel("Normalised amplitude")
             ax1.set_ylim(min(y), max(y) * 1.05)
             ax1.plot(f, y, markersize=0.5, marker="o", lw=2, label='FFT transformation')
-
+            
+            # Show the last frequency:
+            #print(f[-1])
             # Plot RMS bin values in the same figure
             if get_rms_for_bins:
                 ax2 = ax1.twinx()

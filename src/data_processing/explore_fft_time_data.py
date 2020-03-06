@@ -489,22 +489,26 @@ Params:
     - z (Amplitudes): Matrix with frequency amplitudes [[],[],[]]
 
     EXAMPLE CALL:
-
-
+    
     x = np.array([[1,50,100],[1,50,100],[1,50,100]])
-    y = np.array([[0,0,0],[1,1,1],[2,2,2]])
+    y = np.array([[1,1,1],[2,2,2],[2,2,2]])
     z = np.array([[1,2,1],[1,2,1],[1,2,1]])
     average_powers = [200,100,100]
-    print3d_modular("1","sensor_nameXX",x,y,z,average_powers, cm_style='Blues')
+    turbine_number = "1"
+    sensor_name = "My sensor"
+    plot_title = "RMS amplitude over time for 'sensor name'"
+    z_max_plot = 20
+    colorbar_val_min = 10
+    colorbar_val_max = 1337
+    x_axis_title = "Order [X]"
+    cm_style = "copper"
 
+    print3d_modular(x,y,z,turbine_number,sensor_name,plot_title, z_max_plot, colorbar_val_min, colorbar_val_max, x_axis_title, average_powers, cm_style=cm_style)
 '''
-def print3d_modular(turbine_number,sensor_name,x,y,z,average_powers, cm_style='Blues'):
-
-    
-    
+def print3d_modular(x,y,z,turbine_number,sensor_name,plot_title, z_max_plot, colorbar_val_min, colorbar_val_max, x_axis_title, average_powers, cm_style='Blues'):
     fig = plt.figure(figsize=(15,6))
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_title(f"FFT development over time for WT {turbine_number}",pad=20)
+    ax.set_title(f"{plot_title} {turbine_number}",pad=20)
     
     # Get the numpy arrays on the correct shape
     freq_data = x.T
@@ -523,19 +527,12 @@ def print3d_modular(turbine_number,sensor_name,x,y,z,average_powers, cm_style='B
     # Colors:
     
     # cmap="coolwarm"
-    cmap="copper"
+    cmap=cm_style # copper or Blues works
     cmap = cmx.get_cmap(cmap)
     scaled = minmax_scale(average_powers)
-    #print(f"MIN: {min(norm)}. MAX: {max(norm)}")
     col = [cmap(x) for x in scaled]
-    # print(col)
     poly = PolyCollection(verts,facecolors=col)
-    # poly.set_cmap(cmap)
-    # poly.set_norm(norm)
-    # poly.update_scalarmappable()
-    # poly.set_facecolors('k')
-    # poly.set_cmap(cmap)
-    # poly.set_norm(norm)
+
     
     poly.set_alpha(0.7)
 
@@ -543,25 +540,26 @@ def print3d_modular(turbine_number,sensor_name,x,y,z,average_powers, cm_style='B
     # along the y axis. The zs keyword sets each polygon at the
     # correct radius value.
     ax.add_collection3d(poly, zs=rad_data, zdir='y')
-    ax.set_xlim3d(freq_data.min(), freq_data.max())
-    ticks = np.arange(0, freq_data.max(), 250)
-    ax.set_xticks(ticks)
+    ax.set_xlim3d(0, freq_data.max())
+    # ticks = np.arange(0, freq_data.max(), 250)
+    #ax.set_xticks(ticks)
     
     # ax.set_xticks(np.arange(0,freq_data.max(),10))
-    ax.set_xlabel('Frequency [Hz]',labelpad=10)
+    ax.set_xlabel(f'{x_axis_title}',labelpad=10)
     ax.set_ylim3d(rad_data.min(), rad_data.max())
+    for t in ax.zaxis.get_major_ticks(): t.label.set_fontsize(10)
 
 
     ax.set_ylabel('Interval number',labelpad=10)
     # ax.set_zlim3d(amp_data.min(), amp_data.max())
-    ax.set_zlim3d(amp_data.min(), 8)
+    ax.set_zlim3d(0, z_max_plot)
     ax.set_zlabel(f' {sensor_name} RMS amplitude')
 
     # Colourbar
     sm = plt.cm.ScalarMappable(cmap=cmap)
     sm.set_array([])
-    mn=int(np.floor(min(average_powers)))  
-    mx=int(np.ceil(max(average_powers)))
+    mn=int(colorbar_val_min)  
+    mx=int(colorbar_val_max)
     md=(mx-mn)/2
     cb = plt.colorbar(sm)
     cb.set_ticks([0, 0.5, 1])
@@ -573,15 +571,7 @@ def print3d_modular(turbine_number,sensor_name,x,y,z,average_powers, cm_style='B
     # plt.zticks(fontsize=10)
     plt.show()
 
-
-
-
 # In[ ]:
-
-a = 2
-print(2)
-
-
 
 # In[ ]:
 

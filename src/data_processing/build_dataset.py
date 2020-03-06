@@ -174,6 +174,7 @@ def create_rms_datasets_for_one_component(wt_instance,
             interval_data.append(avg_power)
             interval_data.append(active_power)
             interval_data.append(mean_rpm)
+            # interval_data.append(x)
             interval_data.append(wind_speed)
             interval_data.append(nacelle_direction)
 

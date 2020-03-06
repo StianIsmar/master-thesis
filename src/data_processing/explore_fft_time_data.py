@@ -86,7 +86,7 @@ from sklearn.preprocessing import minmax_scale
 '''
 from matplotlib import cm, pyplot as plt
 import math
-def print3d_with_poly_collection(t,sensor_name, remove_indexes,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
+def print3d_with_poly_collection(turbine_number,sensor_name, remove_indexes,x,y,z,color_alt,average_powers, cm_style='Blues',filter = False):
 
     # Delete from the avg_powers and average_rot_speed array
     for i, index in enumerate(remove_indexes):
@@ -98,7 +98,7 @@ def print3d_with_poly_collection(t,sensor_name, remove_indexes,x,y,z,color_alt,a
     
     fig = plt.figure(figsize=(15,6))
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_title(f"FFT development over time for WT {t}",pad=20)
+    ax.set_title(f"FFT development over time for WT {turbine_number}",pad=20)
     
     # Get the numpy arrays on the correct shape
     freq_data = x.T
@@ -291,8 +291,13 @@ def filter_data(avg_powers, RMS_per_bin, average_rpm, wind_speeds, rms_amplitude
     for i, val in enumerate(avg_powers_filtered):
         if val <= 0:
             indexes.append(i)
-    indexes.reverse() # reverse list in order to delete the low powers
     
+    for j, val in enumerate(wind_speeds):
+        if val <=0 and (i not in indexes):
+            indexes.append(j)
+
+    indexes.sort()
+    indexes.reverse() # reverse list in order to delete the low powers
     if (len(indexes) == 0):
         print("Already ran.. ")
         return return_dict
@@ -326,15 +331,12 @@ def filter_data(avg_powers, RMS_per_bin, average_rpm, wind_speeds, rms_amplitude
 
 
 ## Plotting RMS (y-axis) agains ROT speed (x-axis)
-def scatter_plot_rms_rot_speed(bin_list, wt_num,two_d_plot_tw,avg_rot_speeds,every_bin_range=256): # Takes in how many bin you want to have studied
+def scatter_plot_rms_rot_speed(bin_list, wt_num,two_d_plot_tw,avg_rot_speeds,every_bin_range=256, xlab="Mean RPM",ylab="RMS",x_axis_variable = "rot_speed"): # Takes in how many bin you want to have studied
     try:
         wt_num = wt_num.split('0')[1]
         
     except:
         print("wt_num is not the wrong format")
-    
-
-        
     fig = plt.figure()
     
     max_rms_val = 0
@@ -352,12 +354,16 @@ def scatter_plot_rms_rot_speed(bin_list, wt_num,two_d_plot_tw,avg_rot_speeds,eve
     ax.legend(labels=legend_labels,loc='upper left',
              markerscale=2.,fontsize=10)
     plt.margins(0)
-    plt.title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
 
-    plt.ylim(0,max_rms_val+1)
-    plt.xlim(0,1650)
-    plt.xlabel("Mean RPM")
-    plt.ylabel("RMS")
+    if x_axis_variable == "rot_speed":
+        plt.title(f"RMS and RPM correlation for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
+    elif x_axis_variable == "wind_speed":
+        plt.title(f"RMS and wind speed correlation for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
+
+    plt.ylim(0,max_rms_val*1.01)
+    plt.xlim(0,max(avg_rot_speeds)*1.01)
+    plt.xlabel(f"{xlab}")
+    plt.ylabel(f"{ylab}")
     plt.show()
 
 
@@ -467,19 +473,113 @@ def scatter_plot_rms_avg_power(bin_list, avg_powers, bin_rms_values,wt_num,every
     plt.ylabel("RMS")
     plt.title(f"RMS and Average Power for WT {wt_num}" "\n" f"Frequency range: [{int(bin_list[0]*every_bin_range)},{int(bin_list[-1]*every_bin_range)}] Hz")
     
+
+def rms_wind_speed_scatter(filtered_rms_amplitudes_wt, filtered_wind_speeds):
+    first_row = filtered_rms_amplitudes_wt
+
+
+
+# In[ ]:
+'''
+Params:
+    - Turbine number: "1", "2", "3", or "4"
+    - Sensor name: For the plots
+    - x (Frequencies): Matrix with frequencies, bin indexes (for the x axis)
+    - y (Intervals): Matrix with interval indexes [[0,0,0,0..][1,1,1,1,..][2,2,2,2,..].. [414,414,414,..]]
+    - z (Amplitudes): Matrix with frequency amplitudes [[],[],[]]
+
+    EXAMPLE CALL:
+
+
+    x = np.array([[1,50,100],[1,50,100],[1,50,100]])
+    y = np.array([[0,0,0],[1,1,1],[2,2,2]])
+    z = np.array([[1,2,1],[1,2,1],[1,2,1]])
+    average_powers = [200,100,100]
+    print3d_modular("1","sensor_nameXX",x,y,z,average_powers, cm_style='Blues')
+
+'''
+def print3d_modular(turbine_number,sensor_name,x,y,z,average_powers, cm_style='Blues'):
+
     
+    
+    fig = plt.figure(figsize=(15,6))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_title(f"FFT development over time for WT {turbine_number}",pad=20)
+    
+    # Get the numpy arrays on the correct shape
+    freq_data = x.T
+    amp_data = z.T
+    rad_data = np.linspace(0,amp_data.shape[1],amp_data.shape[1])
+    
+    verts = []
+
+    for irad in range(len(rad_data)):
+        # I'm adding a zero amplitude at the beginning and the end to get a nice
+        # flat bottom on the polygons
+        xs = np.concatenate([[freq_data[0,irad]], freq_data[:,irad], [freq_data[-1,irad]]])
+        ys = np.concatenate([[0],amp_data[:,irad],[0]])
+        verts.append(list(zip(xs, ys)))
+
+    # Colors:
+    
+    # cmap="coolwarm"
+    cmap="copper"
+    cmap = cmx.get_cmap(cmap)
+    scaled = minmax_scale(average_powers)
+    #print(f"MIN: {min(norm)}. MAX: {max(norm)}")
+    col = [cmap(x) for x in scaled]
+    # print(col)
+    poly = PolyCollection(verts,facecolors=col)
+    # poly.set_cmap(cmap)
+    # poly.set_norm(norm)
+    # poly.update_scalarmappable()
+    # poly.set_facecolors('k')
+    # poly.set_cmap(cmap)
+    # poly.set_norm(norm)
+    
+    poly.set_alpha(0.7)
+
+    # The zdir keyword makes it plot the "z" vertex dimension (radius)
+    # along the y axis. The zs keyword sets each polygon at the
+    # correct radius value.
+    ax.add_collection3d(poly, zs=rad_data, zdir='y')
+    ax.set_xlim3d(freq_data.min(), freq_data.max())
+    ticks = np.arange(0, freq_data.max(), 250)
+    ax.set_xticks(ticks)
+    
+    # ax.set_xticks(np.arange(0,freq_data.max(),10))
+    ax.set_xlabel('Frequency [Hz]',labelpad=10)
+    ax.set_ylim3d(rad_data.min(), rad_data.max())
+
+
+    ax.set_ylabel('Interval number',labelpad=10)
+    # ax.set_zlim3d(amp_data.min(), amp_data.max())
+    ax.set_zlim3d(amp_data.min(), 8)
+    ax.set_zlabel(f' {sensor_name} RMS amplitude')
+
+    # Colourbar
+    sm = plt.cm.ScalarMappable(cmap=cmap)
+    sm.set_array([])
+    mn=int(np.floor(min(average_powers)))  
+    mx=int(np.ceil(max(average_powers)))
+    md=(mx-mn)/2
+    cb = plt.colorbar(sm)
+    cb.set_ticks([0, 0.5, 1])
+    cb.set_ticklabels([mn,md,mx],update_ticks=True)
+    cb.set_label('Magnitude of Average Power for turbine')
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+    ax.tick_params(axis='both', which='major', pad=1)
+    # plt.zticks(fontsize=10)
+    plt.show()
+
 
 
 
 # In[ ]:
 
-
-
-
-
-# In[ ]:
-
-
+a = 2
+print(2)
 
 
 

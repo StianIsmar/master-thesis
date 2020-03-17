@@ -55,13 +55,11 @@ def plot_vib_consecutive(down):
 # Bandpass method (Bandpass + RECT + LP)
 
 def get_sampling_freq(signal,times):
-    for i in range(len(np.array(times))):
-        times = np.array(times)
-        T = times[0] - times[1]
-        ending_time = np.array(times)[-1]
-        N = len(signal)
-        fs = N/ending_time
-        break
+    times = np.array(times)
+    T = times[0] - times[1]
+    ending_time = np.array(times)[-1]
+    N = len(signal)
+    fs = N/ending_time
     return fs, N, T, ending_time
 
 def perform_fft(amplitudes, timestamps,plot=False ):
@@ -99,7 +97,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     y = filtfilt(b, a, data)
     return y
 
-def perform_envelope_process(timestamps, interval_signal, COMPONENT_NAME, lowcut, lowcut_final_lp, highcut,order = 5,plot_low=60,plot_high=800,plot=False,square=False):
+def perform_envelope_process(wt_name,timestamps, interval_signal, COMPONENT_NAME, lowcut,highcut,order = 5,plot_low=60,plot_high=800,plot=False,square=False,lowcut_final_lp=10000):
     fs, _, _ ,_ =  get_sampling_freq(interval_signal,timestamps)
     bandpass_filtered = butter_bandpass_filter(interval_signal,lowcut, highcut, fs, order=5)
     bandpass_filtered_rect = abs(bandpass_filtered)
@@ -113,7 +111,7 @@ def perform_envelope_process(timestamps, interval_signal, COMPONENT_NAME, lowcut
     all_fft_spectrums = [perform_fft(sig,timestamps) for i, sig in enumerate(all_time_signals)]
 
     if plot:
-        plot_enveloping_process(4,2,COMPONENT_NAME, all_time_signals,all_fft_spectrums, timestamps,lowcut,highcut)
+        plot_enveloping_process(wt_name,4,2,COMPONENT_NAME, all_time_signals,all_fft_spectrums, timestamps,lowcut,highcut)
 
         df = pd.DataFrame(interval_signal)
         df['timestamp'] = timestamps
@@ -139,15 +137,16 @@ def perform_envelope_process(timestamps, interval_signal, COMPONENT_NAME, lowcut
         df['frequency'] = all_fft_spectrums[-1]['freq']
         # df.plot.hist(bins=2000)
         ax=df.plot.line(x='frequency',y=0,title=f"Zoomed in after lowpass: Index {plot_low} to {plot_high}",legend=False,figsize=(10,2))
-        ax.set_xlim(0,1000)
+        ax.set_xlim(0,lowcut_final_lp)
+        ax.set_xlim(0,1200)
         plt.show()
     return all_time_signals, all_fft_spectrums
 
 
 
-def plot_enveloping_process(rows, cols, COMPONENT_NAME, all_time_signals, all_fft_spectrums, timestamps, lowcut, highcut):
+def plot_enveloping_process(wt_name, rows, cols, COMPONENT_NAME, all_time_signals, all_fft_spectrums, timestamps, lowcut, highcut):
     fig, ax = plt.subplots(rows, cols,figsize=(15,7))
-    fig.suptitle(f'{COMPONENT_NAME}: Envelop signal processing ',fontsize=16, y=1.05)
+    fig.suptitle(f'{COMPONENT_NAME}: Envelope signal processing for {wt_name} ',fontsize=16, y=1.05)
 
     # Row 1
     ax[0,0].plot(timestamps,all_time_signals[0])

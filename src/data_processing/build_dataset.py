@@ -348,7 +348,55 @@ def save_all_df_for_component(component_name,bins,power_threshold=2500):
 #save_all_df_for_component('GbxHssRr;0,0102;m/s2',bins=50,power_threshold=2500)
 
 
+def load_wt_high_freq_analysis(wt_name,component_name):
+    wt_instance = wt_data.load_instance(wt_name, load_minimal=False)
+    intervals_vibrations = []
+    intervals_times = []
+    intervals_data = []
+    intervals_peak_arrays = []
+    number_of_intervals = len(wt_instance.ten_second_intervals)
+    
+    for i, interval in enumerate(wt_instance.ten_second_intervals):
+        if (interval.sensor_df.shape[1]) == 14 and (interval.op_df["PwrAvg;kW"][0] > 0):
+            rot_data = interval.high_speed_rot_data
 
+            avg_speed = rot_data['mean']
+            avg_power = interval.op_df["PwrAvg;kW"][0]
+            active_power = interval.op_df["PwrAct;kW"][0]
+            wind_speed = interval.op_df["WdSpdAct;m/s"][0]
+            nacelle_direction = interval.op_df["NacDirAct;deg"][0]
+
+            
+            interval_data = []
+            interval_data.append(avg_power)
+            interval_data.append(active_power)
+            interval_data.append(wind_speed)
+            interval_data.append(nacelle_direction)
+            interval_data.append(avg_speed)
+            
+            # Peak array
+            peak_array = interval.high_speed_peak_array
+            intervals_peak_arrays.append(peak_array)
+
+            
+            # Vibration signal and timestamps
+            vibration_signal = interval.sensor_df[component_name]
+            time_stamps = interval.sensor_df['TimeStamp']
+            time = interval.sensor_df['TimeStamp']
+
+            intervals_vibrations.append(vibration_signal)
+            intervals_times.append(time)
+            intervals_data.append(interval_data)
+            
+    df_column_names = ['AvgPower',
+                       'ActPower',
+                       'WindSpeed',
+                       'NacelleDirection',
+                       'AvgSpeed']
+    
+    df_intervals_data = pd.DataFrame(intervals_data, columns=df_column_names)
+            
+    return intervals_vibrations, intervals_times, df_intervals_data, intervals_peak_arrays
 
 
 #df = load_dataframe('WTG01_RMS')

@@ -203,9 +203,7 @@ def butter_hp_filter(data, lowcut, fs, order=5):
     return y
 
 
-# Lp
-from scipy.signal import butter, lfilter,filtfilt
-
+#lp
 def butter_lp(highcut, fs, order=5):
     nyq = 0.5 * fs
     w = highcut / nyq

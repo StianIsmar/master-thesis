@@ -40,55 +40,60 @@ def insert_str(string, str_to_insert, index):
 def load_raw(component, wt):
 	if component == 'gearbox':
 		sensor = 'GbxHssRr;0,0102;m/s2'
-		path = f'/Volumes/OsvikExtra/signal_data/raw_data/gearbox/{wt}'
-		filepath_vib = path + f'/raw_gearbox_sig_{wt}.npz'
-		filepath_times = path + f'/time_stamps_{wt}.npz'
-		filepath_op_data = path + f'/op_data_{wt}.npz'
-		filepath_peak_array = path + f'/peak_array_{wt}.npz'
-		if os.path.isfile(filepath_vib) and os.path.isfile(filepath_times) and os.path.isfile(filepath_peak_array) and os.path.isfile(filepath_op_data):
-			print("File exist")
 
-			# just load the data:
+	
+	path = f'/Volumes/OsvikExtra/signal_data/raw_data/gearbox/{wt}'
+	filepath_vib = path + f'/raw_gearbox_sig_{wt}.npz'
+	filepath_times = path + f'/time_stamps_{wt}.npz'
+	filepath_op_data = path + f'/op_data_{wt}.npz'
+	filepath_peak_array = path + f'/peak_array_{wt}.npz'
+	if os.path.isfile(filepath_vib) and os.path.isfile(filepath_times) and os.path.isfile(filepath_peak_array) and os.path.isfile(filepath_op_data):
+		print("File exist")
 
-			# Load compressed data
-			vib_signal = load(filepath_vib)
-			vib_signal = vib_signal['arr_0']
+		# just load the data:
 
-			times = load(filepath_times)
-			times = times['arr_0']
+		# Load compressed data
+		vib_signal = load(filepath_vib)
+		vib_signal = vib_signal['arr_0']
 
-			op_data_intervals = pd.read_csv(filepath_op_data, compression='gzip')
+		times = load(filepath_times)
+		times = times['arr_0']
+
+		op_data_intervals = pd.read_csv(filepath_op_data, compression='gzip')
 
 
-			peak_array = load(filepath_peak_array, allow_pickle=True)
-			peak_array = peak_array['arr_0']
+		peak_array = load(filepath_peak_array, allow_pickle=True)
+		peak_array = peak_array['arr_0']
 
-			return vib_signal, times, op_data_intervals, peak_array
+
+		return vib_signal, times, op_data_intervals, peak_array
+	
+	else:
+		print("Building the data")
+		wt_name = wt.upper()
+		wt_name = insert_str(wt_name,'G',2)
+		sig, times, intervals_op_data, peak_array = build_dataset.load_wt_high_freq_analysis(wt_name, sensor)
+		print("Starting to save the data.")
+
+		# Saving vibrations
+		if not (os.path.isfile(filepath_vib)):
+			savez_compressed(filepath_vib, sig)
+
+		# Saving timestamps
+		if not (os.path.isfile(filepath_times)):
+			savez_compressed(filepath_times, times)
+
+		# Saving operating data
+		if not (os.path.isfile(filepath_op_data)):
+			intervals_op_data.to_csv(filepath_op_data, compression='gzip')
+
+		if not (os.path.isfile(filepath_peak_array)):
+			savez_compressed(filepath_peak_array, peak_array)
 		
-		else:
-			print("Building the data")
-			wt_name = wt.upper()
-			wt_name = insert_str(wt_name,'G',2)
-			sig, times, intervals_op_data, peak_array = build_dataset.load_wt_high_freq_analysis(wt_name, sensor)
-			print("Starting to save the data.")
+		print("Done saving the data")
 
-			# Saving vibrations
-			if not (os.path.isfile(filepath_vib)):
-				savez_compressed(filepath_vib, sig)
+		return sig, times, intervals_op_data, peak_array
 
-			# Saving timestamps
-			if not (os.path.isfile(filepath_times)):
-				savez_compressed(filepath_times, times)
+		#del sig, times, intervals_op_data, peak_array
 
-			# Saving operating data
-			if not (os.path.isfile(filepath_op_data)):
-				intervals_op_data.to_csv(filepath_op_data, compression='gzip')
-
-			if not (os.path.isfile(filepath_peak_array)):
-				savez_compressed(filepath_peak_array, peak_array)
-			
-			print("Done saving the data")
-
-			del sig, times, intervals_op_data, peak_array
-
-			load_raw(component, wt)
+		load_raw(component, wt)

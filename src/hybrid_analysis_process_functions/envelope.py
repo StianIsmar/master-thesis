@@ -28,11 +28,11 @@ import ff_transform
 import explore_fft_time_data
 
 # Plot how the vibration looks across all intervals
-def plot_vib_consecutive(down):
+def plot_vib_consecutive(sig):
     indexes = []
     index_start=0
     fig, ax = plt.subplots(figsize=(15,5))
-    for i, d in enumerate(down):
+    for i, d in enumerate(sig):
         indexes.append(index_start)
         index_end = len(d)
         x = np.arange(index_start, index_start+index_end)
@@ -40,7 +40,7 @@ def plot_vib_consecutive(down):
         plt.plot(x,d)
         plt.margins(0)
     print(len(np.linspace(0,index_start+index_end,5)))
-    plt.xticks(np.linspace(0,index_start,24),[int(round(elem)) for i,elem in enumerate(np.linspace(1,len(down)+1,24))])
+    plt.xticks(np.linspace(0,index_start,24),[int(round(elem)) for i,elem in enumerate(np.linspace(1,len(sig)+1,24))])
     #locs, labels = plt.xticks()
     #ax.set_xticks(indexes)
     #ax.set_xticklabels(np.arange(1,len(indexes)+1))

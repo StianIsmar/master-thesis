@@ -1,6 +1,6 @@
 from PyEMD import EEMD
 import numpy as np
-import pylot.matplotlib as plt
+import matplotlib.pyplot as plt
 
 def eemd(wt_name, interval_num, component,signal,timestamps,plotting=True):
 
@@ -16,15 +16,13 @@ def eemd(wt_name, interval_num, component,signal,timestamps,plotting=True):
 	# Execute EEMD on S
 	eIMFs = eemd.eemd(S, t)
 	nIMFs = eIMFs.shape[0]
-	# Plot results
-	plt.figure(figsize=(12,9))
-	
+	# Plot results	
 
 	if plotting:
 		# plt.plot(t, S, 'r')
 		# plt.title("Filtered signal")
 
-		plt.subplot(nIMFs+1, 1, 1)
+		
 		f, axs = plt.subplots((nIMFs)+1,1,figsize=(15,20))
 
 		# plotting the filtered signal first

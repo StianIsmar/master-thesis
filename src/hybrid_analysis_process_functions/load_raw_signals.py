@@ -52,7 +52,7 @@ def load_raw(component, wt):
 
 			# Load compressed data
 			vib_signal = load(filepath_vib)
-			vib_signal = vig_signal['arr_0']
+			vib_signal = vib_signal['arr_0']
 
 			times = load(filepath_times)
 			times = times['arr_0']
@@ -92,10 +92,3 @@ def load_raw(component, wt):
 			del sig, times, intervals_op_data, peak_array
 
 			load_raw(component, wt)
-
-load_raw('gearbox','wt01')
-#load_raw('gearbox','wt02')
-#load_raw('gearbox','wt03')
-# load_raw('gearbox','wt04')
-
-

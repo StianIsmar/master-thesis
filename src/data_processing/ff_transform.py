@@ -144,13 +144,26 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y)
         return fft, time, centroid, rms_bins, x
 
+
+
+
+
+
+
     def find_spectral_centroid(self, f, y):
         weight_sum = 0
         for i, freq in enumerate(f):
             weight_sum += freq * y[i]
         return weight_sum / np.sum(y)
 
-    def fft_transform_time(self, rot_data, avg_power, name="", interval_num='unknown', plot=False,
+
+
+
+
+
+
+
+    def fft_transform_time(self, rot_data=[], avg_power=-1, avg_rpm=-1, name="", interval_num='unknown', plot=False,
                            get_rms_for_bins=False, bins=0, plot_bin_lines=False, x_lim=None, frequency_lines=[],
                            horisontal_lines=[], spectrum_lower_range=-1, spectrum_higher_range=1):
         mean_amplitude = np.mean(self.s)
@@ -190,8 +203,7 @@ class FastFourierTransform:
              range(len(frequency_bins) - 1)]  # The frequency index for the bins!
 
         # Calculate RMS for the ISO interval
-        rms = self.rms(f,
-                       fft_modulus_norm)  # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
+        rms = self.rms(f, fft_modulus_norm)  # F is the half of the frequencies, ffy_modulus_norm is the normalised |fft|
         self.rms_time = rms
 
         bin_indexes_range = []
@@ -204,9 +216,13 @@ class FastFourierTransform:
             self.rms_bins_range_magnitude = rms_bins_range_magnitude
 
         if plot == True:
-            title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' + \
-                    f'Max RPM: {rot_data["max"]:.2f},     Min RPM: {rot_data["min"]:.2f},     ' + \
-                    f'STD RPM: {rot_data["std"]:.2f}'
+            if (len(rot_data) > 0) and (avg_power > -1):
+                title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' + \
+                        f'Max RPM: {rot_data["max"]:.2f},     Min RPM: {rot_data["min"]:.2f},     ' + \
+                        f'STD RPM: {rot_data["std"]:.2f}'
+            elif (avg_rpm > -1) and (avg_power > -1):
+                title = f'Avg Power: {avg_power:.2f}     Mean RPM: {avg_rpm:.2f},     '
+                
             fig, ax1 = plt.subplots(figsize=(15, 5))
             ax1.set_xlabel("Frequency [Hz]")
             ax1.set_ylabel("Normalised amplitude")
@@ -255,6 +271,9 @@ class FastFourierTransform:
         centroid = self.find_spectral_centroid(f, y_norm)
         return fft, time, centroid, rms, rms_bins, x
 
+
+
+
     def fft_transform_time_specified_range(self, y_norm, f, bins, spectrum_lower_range, spectrum_higher_range):
         rms_bins_range_magnitude = []
         if self.type == "gearbox":
@@ -291,6 +310,7 @@ class FastFourierTransform:
     # Function returns rms as a float. Called in the fft_transform_time function
     def rms(self, freq, fft_modulus_norm):
         # Filtering the frequency spectrum based on what component is being analysed
+        filter_indexes=[]
         if (self.type == "generator"):
             filter_indexes = [(freq > 10) & (freq < 5000)]
         if self.type == "gearbox":

@@ -94,7 +94,7 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
 
 def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = filtfilt(b, a, data)
+    y = filtfilt(b, a, data,index=0)
     return y
 
 def perform_envelope_process(wt_name,timestamps, interval_signal, COMPONENT_NAME, lowcut,highcut,order = 5,plot_low=60,plot_high=800,plot=False,square=False,lowcut_final_lp=10000):

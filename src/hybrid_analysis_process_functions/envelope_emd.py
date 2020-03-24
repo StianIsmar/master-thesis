@@ -36,3 +36,5 @@ def eemd(wt_name, interval_num, component,signal,timestamps,plotting=True):
 		    plt.tight_layout()
 		    plt.savefig(f' for {wt_name}', dpi=120)
 		plt.show()
+		eIMFs = eIMFs.insert(0,S)
+	return eIMFs

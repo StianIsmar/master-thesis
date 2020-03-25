@@ -27,33 +27,54 @@ def plot_fft(time, vibration_signal, rot_data=[], avg_power=-1, avg_rpm=-1, inte
     _, _, _, _, _, _ = fast.fft_transform_time(rot_data=rot_data, avg_power=avg_power, avg_rpm=avg_rpm, name=name, interval_num=interval_num, plot=True, get_rms_for_bins=False, plot_bin_lines=False)
     return
 
-def plot_signal(time, vibration_signal, x_min=0, x_max=None):
-
+def plot_signal(time, vibration_signal, peak_array=[], x_min=0, x_max=None, name=''):
 # ------ Plot original signal -------
+    '''
         x_original = []
         y_original = []
         for i in range(round_plots):
             x_original = np.append(x_original, x_interval[i])
             y_original = np.append(y_original, y_interval[i])
         original_vertical_lines = peak_array[0:round_plots+1]
-
-        plt.figure(figsize=(15, 5))
-        plt.plot(x_original, y_original, linewidth=0.2)
-        plt.title(f'Original Vibration Data {name} \nNumber of Data Points: {x_original.shape[0]}')
-        plt.xlabel('Time (in s)', fontsize=16)
-        plt.ylabel('Vibration amplitude (in m/s2)', fontsize=16)
-        for i, round_value in enumerate(original_vertical_lines):
+    '''
+    plt.figure(figsize=(15, 5))
+    plt.plot(time, vibration_signal, linewidth=0.2)
+    plt.title(f'{name} Vibration Data')
+    plt.xlabel('Time (in s)', fontsize=16)
+    plt.ylabel('Vibration amplitude (in m/s2)', fontsize=16)
+    if len(peak_array) > 0:
+        for i, round_value in enumerate(peak_array):
             plt.axvline(x=round_value, c='r', linewidth=0.8)
-        plt.margins(0)
-        plt.show()
+    plt.xlim(x_min, x_max)
+    plt.margins(0)
+    plt.show()
 
 
 def plot_kurtogram(kurtogram, frequencies):
     frequencies = np.asarray(frequencies)
-    kurtogram_index = [0, 1, 1.6, 2, 2.6, 3, 3.6, 4, 4.6, 5, 5.6, 6, 6.6, 7, 7.6, 8]
+    kurtogram_index = ['0 (2)', '1 (4)', '1.6 (6)', '2 (8)', '2.6 (12)', '3 (16)', '3.6 (24)', '4 (32)', 
+                        '4.6 (48)', '5 (64)', '5.6 (96)', '6 (128)', '6.6 (192)', '7 (256)', '7.6 (384)', '8 (512)']
     plt.figure(figsize=(10,8))
-    color=['Blues_r', 'YlGnBu_r']
-    chart = sns.heatmap(kurtogram, cmap=color[1])
-    chart.set_xticklabels(frequencies, minor=False, rotation=45)
+    color=['Blues_r', 'YlGnBu_r', 'YlOrRd_r', 'BuGn_r', 'GnBu_r', 'Greys_r','navy','winter','PuBu_r','CMRmap','mako', 'seismic', 'viridis']
+    
+    custom_blues_1= sns.light_palette((210, 90, 60), 10, input='husl', reverse=True)
+    color.append(custom_blues_1)
+
+    xticks = (frequencies)
+    #print(xticks.shape)
+    keptticks = xticks[::int(len(xticks)/5)]
+    
+    keptticks2 = np.floor(keptticks/1000)
+    #print(keptticks)
+    xticks = ['' for y in xticks]
+    #print(xticks)
+    
+    xticks[::int(len(xticks)/5)] = keptticks2
+    #print(xticks)
+
+    chart = sns.heatmap(kurtogram, cmap=color[-2],yticklabels=kurtogram_index,xticklabels=xticks)
+
+    #chart.set_xticklabels(frequencies, minor=False, rotation=45)
     chart.set_yticklabels(kurtogram_index, rotation=0)
+    plt.xlabel('Frequency (kHz)')
     plt.show()

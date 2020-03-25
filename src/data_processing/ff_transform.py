@@ -173,7 +173,7 @@ class FastFourierTransform:
         # We now have the fft for every timestep in out plot.
 
         # T is the sample frequency in the data set
-        T = self.t[1] - self.t[0]  # This is true when the period between each sample in the time waveform is equal
+        T = self.t[10001] - self.t[10000]  # This is true when the period between each sample in the time waveform is equal
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the biggest freq
         f = f[:N // 2]
@@ -215,6 +215,7 @@ class FastFourierTransform:
             self.bin_indexes_range = bin_indexes_range
             self.rms_bins_range_magnitude = rms_bins_range_magnitude
 
+        title = ''
         if plot == True:
             if (len(rot_data) > 0) and (avg_power > -1):
                 title = f'Avg Power: {avg_power:.2f}     Mean RPM: {rot_data["mean"]:.2f},     ' + \

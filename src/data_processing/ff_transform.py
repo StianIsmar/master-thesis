@@ -224,7 +224,7 @@ class FastFourierTransform:
             elif (avg_rpm > -1) and (avg_power > -1):
                 title = f'Avg Power: {avg_power:.2f}     Mean RPM: {avg_rpm:.2f},     '
                 
-            fig, ax1 = plt.subplots(figsize=(15, 5))
+            fig, ax1 = plt.subplots(figsize=(10, 5))
             ax1.set_xlabel("Frequency [Hz]")
             ax1.set_ylabel("Normalised amplitude")
             ax1.set_ylim(min(y_norm), max(y_norm) * 1.05)

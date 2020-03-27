@@ -37,7 +37,7 @@ def plot_signal(time, vibration_signal, peak_array=[], x_min=0, x_max=None, name
             y_original = np.append(y_original, y_interval[i])
         original_vertical_lines = peak_array[0:round_plots+1]
     '''
-    plt.figure(figsize=(15, 5))
+    plt.figure(figsize=(10, 5))
     plt.plot(time, vibration_signal, linewidth=0.2)
     plt.title(f'{name} Vibration Data')
     plt.xlabel('Time (in s)', fontsize=16)
@@ -50,7 +50,7 @@ def plot_signal(time, vibration_signal, peak_array=[], x_min=0, x_max=None, name
     plt.show()
 
 
-def plot_kurtogram(kurtogram, frequencies):
+def plot_kurtogram(kurtogram, frequencies, file_name='', wt='', max_sk=None, cf=None, bw=None, window=None, save_path=None):
     frequencies = np.asarray(frequencies)
     kurtogram_index = ['0 (2)', '1 (4)', '1.6 (6)', '2 (8)', '2.6 (12)', '3 (16)', '3.6 (24)', '4 (32)', 
                         '4.6 (48)', '5 (64)', '5.6 (96)', '6 (128)', '6.6 (192)', '7 (256)', '7.6 (384)', '8 (512)']
@@ -61,20 +61,27 @@ def plot_kurtogram(kurtogram, frequencies):
     color.append(custom_blues_1)
 
     xticks = (frequencies)
-    #print(xticks.shape)
     keptticks = xticks[::int(len(xticks)/5)]
-    
     keptticks2 = np.floor(keptticks/1000)
-    #print(keptticks)
     xticks = ['' for y in xticks]
-    #print(xticks)
-    
     xticks[::int(len(xticks)/5)] = keptticks2
-    #print(xticks)
 
-    chart = sns.heatmap(kurtogram, cmap=color[-2],yticklabels=kurtogram_index,xticklabels=xticks)
-
-    #chart.set_xticklabels(frequencies, minor=False, rotation=45)
+    chart = sns.heatmap(kurtogram, cmap=color[-2],yticklabels=kurtogram_index,xticklabels=xticks,cbar_kws={'label': 'Spectral Kurtosis'})
     chart.set_yticklabels(kurtogram_index, rotation=0)
+    
+    chart_title = f'Kurtogram'
+    if file_name != '':
+        chart_title = f'{chart_title} of {file_name}'
+    if wt != '':
+        chart_title = f'{chart_title} Turbine {wt}'
+    if (max_sk is not None) and (cf is not None) and (bw is not None) and (window is not None):
+        chart_title = f'{chart_title}\nMax SK value: {max_sk:.2f}     Optimal Window Length: {kurtogram_index[window]}\nCenter Frequency: {cf:.2f}         Bandwidth: {bw:.2f}'
+    
     plt.xlabel('Frequency (kHz)')
-    plt.show()
+    plt.ylabel('Level (Window Length)')
+    plt.title(chart_title)
+    if (save_path is not None) and (file_name != ''):
+        plt.savefig(f'{save_path}kurt_{file_name}.png')
+    #plt.show()
+    plt.close()
+    return None

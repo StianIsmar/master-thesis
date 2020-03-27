@@ -22,20 +22,18 @@ resampled_y:       array of resampled amplitude
 x_time:            array of resampled x-axis in terms of time
 '''
 
-def do_resampling(time, vibration_signal, peak_array, number_of_resample_points=2000, interpolation='linear'):
-    if interpolation == 'linear':
-        _, _, x_round, resampled_y, x_time = resample.linear_interpolation_resampling(time,
-                                                                                      vibration_signal,
-                                                                                      peak_array, 
-                                                                                      number_of_resample_points=number_of_resample_points)
+def do_linear_resampling(time, vibration_signal, peak_array, number_of_resample_points=2000):
+    _, _, x_round, resampled_y, x_time = resample.linear_interpolation_resampling(time,
+                                                                                  vibration_signal,
+                                                                                  peak_array, 
+                                                                                  number_of_resample_points=number_of_resample_points)
 
-    elif interpolation == 'cubic':
-         _, _, x_round, resampled_y, x_time = resample.cubic_interpolation_resampling(time,
-                                                                                      vibration_signal,
-                                                                                      peak_array, 
-                                                                                      number_of_resample_points=number_of_resample_points)
-    else:
-        print('Interpolation method must either be "linear" or "cubic".')
-        return None, None, None
+    return x_round, resampled_y, x_time
+
+def do_cubic_resampling(time, vibration_signal, peak_array, number_of_resample_points=2000):
+    _, _, x_round, resampled_y, x_time = resample.cubic_interpolation_resampling(time,
+                                                                                 vibration_signal,
+                                                                                 peak_array, 
+                                                                                 number_of_resample_points=number_of_resample_points)
 
     return x_round, resampled_y, x_time

@@ -40,5 +40,5 @@ def eemd(wt_name, interval_num, component,signal,timestamps,plotting=True):
 		print(f'{eIMFs.shape} is the shape of the IMFs!')
 
 	eIMFs = np.insert(eIMFs,0,S,axis=0) # Inserting the original signal into the fist index of the returned array
-	print(f'{eIMFs.shape} is the shape of the IMFs!')
+	#print(f'{eIMFs.shape} is the shape of the IMFs!')
 	return eIMFs

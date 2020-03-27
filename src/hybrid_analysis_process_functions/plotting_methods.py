@@ -22,9 +22,11 @@ name:              string - additional info to the figure header. Default is ''.
 OUTPUT:
 nothing, only displays figure. 
 '''
-def plot_fft(time, vibration_signal, rot_data=[], avg_power=-1, avg_rpm=-1, interval_num=-1, name='',):
+def plot_fft(time, vibration_signal, rot_data=[], avg_power=-1, avg_rpm=-1, interval_num=-1, name='', x_max=None):
     fast = ff_transform.FastFourierTransform(vibration_signal, time, 'gearbox')
-    _, _, _, _, _, _ = fast.fft_transform_time(rot_data=rot_data, avg_power=avg_power, avg_rpm=avg_rpm, name=name, interval_num=interval_num, plot=True, get_rms_for_bins=False, plot_bin_lines=False)
+    _, _, _, _, _, _ = fast.fft_transform_time(rot_data=rot_data, avg_power=avg_power, avg_rpm=avg_rpm, name=name, 
+                                               interval_num=interval_num, plot=True, get_rms_for_bins=False, 
+                                               plot_bin_lines=False, x_lim=x_max)
     return
 
 def plot_signal(time, vibration_signal, peak_array=[], x_min=0, x_max=None, name=''):
@@ -37,7 +39,7 @@ def plot_signal(time, vibration_signal, peak_array=[], x_min=0, x_max=None, name
             y_original = np.append(y_original, y_interval[i])
         original_vertical_lines = peak_array[0:round_plots+1]
     '''
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(15, 5))
     plt.plot(time, vibration_signal, linewidth=0.2)
     plt.title(f'{name} Vibration Data')
     plt.xlabel('Time (in s)', fontsize=16)

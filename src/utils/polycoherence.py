@@ -193,7 +193,7 @@ def plot_polycoherence(freq1, freq2, bicoh):
     df2 = freq2[1] - freq2[0]
     freq1 = np.append(freq1, freq1[-1] + df1) - 0.5 * df1
     freq2 = np.append(freq2, freq2[-1] + df2) - 0.5 * df2
-    plt.figure()
+    plt.figure(figsize=(8,5))
     plt.pcolormesh(freq2, freq1, np.abs(bicoh))
     plt.xlabel('freq (Hz)')
     plt.ylabel('freq (Hz)')

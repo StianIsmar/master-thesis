@@ -17,9 +17,9 @@ def plot_clusters(y_cluster_kmeans):
     min_clus = y_cluster_kmeans.min()
     
     if not (min_clus == 0):
-        if min_clus <0:
-            y_cluster_kmeans = y_cluster_kmeans + (min_clus*-1)    
-        else:
+        if min_clus < 0:
+            y_cluster_kmeans = y_cluster_kmeans + (min_clus*-1 )    
+        elif min_clus > 0:
             y_cluster_kmeans = y_cluster_kmeans - min_clus
         min_clus = 0
     
@@ -97,8 +97,27 @@ def db_scan_clustering(df,kind,eps=0.25):
     from sklearn.cluster import DBSCAN
     from matplotlib import pyplot as plt
     import seaborn as sns
+    from matplotlib import cm
 
-    
+    def dfScatter(df, xcol='Height', ycol='Weight', catcol='Gender'):
+        fig, ax = plt.subplots(figsize=(15,6))
+        cmap=plt.get_cmap('tab20c')
+
+        ## sns.palplot(sns.color_palette("deep",20))
+
+
+        categories = np.unique(df[catcol])
+        colors = np.linspace(0, 1, len(categories))
+        colordict = dict(zip(categories, colors))  
+        for i in range(len(colordict)):
+            colordict[i+1] = cmap(colordict[i+1])
+        df["Color"] = df[catcol].apply(lambda x: colordict[x])
+        # df['Color'] = sns.color_palette("deep",len(colordict))
+        ax.scatter(df[xcol], df[ycol], c=df.Color)
+        axes = plt.gca()
+        axes.yaxis.grid()
+        return fig,ax
+
     
     if kind=="raw":
         # Clustering with db scan
@@ -107,11 +126,31 @@ def db_scan_clustering(df,kind,eps=0.25):
         clustering = DBSCAN(eps=0.25, min_samples=2).fit(X)
         cluster_map = pd.DataFrame()
         cluster_map['data_index'] = res.index.values
-        cluster_map['cluster'] = clustering.labels_
-        cluster_map.plot.scatter(y='cluster', x='data_index',c="#0F215A")
+        cluster = clustering.labels_
+        min_clus = cluster.min()
+        if min_clus < 0:
+            print("Less than 0.")
+            cluster = cluster + (min_clus*-1+1)    
+        elif min_clus > 0:
+            print("More than 0.")
+            cluster = cluster - min_clus
+        elif min_clus == 0:
+            print("Equal 0.")
+            cluster = cluster + 1
+
+        cluster_map['cluster'] = cluster
+        # cluster_map.plot.scatter(y='cluster', x='data_index',hue="cluster") # c="#0F215A"
+        #sns.scatterplot(x=cluster_map['data_index'],y=cluster_map['cluster'],hue=cluster_map['cluster'])
+        fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
         plt.title("Clustering assignment over time")
+        plt.xlabel("Clusters")
+        locs, labels = plt.yticks()            # Get locations and labels
+        plt.yticks(np.arange(0, max(cluster)+1, 1.0))
+
+        # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
+
         plt.show()
-        plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values)
+        # plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values)
         return clustering.labels_
 
     if kind=="pca":
@@ -147,14 +186,30 @@ def plot_clusters_pair_plot(df, features, y_clusters):
     features:: the featres in the pairplot to be studied. EX: ['ActPower','B1','B4']
     y_clusters:: The cluster assignment. 
     '''
+    print("THIS IS THE MIN:", y_clusters.min())
 
-    if len(y_clusters) == df.shape[0]:
-        df['cluster_assigned'] = y_clusters
-    else:
-        print("Not the same shape.")
+    min_clus = y_clusters.min()
+    if min_clus < 0:
+        print("Less than 0.")
+        y_clusters = y_clusters + (min_clus*-1+1)    
+    elif min_clus > 0:
+        print("More than 0.")
+        y_clusters = y_clusters - min_clus
+    elif min_clus == 0:
+        print("Equal 0.")
+        y_clusters = y_clusters + 1
+
+    min_clus = 0
+    df['cluster_assigned'] = y_clusters
+    print("THIS IS THE MIN:", y_clusters.min())
+
+
     # hue='Index'
     ax=sns.pairplot(df,vars=features, hue='cluster_assigned')
     plt.show()
+    current_palette = sns.color_palette()
+    print(current_palette)
+    sns.palplot(current_palette)
 
 
 

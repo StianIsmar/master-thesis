@@ -34,8 +34,45 @@ def get_time_domain_features(sig,fs):
     return rms, kurt, skewness, energy_mean, signal_mean
 
 
+def build_time_df(all_vibrations,fs):
+    data = []
+    for j, sig in enumerate(all_vibrations):
+        signal_data = []
+        rms, kurt, skewness, energy_mean, signal_mean=get_time_domain_features(sig,fs)
+        signal_data.append(rms)
+        signal_data.append(kurt)
+        signal_data.append(skewness)
+        signal_data.append(energy_mean)
+        signal_data.append(signal_mean)
+        
+
+        data.append(signal_data)
+
+    df = pd.DataFrame(data, columns=[
+        'rms', 
+        'kurt', 
+        'skewness', 
+        'energy_mean', 
+        'signal_mean',
+        ]
+                     )
+    return df
+
+
+def create_df_for_all_signals(signals,fs):
+	all_feature_values =[]
+	for sig in signals:
+		features, feature_headings, feature_names = get_freq_domain_features(sig,fs,15000,False)
+		all_feature_values.append(features)
+
+	df = pd.DataFrame(data = all_feature_values, columns=feature_headings)
+	return df, feature_names
 
 def get_freq_domain_features(sig,fs,N=20000,plot=True):
+
+	# modify to take in all signals
+
+
 
     #Using bispectrum.
     #N is the number of parts we want to split the signal into.
@@ -105,3 +142,78 @@ def weighted_sum(bispectrum):
             sum_arr_nevner.append(bispectrum[i][j])
     wcomb = np.sum(sum_arr_teller) / np.sum(sum_arr_nevner)
     return wcomb
+
+
+from sklearn.preprocessing import MinMaxScaler
+from entropy import spectral_entropy
+
+def get_psd(signals,fs,plot=False):
+	psds = []
+	for sig in signals:
+		se = spectral_entropy(sig, sf=fs, method='welch', normalize=True)
+		psds.append(se)
+	psds_df = pd.DataFrame(data=psds,columns=['Power spectral entropy'])
+	return psds_df
+    
+#a=(get_psd([1,24,2,5,1.2,5.21,6,6],1))
+#print(a)
+
+
+def generate_feature_df(wt_number, fs, op_data_intervals, final_signals):
+	'''
+		Takes in signal that have been rectified and lowpassed (after eemd-step) and then:
+			1. filter samples on 1450 rpm
+			2. calc time, freq and power spectrum features.
+	'''
+
+	from pathlib import Path
+
+
+	# Frequency features:
+	if Path(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv').is_file():
+	    print("Frequency features exist")
+	    feature_df = pd.read_csv(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv')
+	else:
+	    feature_df, names = create_df_for_all_signals(final_signals,fs)
+	    save_path_freq = f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv'
+	    feature_df.to_csv(save_path_freq) # save till next time
+
+
+	# Time features
+	time = build_time_df(final_signals,fs)
+
+	#Power spectrum
+	psd_df = get_psd(final_signals, fs) # Power spectral entropy
+
+	# Merging into one df
+	data = pd.concat([op_data_intervals,time,psd_df,feature_df],axis=1,sort=False) # concatinate all
+	data = data.drop(['Unnamed: 0'],axis=1)
+	newCol = np.arange(0,data.shape[0],1)
+	newCol = pd.DataFrame(newCol,columns=['Index'])
+	data = pd.concat([newCol,data],axis=1,sort=False) # concatinate all
+
+	# Filtering on 1450 RPM
+	res = data[data['AvgSpeed'] >= 1450]
+
+	print("Filtering done.")
+	res['B5'] = res['B5'].apply(lambda x: abs(complex(x)))
+	
+	# Saving to file
+	print("Saving all features to file: "+ f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/dataset.csv')
+	res.to_csv(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/dataset.csv')
+	return res
+
+	# Count number of zeros in full bispectrum:
+def num_of_zeros(array):
+    sh = (array.shape)
+    non = np.count_nonzero(array==0)
+    print("non",non)
+    zero_elems = sh[0]*sh[1] - non
+    print(zero_elems)
+
+
+def remove_values_from_list(the_list, val):
+    return [value for value in the_list if value != val]
+
+
+# def scale_df():

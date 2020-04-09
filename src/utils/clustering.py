@@ -1,0 +1,166 @@
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+def plot_clusters(y_cluster_kmeans):
+    '''
+    y_cluster_kmeans :: List of all datapoints and which cluster they are assigned to.
+    
+    EXAMPLE:
+    plot_clusters([2, 2, 1, 1, 1, 2, 3]). Datapoint at index 0 is assigned to cluster 2, index 1 has the same cluster etc.
+    
+    '''    
+    myDict = {}
+    min_clus = y_cluster_kmeans.min()
+    
+    if not (min_clus == 0):
+        if min_clus <0:
+            y_cluster_kmeans = y_cluster_kmeans + (min_clus*-1)    
+        else:
+            y_cluster_kmeans = y_cluster_kmeans - min_clus
+        min_clus = 0
+    
+    for i, elem in enumerate(y_cluster_kmeans):
+        if (elem in myDict):
+            myDict[elem].append(i)
+        else:
+            myDict[elem] = [i]
+    # sorted plot matplotlib
+
+    for i in range(min_clus,len(myDict)):
+
+        np.sort(myDict[i])
+    dfs =[]
+    for i in range(min_clus,len(myDict)):
+        dfs.append(pd.DataFrame.from_dict(myDict[i]))
+
+    fig, axs = plt.subplots(1,len(myDict), figsize=(15, 6), facecolor='w', edgecolor='k',sharex=True, sharey=True)
+    fig.subplots_adjust(hspace = .2, wspace=1)
+
+    # ax.set_xticks(np.arange(len(myDict)))
+
+    norm = plt.Normalize(0, len(y_cluster_kmeans))
+    # col = plt.cm.Blues(norm(dfs[0].values))
+    #dfs[0].T.plot(kind='bar',stacked=True,width=0.5,legend=False, color=col,ax=ax)
+    for i in range(min_clus,len(myDict)):
+        col = plt.cm.Blues(norm(dfs[i].values))
+        pd.DataFrame(data=np.repeat(1,len(norm(dfs[i].values)))).T.plot(kind='bar',stacked=True,ax=axs[i],width=1,legend=False,color=col)
+        axs[i].set_xticks(ticks=[])
+        axs[i].set_xlabel(f"{i+1}",rotation=90)
+
+    fig.text(0.5, 0.04, 'Clusters', ha='center')
+    fig.text(0.07, 0.5, 'Number of samples', va='center', rotation='vertical')
+
+    sm = plt.cm.ScalarMappable(cmap="Blues", norm=norm)
+    sm.set_array([])
+        
+    cax = fig.add_axes([axs[-1].get_position().x1+0.01,axs[-1].get_position().y0,0.02,axs[-1].get_position().height])
+
+    #plt.colorbar(sm,fraction=2.5, pad=1.5)
+    cbar = plt.colorbar(sm,cax=cax)
+    cbar.set_label('Interval index', rotation=270,labelpad=15)
+    plt.title("Cluster assignment") # change location
+
+
+    plt.show()
+
+
+
+def scale_df(df):
+    scaler = MinMaxScaler()
+    scaled = scaler.fit_transform(df)
+    return scaled
+
+def find_optimal_dist(X):
+        neigh = NearestNeighbors(n_neighbors=2)
+        nbrs = neigh.fit(X)
+        distances, indices = nbrs.kneighbors(X)
+
+        distances = np.sort(distances, axis=0)
+        distances = distances[:,1]
+        plt.plot(distances,color="#0F215A")
+        plt.grid(True)
+from sklearn.cluster import DBSCAN
+
+def db_scan_clustering(df,kind,eps=0.25):
+    res = df
+    cluster_df= res.drop(labels=['Index','NacelleDirection'],axis=1)
+    scaled = scale_df(cluster_df)
+
+    # Find the optimal epsilon
+    import numpy as np
+    from sklearn.datasets.samples_generator import make_blobs
+    from sklearn.neighbors import NearestNeighbors
+    from sklearn.cluster import DBSCAN
+    from matplotlib import pyplot as plt
+    import seaborn as sns
+
+    
+    
+    if kind=="raw":
+        # Clustering with db scan
+        find_optimal_dist(scaled)
+        X = scaled
+        clustering = DBSCAN(eps=0.25, min_samples=2).fit(X)
+        cluster_map = pd.DataFrame()
+        cluster_map['data_index'] = res.index.values
+        cluster_map['cluster'] = clustering.labels_
+        cluster_map.plot.scatter(y='cluster', x='data_index',c="#0F215A")
+        plt.title("Clustering assignment over time")
+        plt.show()
+        plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values)
+        return clustering.labels_
+
+    if kind=="pca":
+        from sklearn.decomposition import PCA
+        COMPONENTS = 8
+        pca = PCA(n_components=COMPONENTS)
+        principalComponents = pca.fit_transform(scaled)
+        principalDf = pd.DataFrame(data = principalComponents
+                     , columns = [f"{i}" for i in (range(COMPONENTS))])
+
+        find_optimal_dist(principalDf.values) # optimal distance
+        
+        # clustring it
+        clustering = DBSCAN(eps=eps, min_samples=5).fit(principalDf)
+        cluster_map = pd.DataFrame()
+        cluster_map['data_index'] = res.index.values
+        cluster_map['cluster'] = clustering.labels_
+        cluster_map.plot.scatter(y='cluster', x='data_index',c="#0F215A")
+        plt.xlabel(f'Data point Timestamp [0 ->{res.index.values.max()}]')
+        plt.ylabel('Cluster')
+        plt.show()
+        plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values,color="#0F215A")
+        plt.xlabel('Cluster number')
+        plt.ylabel('Number of points in cluster')
+        return clustering.labels_
+
+
+
+
+def plot_clusters_pair_plot(df, features, y_clusters):
+    '''
+    df:: The dataframe with all features for wt.
+    features:: the featres in the pairplot to be studied. EX: ['ActPower','B1','B4']
+    y_clusters:: The cluster assignment. 
+    '''
+
+    if len(y_clusters) == df.shape[0]:
+        df['cluster_assigned'] = y_clusters
+    else:
+        print("Not the same shape.")
+    # hue='Index'
+    ax=sns.pairplot(df,vars=features, hue='cluster_assigned')
+    plt.show()
+
+
+
+
+
+
+
+
+

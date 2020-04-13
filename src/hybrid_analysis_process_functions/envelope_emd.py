@@ -14,7 +14,7 @@ def eemd(wt_name, interval_num, component,signal,timestamps,plotting=True):
 	emd = eemd.EMD
 	emd.extrema_detection="parabol"
 	# Execute EEMD on S
-	eIMFs = eemd.eemd(S, t)
+	eIMFs = eemd.eemd(S, t,max_imf=1)
 	nIMFs = eIMFs.shape[0]
 	# Plot results	
 

@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import pandas as pd
 
 def plot_clusters(y_cluster_kmeans):
     '''
@@ -85,7 +86,7 @@ def find_optimal_dist(X):
         plt.grid(True)
 from sklearn.cluster import DBSCAN
 
-def db_scan_clustering(df,kind,eps=0.25):
+def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
     res = df
     cluster_df= res.drop(labels=['Index','NacelleDirection'],axis=1)
     scaled = scale_df(cluster_df)
@@ -98,6 +99,8 @@ def db_scan_clustering(df,kind,eps=0.25):
     from matplotlib import pyplot as plt
     import seaborn as sns
     from matplotlib import cm
+    import pandas as pd
+
 
     def dfScatter(df, xcol='Height', ycol='Weight', catcol='Gender'):
         fig, ax = plt.subplots(figsize=(15,6))
@@ -117,6 +120,7 @@ def db_scan_clustering(df,kind,eps=0.25):
         axes = plt.gca()
         axes.yaxis.grid()
         return fig,ax
+        
 
     
     if kind=="raw":
@@ -146,6 +150,7 @@ def db_scan_clustering(df,kind,eps=0.25):
         plt.xlabel("Clusters")
         locs, labels = plt.yticks()            # Get locations and labels
         plt.yticks(np.arange(0, max(cluster)+1, 1.0))
+        plt.margins(0)
 
         # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
 
@@ -155,7 +160,50 @@ def db_scan_clustering(df,kind,eps=0.25):
 
     if kind=="pca":
         from sklearn.decomposition import PCA
-        COMPONENTS = 8
+        COMPONENTS = pca_components # from the argument of the function call
+        pca = PCA(n_components=COMPONENTS)
+        principalComponents = pca.fit_transform(scaled)
+        principalDf = pd.DataFrame(data = principalComponents
+                     , columns = [f"{i}" for i in (range(COMPONENTS))])
+
+        find_optimal_dist(principalDf.values) # optimal distance
+        
+        # clustring it
+        clustering = DBSCAN(eps=eps, min_samples=5).fit(principalDf)
+        cluster_map = pd.DataFrame()
+        cluster_map['data_index'] = res.index.values
+        cluster = clustering.labels_
+        min_clus = cluster.min()
+        if min_clus < 0:
+            print("Less than 0.")
+            cluster = cluster + (min_clus*-1+1)    
+        elif min_clus > 0:
+            print("More than 0.")
+            cluster = cluster - min_clus
+        elif min_clus == 0:
+            print("Equal 0.")
+            cluster = cluster + 1
+
+        cluster_map['cluster'] = cluster
+        fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
+        plt.title("Clustering assignment over time")
+        plt.xlabel("Clusters")
+        locs, labels = plt.yticks()            # Get locations and labels
+        plt.yticks(np.arange(0, max(cluster)+1, 1.0))
+        plt.margins(0)
+
+        # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
+
+        plt.show()
+        # plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values,color="#0F215A")
+        # plt.xlabel('Cluster number')
+        # plt.ylabel('Number of points in cluster')
+        return clustering.labels_,principalDf
+
+        '''
+        if kind=="pca":
+        from sklearn.decomposition import PCA
+        COMPONENTS = pca_components # from the argument of the function call
         pca = PCA(n_components=COMPONENTS)
         principalComponents = pca.fit_transform(scaled)
         principalDf = pd.DataFrame(data = principalComponents
@@ -172,12 +220,51 @@ def db_scan_clustering(df,kind,eps=0.25):
         plt.xlabel(f'Data point Timestamp [0 ->{res.index.values.max()}]')
         plt.ylabel('Cluster')
         plt.show()
-        plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values,color="#0F215A")
-        plt.xlabel('Cluster number')
-        plt.ylabel('Number of points in cluster')
-        return clustering.labels_
+        # plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values,color="#0F215A")
+        # plt.xlabel('Cluster number')
+        # plt.ylabel('Number of points in cluster')
+        return clustering.labels_,principalDf
+        '''
 
 
+
+    if kind=="knn":
+        import numpy as np
+        import pandas as pd
+        from matplotlib import pyplot as plt
+        from sklearn.datasets.samples_generator import make_blobs
+        from sklearn.cluster import KMeans
+        from sklearn.decomposition import PCA
+
+        COMPONENTS = 8
+        pca = PCA(n_components=COMPONENTS)
+        principalComponents = pca.fit_transform(scaled)
+        principalDf = pd.DataFrame(data = principalComponents
+                     , columns = [f"{i}" for i in (range(COMPONENTS))])
+
+
+        # Optimal distance
+        X = principalDf.values
+
+        wcss = []
+        for i in range(1, 11):
+            kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+            kmeans.fit(X)
+            wcss.append(kmeans.inertia_)
+        plt.plot(range(1, 11), wcss)
+        plt.title('Elbow Method')
+        plt.xlabel('Number of clusters')
+        plt.ylabel('WCSS')
+        plt.show()
+
+
+        
+        kmeans = KMeans(n_clusters=8, init='k-means++', max_iter=300, n_init=10, random_state=0)
+        pred_y = kmeans.fit_predict(X)
+        print((pred_y)) # the clusters assigned
+
+   
+        return pred_y
 
 
 def plot_clusters_pair_plot(df, features, y_clusters):
@@ -190,13 +277,10 @@ def plot_clusters_pair_plot(df, features, y_clusters):
 
     min_clus = y_clusters.min()
     if min_clus < 0:
-        print("Less than 0.")
         y_clusters = y_clusters + (min_clus*-1+1)    
     elif min_clus > 0:
-        print("More than 0.")
         y_clusters = y_clusters - min_clus
     elif min_clus == 0:
-        print("Equal 0.")
         y_clusters = y_clusters + 1
 
     min_clus = 0
@@ -207,9 +291,9 @@ def plot_clusters_pair_plot(df, features, y_clusters):
     # hue='Index'
     ax=sns.pairplot(df,vars=features, hue='cluster_assigned')
     plt.show()
-    current_palette = sns.color_palette()
-    print(current_palette)
-    sns.palplot(current_palette)
+    #current_palette = sns.color_palette()
+    #print(current_palette)
+    #sns.palplot(current_palette)
 
 
 

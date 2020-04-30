@@ -14,55 +14,93 @@ import pandas as pd
 
 
 def get_time_domain_features(sig,fs):
-    # rms
+    r1 = sum(map(lambda x: abs(x), sig)) 
+    
+    # 1. rms
     r = sum(map(lambda x: x**2,sig))
-    rms = np.sqrt(2*r)
+    rms = (np.sqrt(2*r))/len(sig)
 
-    # kurt
+    # 2. kurt
     kurt = kurtosis(sig)
 
-    # skewness
+    # 3. skewness
     skewness = skew(sig)
+ 
+    # 4. Peak to peak
+    peak_to_peak=np.max(sig)-np.min(sig)
 
-    # signal energy
-    signal_energy = signal.welch(sig,fs)
-    energy_mean = np.mean(signal_energy)
+    # 5. Crest factor
+    crest_factor = np.max(sig)/rms
 
-    # normal mean
-    signal_mean = np.mean(sig)
+    # 6. Shape factor
+    shape_factor = rms/(r1/len(sig))
+
+    # 7. Impulse factor
+    impulse_factor = np.max(sig)/(r1/len(sig))
+
+    # 8. Margin factor
+    margin_factor=np.max(sig)/(r1/len(sig))**2
     
-    return rms, kurt, skewness, energy_mean, signal_mean
+    # 9. Mean
+    signal_mean = np.mean(sig)
+   
+    # 10. Standard deviation
+    std = np.std(sig)
+
+    # 11. signal energy
+    signal_energy = signal.welch(sig,fs)
+    
+    # 12. Energy entropy
+    entropy = -1*sum(map(lambda x: x*np.log(x)))
+
+    return rms, kurt, skewness, peak_to_peak,crest_factor,shape_factor,impulse_factor,margin_factor,signal_mean,std,signal_energy, entropy
 
 
 def build_time_df(all_vibrations,fs):
     data = []
     for j, sig in enumerate(all_vibrations):
-        signal_data = []
-        rms, kurt, skewness, energy_mean, signal_mean=get_time_domain_features(sig,fs)
-        signal_data.append(rms)
-        signal_data.append(kurt)
-        signal_data.append(skewness)
-        signal_data.append(energy_mean)
-        signal_data.append(signal_mean)
-        
-
-        data.append(signal_data)
+    	signal_data = []
+    	rms, kurt, skewness, peak_to_peak,crest_factor,shape_factor,impulse_factor,margin_factor,signal_mean,std,signal_energy, entropy=get_time_domain_features(sig,fs)
+    	signal_data.append(rms)
+    	signal_data.append(kurt)
+    	signal_data.append(skewness)
+    	signal_data.append(peak_to_peak)
+    	signal_data.append(crest_factor)
+    	signal_data.append(shape_factor)
+    	signal_data.append(impulse_factor)
+    	signal_data.append(margin_factor)
+    	signal_data.append(signal_mean)
+    	signal_data.append(std)
+    	signal_data.append(signal_energy)
+    	signal_data.append(entropy)
+    	data.append(signal_data)
 
     df = pd.DataFrame(data, columns=[
         'rms', 
         'kurt', 
         'skewness', 
-        'energy_mean', 
-        'signal_mean',
+        'peak_to_peak', 
+        'crest_factor',
+		'shape_factor',
+		'impulse_factor',
+		'margin_factor',
+		'signal_mean',
+		'std',
+		'signal_energy',
+		'entropy'
         ]
                      )
     return df
 
 
-def create_df_for_all_signals(signals,fs):
+def create_frequency_df_for_all_signals(signals,fs):
+	'''
+		Since the signal is non stationary, and bi-spectrum analysis requires statioary signals,
+		only 0:3000 of the plot is selected.
+	'''
 	all_feature_values =[]
 	for sig in signals:
-		features, feature_headings, feature_names = get_freq_domain_features(sig,fs,15000,False)
+		features, feature_headings, feature_names = get_freq_domain_features(sig[0:3000],fs,15000,False)
 		all_feature_values.append(features)
 
 	df = pd.DataFrame(data = all_feature_values, columns=feature_headings)
@@ -71,16 +109,15 @@ def create_df_for_all_signals(signals,fs):
 def get_freq_domain_features(sig,fs,N=20000,plot=True):
 
 	# modify to take in all signals
-
-
-
     #Using bispectrum.
     #N is the number of parts we want to split the signal into.
 	kw = dict(nperseg=N // 10, noverlap=N // 20, nfft=next_fast_len(N // 2))
 	freq1, fre2, bispec = polycoherence.polycoherence(sig, fs, norm=None, **kw)
 	
+	half_bispec_1d=list(bispec[np.triu_indices_from(bispec)])
 	bispec_half = np.triu(bispec) # remove symmetric part
 
+	
 	if plot:
 		polycoherence.plot_polycoherence(freq1, fre2, bispec)
 		plt.show()
@@ -90,22 +127,29 @@ def get_freq_domain_features(sig,fs,N=20000,plot=True):
 		polycoherence.plot_polycoherence(freq1, fre2, bispec_rot)
 		plt.show() # plot half the bispectrum
 
+
+
 	features = []
-	features.append(bispec_log_amp(bispec))
+	features.append(bispec_log_amp(half_bispec_1d))
 	features.append(bispec_log_amp_diag(bispec))
 	features.append(first_order_spectral_moment_diag(bispec))
-	features.append(normalized_entropy(bispec))
-	# features.append(normalized_entropy_squared(bispec)) # Needed to remove because of too small values.
-	features.append(weighted_sum(bispec))
-	feature_headings=['B1', 'B2', 'B3','B4','B5']
-	feature_names = ['Bispectrum Log Amplitude','Bispectrum Log Amplitude Diagonal',
-	'Bispectrum First oreder Spectral Moment Diagonal', 'Bispectrum Normalized Entropy','Bispectrum Weigheted Sum']
-	return features,feature_headings, feature_names
+	features.append(normalized_entropy(half_bispec_1d))
+	features.append(normalized_entropy_squared(half_bispec_1d)) # Needed to remove because of too small values.
+	features.append(weighted_sum(bispec_half,0))
+	features.append(weighted_sum(bispec_half,1))
+	feature_headings=['B1','B2','B3','B4','B5','B6','B7']
+	feature_names = ['Bispectrum Log Amplitude',
+	'Bi-spectrum Log Amplitude Diagonal',
+	'Bi-spectrum First order Spectral Moment Diagonal',
+	'Bi-spectrum Normalized Entropy',
+	'Normalized bi-spectral squared entropy',
+	'Bi-spectrum first axis weighted center',
+	'Bi-spectrum second axis weighted center']
+	return features, feature_headings, feature_names
 
 # 1. Sum of logarithmic amplitudes of the bi-spectrum, OK 
 def bispec_log_amp(bispectrum):
-    return np.sum(np.log(np.abs(bispectrum)))/2 # Symmetry
-
+    return np.sum(np.log(np.abs(bispectrum))) # Symmetry
 
 # 2. Sum of logarithmic amplitudes of diagonal elements in the bi-spectrum, OK
 def bispec_log_amp_diag(bispectrum):
@@ -128,19 +172,34 @@ def normalized_entropy(bispectrum):
 
 # 5. Normalized bi-specral squared entropy
 def normalized_entropy_squared(bispectrum):
-    qn = (np.abs(bispectrum)**2) / (np.sum(np.abs(bispectrum)**2))
+    qn = (np.(abs(bispectrum))**2) / (np.sum((np.abs(bispectrum))**2))
     p2 = -1*(np.sum(qn*np.log(qn)))
     return (p2)
 
-# 6. Weighted center of bi-spectrum
-def weighted_sum(bispectrum):
+# 6. Bi-spectrum phase entropy
+#def phase_entropy(bispectrum):
+	#continue
+
+
+# 6. Weighted center of bi-spectrum (first axe)
+def weighted_sum(bispectrum,axis=0):
     sum_arr_teller = []
     sum_arr_nevner = []
-    for j in range(bispectrum.shape[1]): # cols
-        for i in range(bispectrum.shape[0]): # rows
-            sum_arr_teller.append(i*bispectrum[i][j])
-            sum_arr_nevner.append(bispectrum[i][j])
+
+    if axis==0:
+	    for j in range(bispectrum.shape[1]): # cols
+	        for i in range(bispectrum.shape[0]): # rows
+	            sum_arr_teller.append(i*bispectrum[i][j])
+	            sum_arr_nevner.append(bispectrum[i][j])
+	    wcomb = np.sum(sum_arr_teller) / np.sum(sum_arr_nevner)
+    
+    if axis==1:
+	    for j in range(bispectrum.shape[1]): # cols
+        	for i in range(bispectrum.shape[0]): # rows
+        	    sum_arr_teller.append(j*bispectrum[i][j]) # multiplying with j instead!
+        	    sum_arr_nevner.append(bispectrum[i][j])
     wcomb = np.sum(sum_arr_teller) / np.sum(sum_arr_nevner)
+
     return wcomb
 
 
@@ -170,13 +229,13 @@ def generate_feature_df(wt_number, fs, op_data_intervals, final_signals):
 
 
 	# Frequency features:
-	if Path(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv').is_file():
-	    print("Frequency features exist")
-	    feature_df = pd.read_csv(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv')
-	else:
-	    feature_df, names = create_df_for_all_signals(final_signals,fs)
-	    save_path_freq = f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv'
-	    feature_df.to_csv(save_path_freq) # save till next time
+	#if Path(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv').is_file():
+	    #print("Frequency features exist")
+	    #feature_df = pd.read_csv(f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv')
+	#else:
+	feature_df, names = create_frequency_df_for_all_signals(final_signals,fs)
+	save_path_freq = f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/freq_features.csv'
+	feature_df.to_csv(save_path_freq) # save till next time
 
 
 	# Time features

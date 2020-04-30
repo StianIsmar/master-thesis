@@ -5,6 +5,27 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import pandas as pd
+import numpy as np
+import pandas as pd
+from scipy import stats
+import matplotlib.pyplot as plt
+import sys, os,os.path
+ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
+module_paths = []
+module_paths.append(os.path.abspath(os.path.join(ROOT_PATH+"/data_processing/")))
+module_paths.append(os.path.abspath(os.path.join(ROOT_PATH+"/hybrid_analysis_process_functions/")))
+module_paths.append(os.path.abspath(os.path.join(ROOT_PATH+"/utils/")))
+for module_path in module_paths:
+    if module_path not in sys.path:
+        print("appended")
+        sys.path.append(module_path)
+import functions as f
+c, p = f.color_palette()
+
+sns.set(context='paper', style='whitegrid', palette=np.array(p))
+ROOT_PATH = os.path.abspath(".").split("src")[0]
+
+plt.style.use('file://' + ROOT_PATH + "src/utils/plotparams.rc")
 
 def plot_clusters(y_cluster_kmeans):
     '''
@@ -39,7 +60,11 @@ def plot_clusters(y_cluster_kmeans):
         dfs.append(pd.DataFrame.from_dict(myDict[i]))
 
     fig, axs = plt.subplots(1,len(myDict), figsize=(15, 6), facecolor='w', edgecolor='k',sharex=True, sharey=True)
-    fig.subplots_adjust(hspace = .2, wspace=1)
+    fig.suptitle("Cluster assignment",fontsize=14) # change location
+    plt.grid(b=None)
+
+
+    # fig.subplots_adjust(hspace = .2, wspace=1)
 
     # ax.set_xticks(np.arange(len(myDict)))
 
@@ -51,9 +76,11 @@ def plot_clusters(y_cluster_kmeans):
         pd.DataFrame(data=np.repeat(1,len(norm(dfs[i].values)))).T.plot(kind='bar',stacked=True,ax=axs[i],width=1,legend=False,color=col)
         axs[i].set_xticks(ticks=[])
         axs[i].set_xlabel(f"{i+1}",rotation=90)
+        axs[i].grid(False)
 
-    fig.text(0.5, 0.04, 'Clusters', ha='center')
-    fig.text(0.07, 0.5, 'Number of samples', va='center', rotation='vertical')
+    fig.text(0.5, 0.04, 'Clusters', ha='center',fontsize=14)
+    fig.text(0.07, 0.5, 'Number of samples', va='center', rotation='vertical',fontsize=14)
+
 
     sm = plt.cm.ScalarMappable(cmap="Blues", norm=norm)
     sm.set_array([])
@@ -63,7 +90,6 @@ def plot_clusters(y_cluster_kmeans):
     #plt.colorbar(sm,fraction=2.5, pad=1.5)
     cbar = plt.colorbar(sm,cax=cax)
     cbar.set_label('Interval index', rotation=270,labelpad=15)
-    plt.title("Cluster assignment") # change location
 
 
     plt.show()
@@ -116,9 +142,10 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
             colordict[i+1] = cmap(colordict[i+1])
         df["Color"] = df[catcol].apply(lambda x: colordict[x])
         # df['Color'] = sns.color_palette("deep",len(colordict))
-        ax.scatter(df[xcol], df[ycol], c=df.Color)
+        ax.scatter(df[xcol], df[ycol], c=df.Color,s=20)
         axes = plt.gca()
-        axes.yaxis.grid()
+        axes.yaxis.grid(True)
+        axes.xaxis.grid(False)
         return fig,ax
         
 
@@ -146,17 +173,37 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         # cluster_map.plot.scatter(y='cluster', x='data_index',hue="cluster") # c="#0F215A"
         #sns.scatterplot(x=cluster_map['data_index'],y=cluster_map['cluster'],hue=cluster_map['cluster'])
         fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
-        plt.title("Clustering assignment over time")
-        plt.xlabel("Clusters")
+        fig.suptitle("Clustering assignment over time",fontsize=14)
+        plt.xlabel(f"Interval number")
+        #plt.grid(axis='y')
+        ax.xaxis.grid(False)
+
+
+        temp = np.arange(0,cluster_map['data_index'].values[-1],1.0)
+
+        result2 = [str(x) for x in list(temp)]
+        result2[0] = 'August\n2018'
+        result2[-1] = 'January\n2020'
+    
+
+        locs, labels = plt.xticks()
+        # Get locations and labels
+        # plt.xticks(locs,labels)
+
+        fig.text(0.04, -0.11, 'August\n2018', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
+
+        fig.text(0.96, -0.11, 'January\n2020', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
+
+        #plt.xticks(np.arange(0,(cluster_map['data_index'].values)[-1]),np.repeat)
         locs, labels = plt.yticks()            # Get locations and labels
         plt.yticks(np.arange(0, max(cluster)+1, 1.0))
-        plt.margins(0)
+
 
         # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
 
         plt.show()
         # plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values)
-        return clustering.labels_
+        return clustering.labels_,cluster_map
 
     if kind=="pca":
         from sklearn.decomposition import PCA
@@ -175,22 +222,23 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         cluster = clustering.labels_
         min_clus = cluster.min()
         if min_clus < 0:
-            print("Less than 0.")
+            
             cluster = cluster + (min_clus*-1+1)    
         elif min_clus > 0:
-            print("More than 0.")
+            
             cluster = cluster - min_clus
         elif min_clus == 0:
-            print("Equal 0.")
+            
             cluster = cluster + 1
 
         cluster_map['cluster'] = cluster
         fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
         plt.title("Clustering assignment over time")
         plt.xlabel("Clusters")
+        plt.xticks(rotation=90)
+
         locs, labels = plt.yticks()            # Get locations and labels
         plt.yticks(np.arange(0, max(cluster)+1, 1.0))
-        plt.margins(0)
 
         # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
 
@@ -256,13 +304,34 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         plt.xlabel('Number of clusters')
         plt.ylabel('WCSS')
         plt.show()
-
-
         
         kmeans = KMeans(n_clusters=8, init='k-means++', max_iter=300, n_init=10, random_state=0)
         pred_y = kmeans.fit_predict(X)
-        print((pred_y)) # the clusters assigned
 
+        cluster_map = pd.DataFrame()
+        cluster_map['data_index'] = res.index.values
+        cluster = pred_y
+        min_clus = cluster.min()
+        if min_clus < 0:
+
+            cluster = cluster + (min_clus*-1+1)    
+        elif min_clus > 0:
+
+            cluster = cluster - min_clus
+        elif min_clus == 0:
+
+            cluster = cluster + 1
+
+        cluster_map['cluster'] = cluster
+        fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
+        plt.title("Clustering assignment over time")
+        plt.xlabel("Clusters")
+        locs, labels = plt.yticks()            # Get locations and labels
+        plt.yticks(np.arange(0, max(cluster)+1, 1.0))
+
+        # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
+
+        plt.show()
    
         return pred_y
 
@@ -273,7 +342,6 @@ def plot_clusters_pair_plot(df, features, y_clusters):
     features:: the featres in the pairplot to be studied. EX: ['ActPower','B1','B4']
     y_clusters:: The cluster assignment. 
     '''
-    print("THIS IS THE MIN:", y_clusters.min())
 
     min_clus = y_clusters.min()
     if min_clus < 0:
@@ -285,7 +353,7 @@ def plot_clusters_pair_plot(df, features, y_clusters):
 
     min_clus = 0
     df['cluster_assigned'] = y_clusters
-    print("THIS IS THE MIN:", y_clusters.min())
+    
 
 
     # hue='Index'

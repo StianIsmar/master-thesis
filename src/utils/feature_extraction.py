@@ -11,6 +11,8 @@ from scipy.signal import spectrogram
 import matplotlib.pyplot as plt
 import polycoherence
 import pandas as pd
+import sys, os,os.path
+
 
 
 def get_time_domain_features(sig,fs):
@@ -100,6 +102,7 @@ def create_frequency_df_for_all_signals(signals,fs):
 	'''
 	all_feature_values =[]
 	for sig in signals:
+		# To approximate a stationary signal, it only 3000 points are sent in.
 		features, feature_headings, feature_names = get_freq_domain_features(sig[0:3000],fs,15000,False)
 		all_feature_values.append(features)
 
@@ -172,7 +175,7 @@ def normalized_entropy(bispectrum):
 
 # 5. Normalized bi-specral squared entropy
 def normalized_entropy_squared(bispectrum):
-    qn = (np.(abs(bispectrum))**2) / (np.sum((np.abs(bispectrum))**2))
+    qn = ((np.abs(bispectrum))**2) / (np.sum((np.abs(bispectrum))**2))
     p2 = -1*(np.sum(qn*np.log(qn)))
     return (p2)
 
@@ -275,4 +278,81 @@ def remove_values_from_list(the_list, val):
     return [value for value in the_list if value != val]
 
 
-# def scale_df():
+
+def get_time_frequency_features(turbine_number,input_file_type='zip'):
+	file_path = f'/Volumes/OsvikExtra/signal_data/features/wt0{turbine_number}/time_freq_features.csv' 
+	if os.path.isfile(file_path):
+	    time_freq_features = pd.read_csv(file_path)
+	    time_freq_features=time_freq_features.drop(['Unnamed: 0'],axis=1)
+	    print('Loaded csv.')
+
+	else:
+	    raw_imfs_path=f'/Volumes/OsvikExtra/signal_data/raw_data/gearbox/wt0{turbine_number}/eemds/'
+	    energy_rates,energy_entropies = get_imf_features(raw_imfs_path,input_file_type)
+
+	    # save the reates and entropies:
+	    df1 = pd.DataFrame(energy_rates,columns=['imf_rate_1','imf_rate_2','imf_rate_3','imf_rate_4','imf_rate_5'])
+	    df2 = pd.DataFrame(energy_entropies,columns=['imf_entropy_1','imf_entropy_2','imf_entropy_3','imf_entropy_4','imf_entropy_5'])
+	    time_freq_features = pd.concat([df1,df2],axis=1)
+	    time_freq_features.to_csv(f'/Volumes/OsvikExtra/signal_data/features/wt0{turbine_number}/time_freq_features.csv')
+	return time_freq_features
+
+def get_imf_features(path_folder,input_file_type):
+    result_features=[]
+    
+    def calculate_imf_energy(imf):
+        imf_energy=0
+        for x in imf:
+            imf_energy+=(x**2)
+        return imf_energy
+
+    file_count = len(glob.glob1(path_folder,"*.zip"))
+    print("file count:", file_count)
+    
+    energy_rates_intervals=[]
+    energy_entropies_intervals=[]
+    #range(file_count)
+    for i in tqdm(range(file_count)): # looping through the intervals
+        total_entropy=0
+
+        energy_five_imfs=0 # per interval for the 5 imfs.
+        imf_energy_individual={1:0,2:0,3:0,4:0,5:0}
+        
+        if input_file_type == 'csv':
+            path=path_folder + f'interval_number_{i}.csv'
+            df = pd.read_csv(path, header=None)
+        if input_file_type == 'zip':
+            path=path_folder + f'raw_wt04_interval_number_{i}.zip'
+            df = pd.read_csv(path,compression='zip')
+        # do something with each IMF.. get features?
+        
+        if (df.shape[0]) < 6:
+            print('There are not enought IMFs...')
+            break
+                    
+        # looping through every IMF:
+        imf_energy=0
+        for imf_index in range(6):
+            '''
+                Looping through the first 5 IMFs in the interval.
+                We are only interested in the first 5 IMFs.
+                The first one is the original input signal.
+            '''
+            if imf_index == 0:
+                # this is the original signal, which we are not working with
+                continue
+                
+            imf_energy=calculate_imf_energy(df.iloc[imf_index,:]) # (1) calc energy for imf 
+            imf_energy_individual[imf_index]=imf_energy
+            energy_five_imfs+=imf_energy # (2) updating energy for the first 5 imfs.
+        # after the for-loop:
+        energy_rates=[]
+        energy_entropy=[] # energyEntropy1,...,energyEntropy5
+        for k,imf_energy_value in imf_energy_individual.items():
+            p=imf_energy_value/((abs(energy_five_imfs)))
+            energy_rates.append(p)
+            imf_energy_entropy = -p*np.log(p)
+            energy_entropy.append(imf_energy_entropy) # the energy entropy for one interval []
+        energy_rates_intervals.append(energy_rates) # energy_rates:[E1/E,E2/E,...,E5/E]            
+        energy_entropies_intervals.append(energy_entropy)
+    return energy_rates_intervals,energy_entropies_intervals

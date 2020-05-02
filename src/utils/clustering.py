@@ -97,6 +97,7 @@ def plot_clusters(y_cluster_kmeans):
 
 
 def scale_df(df):
+    df = np.asarray(df)
     scaler = MinMaxScaler()
     scaled = scaler.fit_transform(df)
     return scaled
@@ -112,9 +113,9 @@ def find_optimal_dist(X):
         plt.grid(True)
 from sklearn.cluster import DBSCAN
 
-def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
+def db_scan_clustering(df,kind,eps=0.25,pca_components=8,knn_clusters=8):
     res = df
-    cluster_df= res.drop(labels=['Index','NacelleDirection'],axis=1)
+    cluster_df= res.drop(labels=['Index'],axis=1)
     scaled = scale_df(cluster_df)
 
     # Find the optimal epsilon
@@ -157,6 +158,7 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         clustering = DBSCAN(eps=0.25, min_samples=2).fit(X)
         cluster_map = pd.DataFrame()
         cluster_map['data_index'] = res.index.values
+        cluster_map['real_index']=df['Index']
         cluster = clustering.labels_
         min_clus = cluster.min()
         if min_clus < 0:
@@ -172,19 +174,11 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         cluster_map['cluster'] = cluster
         # cluster_map.plot.scatter(y='cluster', x='data_index',hue="cluster") # c="#0F215A"
         #sns.scatterplot(x=cluster_map['data_index'],y=cluster_map['cluster'],hue=cluster_map['cluster'])
-        fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
+        fig,ax = dfScatter(cluster_map,xcol='real_index',ycol='cluster',catcol='cluster')
         fig.suptitle("Clustering assignment over time",fontsize=14)
         plt.xlabel(f"Interval number")
         #plt.grid(axis='y')
-        ax.xaxis.grid(False)
-
-
-        temp = np.arange(0,cluster_map['data_index'].values[-1],1.0)
-
-        result2 = [str(x) for x in list(temp)]
-        result2[0] = 'August\n2018'
-        result2[-1] = 'January\n2020'
-    
+        ax.xaxis.grid(False)    
 
         locs, labels = plt.xticks()
         # Get locations and labels
@@ -248,33 +242,6 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         # plt.ylabel('Number of points in cluster')
         return clustering.labels_,principalDf
 
-        '''
-        if kind=="pca":
-        from sklearn.decomposition import PCA
-        COMPONENTS = pca_components # from the argument of the function call
-        pca = PCA(n_components=COMPONENTS)
-        principalComponents = pca.fit_transform(scaled)
-        principalDf = pd.DataFrame(data = principalComponents
-                     , columns = [f"{i}" for i in (range(COMPONENTS))])
-
-        find_optimal_dist(principalDf.values) # optimal distance
-        
-        # clustring it
-        clustering = DBSCAN(eps=eps, min_samples=5).fit(principalDf)
-        cluster_map = pd.DataFrame()
-        cluster_map['data_index'] = res.index.values
-        cluster_map['cluster'] = clustering.labels_
-        cluster_map.plot.scatter(y='cluster', x='data_index',c="#0F215A")
-        plt.xlabel(f'Data point Timestamp [0 ->{res.index.values.max()}]')
-        plt.ylabel('Cluster')
-        plt.show()
-        # plt.bar(cluster_map['cluster'].value_counts().keys(), cluster_map['cluster'].value_counts().values,color="#0F215A")
-        # plt.xlabel('Cluster number')
-        # plt.ylabel('Number of points in cluster')
-        return clustering.labels_,principalDf
-        '''
-
-
 
     if kind=="knn":
         import numpy as np
@@ -284,7 +251,7 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         from sklearn.cluster import KMeans
         from sklearn.decomposition import PCA
 
-        COMPONENTS = 8
+        COMPONENTS = pca_components
         pca = PCA(n_components=COMPONENTS)
         principalComponents = pca.fit_transform(scaled)
         principalDf = pd.DataFrame(data = principalComponents
@@ -305,7 +272,7 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         plt.ylabel('WCSS')
         plt.show()
         
-        kmeans = KMeans(n_clusters=8, init='k-means++', max_iter=300, n_init=10, random_state=0)
+        kmeans = KMeans(n_clusters=knn_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
         pred_y = kmeans.fit_predict(X)
 
         cluster_map = pd.DataFrame()
@@ -328,7 +295,9 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8):
         plt.xlabel("Clusters")
         locs, labels = plt.yticks()            # Get locations and labels
         plt.yticks(np.arange(0, max(cluster)+1, 1.0))
+        fig.text(0.04, -0.11, 'August\n2018', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
 
+        fig.text(0.96, -0.11, 'January\n2020', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
         # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
 
         plt.show()

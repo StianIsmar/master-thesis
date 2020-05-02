@@ -8,10 +8,13 @@ import matplotlib.pyplot as plt
     path_to_csv [String]: Path to csv you want to build the correlation plot from
     Filename [String]: Name you would like to save the correlation plot as
 '''
-def create_save_correlation_plot(path_to_csv, save_as_filename,plot_title):
-
-    df = pd.read_csv(path_to_csv)
-    sns.set(style="white")
+def create_save_correlation_plot(save_as_filename,plot_title,input_df=None,path_to_csv=None):
+    
+    if isinstance(input_df, pd.DataFrame):
+        df = input_df
+    elif path_to_csv !=None:
+        df = pd.read_csv(path_to_csv)
+        sns.set(style="white")
 
     # Compute the correlation matrix
     corr = df.corr()
@@ -27,9 +30,13 @@ def create_save_correlation_plot(path_to_csv, save_as_filename,plot_title):
     cmap = sns.diverging_palette(220, 10, as_cmap=True)
 
     # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+    g=sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
                 square=True, linewidths=.5, cbar_kws={"shrink": .5})
+    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 11)
+
+    ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 11)
+
 
     # Saving the file
     f.tight_layout()
-    f.savefig(f'../../plots/correlation_plot_{save_as_filename}.eps', format='eps')
+    f.savefig(f'../../plots/correlation_plots_df/correlation_plot_{save_as_filename}.eps', format='eps')

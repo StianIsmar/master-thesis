@@ -1,15 +1,18 @@
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import NearestNeighbors
-import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import pandas as pd
+from sklearn.decomposition import PCA
 import numpy as np
-import pandas as pd
+from sklearn.datasets.samples_generator import make_blobs
+from sklearn.cluster import DBSCAN
+import seaborn as sns
+from matplotlib import cm
+from sklearn.cluster import KMeans
 from scipy import stats
-import matplotlib.pyplot as plt
 import sys, os,os.path
+
 ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
 module_paths = []
 module_paths.append(os.path.abspath(os.path.join(ROOT_PATH+"/data_processing/")))
@@ -27,14 +30,18 @@ ROOT_PATH = os.path.abspath(".").split("src")[0]
 
 plt.style.use('file://' + ROOT_PATH + "src/utils/plotparams.rc")
 
-def plot_clusters(y_cluster_kmeans):
+def plot_clusters(y_cluster_kmeans,feature_df):
     '''
     y_cluster_kmeans :: List of all datapoints and which cluster they are assigned to.
     
     EXAMPLE:
     plot_clusters([2, 2, 1, 1, 1, 2, 3]). Datapoint at index 0 is assigned to cluster 2, index 1 has the same cluster etc.
     
-    '''    
+    ''' 
+    def map_index(index):
+        return feature_df.iloc[index,:]['Index']
+
+
     myDict = {}
     min_clus = y_cluster_kmeans.min()
     
@@ -45,16 +52,23 @@ def plot_clusters(y_cluster_kmeans):
             y_cluster_kmeans = y_cluster_kmeans - min_clus
         min_clus = 0
     
+    # Placing the clustered points in cluster lists (where the lists in each ket contain indexes)
     for i, elem in enumerate(y_cluster_kmeans):
         if (elem in myDict):
             myDict[elem].append(i)
         else:
             myDict[elem] = [i]
-    # sorted plot matplotlib
 
-    for i in range(min_clus,len(myDict)):
-
+    for i in range(min_clus,len(myDict)): # Sorting the dictionaries
         np.sort(myDict[i])
+    
+    for i in range(min_clus,len(myDict)): # map these
+        index_list=myDict[i]
+        new_list=[]
+        for j,elem in enumerate(index_list):
+            new_list.append(int(map_index(elem)))
+        myDict[i]=new_list
+
     dfs =[]
     for i in range(min_clus,len(myDict)):
         dfs.append(pd.DataFrame.from_dict(myDict[i]))
@@ -64,13 +78,7 @@ def plot_clusters(y_cluster_kmeans):
     plt.grid(b=None)
 
 
-    # fig.subplots_adjust(hspace = .2, wspace=1)
-
-    # ax.set_xticks(np.arange(len(myDict)))
-
-    norm = plt.Normalize(0, len(y_cluster_kmeans))
-    # col = plt.cm.Blues(norm(dfs[0].values))
-    #dfs[0].T.plot(kind='bar',stacked=True,width=0.5,legend=False, color=col,ax=ax)
+    norm = plt.Normalize(1, feature_df['Index'].values[-1])
     for i in range(min_clus,len(myDict)):
         col = plt.cm.Blues(norm(dfs[i].values))
         pd.DataFrame(data=np.repeat(1,len(norm(dfs[i].values)))).T.plot(kind='bar',stacked=True,ax=axs[i],width=1,legend=False,color=col)
@@ -113,20 +121,85 @@ def find_optimal_dist(X):
         plt.grid(True)
 from sklearn.cluster import DBSCAN
 
+def k_means_clustering(df,kind,knn_clusters=8,pca_components=10):
+    res = df
+    cluster_df= res.drop(labels=['Index'],axis=1) # Removing the index feature.
+    scaled = scale_df(cluster_df)
+
+    def dfScatter(df, xcol='Height', ycol='Weight', catcol='Gender'):
+        fig, ax = plt.subplots(figsize=(15,6))
+        cmap=plt.get_cmap('tab20c')
+
+        categories = np.unique(df[catcol])
+        colors = np.linspace(0, 1, len(categories))
+        colordict = dict(zip(categories, colors))  
+        for i in range(len(colordict)):
+            colordict[i+1] = cmap(colordict[i+1])
+        df["Color"] = df[catcol].apply(lambda x: colordict[x])
+        # df['Color'] = sns.color_palette("deep",len(colordict))
+        ax.scatter(df[xcol], df[ycol], c=df.Color, s=40)
+        axes = plt.gca()
+        axes.yaxis.grid(True)
+        axes.xaxis.grid(False)
+        return fig,ax
+
+    if type=='kmeans_pca':
+        COMPONENTS = pca_components
+        pca = PCA(n_components=COMPONENTS)
+        principalComponents = pca.fit_transform(scaled)
+        principalDf = pd.DataFrame(data = principalComponents
+                 , columns = [f"{i}" for i in (range(COMPONENTS))])
+
+        # Optimal number of clusters
+        X = principalDf.values
+    else:
+        X = scaled
+
+    wcss = []
+    for i in range(1, 11):
+        kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+        kmeans.fit(X)
+        wcss.append(kmeans.inertia_)
+    plt.plot(range(1, 11), wcss)
+    plt.title('Elbow Method')
+    plt.xlabel('Number of clusters')
+    plt.ylabel('WCSS')
+    plt.show()
+    
+    kmeans = KMeans(n_clusters=knn_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
+    pred_y = kmeans.fit_predict(X)
+
+    cluster_map = pd.DataFrame()
+    cluster_map['data_index'] = res.index.values
+    cluster = pred_y
+    min_clus = cluster.min()
+    if min_clus < 0:
+        cluster = cluster + (min_clus*-1+1)    
+    elif min_clus > 0:
+        cluster = cluster - min_clus
+    elif min_clus == 0:
+        cluster = cluster + 1
+
+    cluster_map['cluster'] = cluster
+    fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
+    plt.title("Clustering assignment over time")
+    plt.xlabel("Clusters")
+    locs, labels = plt.yticks()            # Get locations and labels
+    plt.yticks(np.arange(0, max(cluster)+1, 1.0))
+    
+    # Some figtext
+    fig.text(0.04, -0.11, 'August\n2018', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
+    fig.text(0.96, -0.11, 'January\n2020', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
+    # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
+    plt.show()
+    return pred_y
+  
 def db_scan_clustering(df,kind,eps=0.25,pca_components=8,knn_clusters=8):
     res = df
     cluster_df= res.drop(labels=['Index'],axis=1)
     scaled = scale_df(cluster_df)
 
     # Find the optimal epsilon
-    import numpy as np
-    from sklearn.datasets.samples_generator import make_blobs
-    from sklearn.neighbors import NearestNeighbors
-    from sklearn.cluster import DBSCAN
-    from matplotlib import pyplot as plt
-    import seaborn as sns
-    from matplotlib import cm
-    import pandas as pd
 
 
     def dfScatter(df, xcol='Height', ycol='Weight', catcol='Gender'):
@@ -143,13 +216,11 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8,knn_clusters=8):
             colordict[i+1] = cmap(colordict[i+1])
         df["Color"] = df[catcol].apply(lambda x: colordict[x])
         # df['Color'] = sns.color_palette("deep",len(colordict))
-        ax.scatter(df[xcol], df[ycol], c=df.Color,s=20)
+        ax.scatter(df[xcol], df[ycol], c=df.Color, s=40)
         axes = plt.gca()
         axes.yaxis.grid(True)
         axes.xaxis.grid(False)
         return fig,ax
-        
-
     
     if kind=="raw":
         # Clustering with db scan
@@ -241,68 +312,6 @@ def db_scan_clustering(df,kind,eps=0.25,pca_components=8,knn_clusters=8):
         # plt.xlabel('Cluster number')
         # plt.ylabel('Number of points in cluster')
         return clustering.labels_,principalDf
-
-
-    if kind=="knn":
-        import numpy as np
-        import pandas as pd
-        from matplotlib import pyplot as plt
-        from sklearn.datasets.samples_generator import make_blobs
-        from sklearn.cluster import KMeans
-        from sklearn.decomposition import PCA
-
-        COMPONENTS = pca_components
-        pca = PCA(n_components=COMPONENTS)
-        principalComponents = pca.fit_transform(scaled)
-        principalDf = pd.DataFrame(data = principalComponents
-                     , columns = [f"{i}" for i in (range(COMPONENTS))])
-
-
-        # Optimal distance
-        X = principalDf.values
-
-        wcss = []
-        for i in range(1, 11):
-            kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
-            kmeans.fit(X)
-            wcss.append(kmeans.inertia_)
-        plt.plot(range(1, 11), wcss)
-        plt.title('Elbow Method')
-        plt.xlabel('Number of clusters')
-        plt.ylabel('WCSS')
-        plt.show()
-        
-        kmeans = KMeans(n_clusters=knn_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
-        pred_y = kmeans.fit_predict(X)
-
-        cluster_map = pd.DataFrame()
-        cluster_map['data_index'] = res.index.values
-        cluster = pred_y
-        min_clus = cluster.min()
-        if min_clus < 0:
-
-            cluster = cluster + (min_clus*-1+1)    
-        elif min_clus > 0:
-
-            cluster = cluster - min_clus
-        elif min_clus == 0:
-
-            cluster = cluster + 1
-
-        cluster_map['cluster'] = cluster
-        fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
-        plt.title("Clustering assignment over time")
-        plt.xlabel("Clusters")
-        locs, labels = plt.yticks()            # Get locations and labels
-        plt.yticks(np.arange(0, max(cluster)+1, 1.0))
-        fig.text(0.04, -0.11, 'August\n2018', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
-
-        fig.text(0.96, -0.11, 'January\n2020', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
-        # ax.set_yticks(np.arange(locs.min(),locs.max()),np.arange(0,(cluster.max()+1)))
-
-        plt.show()
-   
-        return pred_y
 
 
 def plot_clusters_pair_plot(df, features, y_clusters):

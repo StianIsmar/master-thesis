@@ -25,16 +25,22 @@ def create_save_correlation_plot(save_as_filename,plot_title,input_df=None,path_
 
     # Set up the matplotlib figure
     f, ax = plt.subplots(figsize=(11, 9))
+    ax.set_xticks(np.arange(len(df.columns)))
+    ax.set_yticks(np.arange(len(df.columns)))
     ax.set_title(plot_title)
     # Generate a custom diverging colormap
     cmap = sns.diverging_palette(220, 10, as_cmap=True)
 
     # Draw the heatmap with the mask and correct aspect ratio
     g=sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
-                square=True, linewidths=.5, cbar_kws={"shrink": .5})
-    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 11)
+                square=True, linewidths=.5, cbar_kws={"shrink": .5},xticklabels=True, yticklabels=True)
+    
+    ax.set_xticklabels(df.columns,rotation=90, fontsize=10)
+    ax.set_yticklabels(df.columns,rotation=0, fontsize=10)
 
-    ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 11)
+    # ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 8)
+
+    # ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 8)
 
 
     # Saving the file

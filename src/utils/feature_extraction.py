@@ -17,6 +17,8 @@ from tqdm.notebook import tqdm
 import glob # To count files in folder
 
 
+#f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/time_features.csv'
+
 def calc_kurtosis(sig):
     return kurtosis(sig)
 
@@ -68,7 +70,7 @@ def build_time_feature_df(wt_number,signals,fs):
     path=f'/Volumes/OsvikExtra/signal_data/raw_filtered_6000Hz/gearbox/wt0{wt_number}/time_features.csv'
     if os.path.exists(path):
         print("Time domain features exist and are loaded.")
-        return pd.DataFrame.read_csv(path)
+        return pd.read_csv(path)
 
     all_time_features = []
     print('time-domain...')
@@ -92,6 +94,9 @@ def build_time_feature_df(wt_number,signals,fs):
         'entropy'
         ]
                      )
+
+    # save the df
+    df.to_csv(path)
     return df
 
 
@@ -304,17 +309,18 @@ def get_time_frequency_features(turbine_number,input_file_type='zip'):
 
     else:
         raw_imfs_path=f'/Volumes/OsvikExtra/signal_data/raw_data/gearbox/wt0{turbine_number}/eemds/'
-        energy_rates,energy_entropies,eemd_kurtosis = get_imf_features(raw_imfs_path,input_file_type)
+        energy_rates,energy_entropies,eemd_kurtosis = get_imf_features(turbine_number,raw_imfs_path,input_file_type)
+
 
         # save the reates and entropies:
         df1 = pd.DataFrame(energy_rates,columns=['imf_rate_1','imf_rate_2','imf_rate_3','imf_rate_4','imf_rate_5'])
         df2 = pd.DataFrame(energy_entropies,columns=['imf_entropy_1','imf_entropy_2','imf_entropy_3','imf_entropy_4','imf_entropy_5'])
         df3 = pd.DataFrame(eemd_kurtosis,columns=['imf_kurtosis_1','imf_kurtosis_2','imf_kurtosis_3','imf_kurtosis_4','imf_kurtosis_5'])
         time_freq_features = pd.concat([df1,df2,df3],axis=1)
-        time_freq_features.to_csv(f'/Volumes/OsvikExtra/signal_data/features/wt0{turbine_number}/time_freq_features.csv')
+        time_freq_features.to_csv(file_path)
     return time_freq_features
 
-def get_imf_features(path_folder,input_file_type):
+def get_imf_features(turbine_number,path_folder,input_file_type):
     result_features=[]
     
     def calculate_imf_energy(imf):
@@ -340,7 +346,7 @@ def get_imf_features(path_folder,input_file_type):
             path=path_folder + f'interval_number_{i}.csv'
             df = pd.read_csv(path, header=None)
         if input_file_type == 'zip':
-            path=path_folder + f'raw_wt04_interval_number_{i}.zip'
+            path=path_folder + f'raw_wt0{turbine_number}_interval_number_{i}.zip'
             df = pd.read_csv(path,compression='zip')
         # do something with each IMF.. get features?
         

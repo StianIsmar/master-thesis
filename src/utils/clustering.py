@@ -11,6 +11,7 @@ import seaborn as sns
 from matplotlib import cm
 from sklearn.cluster import KMeans
 from scipy import stats
+from textwrap import wrap
 import sys, os,os.path
 
 ROOT_PATH = os.path.abspath("..").split("data_processing")[0]
@@ -30,7 +31,8 @@ ROOT_PATH = os.path.abspath(".").split("src")[0]
 
 plt.style.use('file://' + ROOT_PATH + "src/utils/plotparams.rc")
 
-def plot_clusters(wt_num,k,y_cluster_kmeans,feature_df,plot=True,dataset_name=''):
+def plot_clusters(plottitle,wt_num,k,y_cluster_kmeans,feature_df,plot=True,dataset_name=''):
+    # Plots the barplots
     '''
     Args:
         y_cluster_kmeans (List): List of all datapoints and which cluster they are assigned to.
@@ -74,7 +76,7 @@ def plot_clusters(wt_num,k,y_cluster_kmeans,feature_df,plot=True,dataset_name=''
 
     if plot:
         fig, axs = plt.subplots(1,len(myDict), figsize=(15, 6), facecolor='w', edgecolor='k',sharex=True, sharey=True)
-        fig.suptitle(f"WT0{wt_num}: Cluster assignment", fontsize=14) # change location
+        fig.suptitle(f"WT0{wt_num}, {plottitle}: Cluster assignment", fontsize=14) # change location
         plt.grid(b=None)
 
 
@@ -101,8 +103,8 @@ def plot_clusters(wt_num,k,y_cluster_kmeans,feature_df,plot=True,dataset_name=''
 
         # plt.tight_layout()
 
-        save_path=f'../../plots/cluster_results'
-        plt.savefig(f'{save_path}/wt{wt_num}kmeans_{k}_clusters_{dataset_name}.png',dpi=300)
+        save_path=f'../../plots/cluster_results/wt0{wt_num}'
+        plt.savefig(f'{save_path}/wt0{wt_num}_kmeans_{k}_clusters_{dataset_name}.png',dpi=300)
 
         plt.show()
 
@@ -128,21 +130,27 @@ def find_optimal_dist(X):
         plt.grid(True)
 from sklearn.cluster import DBSCAN
 
+def k_means_clustering(plottitle,wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True,dataset_name='',selected_cluster=''):
+    print(f'THIS IS THE SELECTED CLUSTER: {selected_cluster}')
 
-
-
-def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True,dataset_name=''):
     res = df
     cluster_df=res
+    
+
     try:
-        cluster_df= res.drop(labels=['Index'],axis=1) # Removing the index feature.
+        cluster_df = cluster_df.drop(labels=['marker_styles'],axis=1)
+    except:
+        print('Marker-styles not there.')
+    try:
+        cluster_df= cluster_df.drop(labels=['Index'],axis=1) # Removing the index feature.
     except:
         print('Index does not exist')
     try:
-        features_cleaned.drop(['cluster_assigned'],axis=1)
+        cluster_df=cluster_df.drop(['cluster_assigned'],axis=1)
     except:
         # print('Col not there')
         pass
+
     scaled = scale_df(cluster_df)
 
     def map_index1(i,df,labels):
@@ -162,7 +170,7 @@ def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True
         # print(i,result)
         return round(result)
 
-    def dfScatter(feature_df,df, xcol='Height', ycol='Weight', catcol='Gender'):
+    def dfScatter(feature_df,df, xcol='Height', ycol='Weight', catcol='Gender',selected_cluster=-1):
 
         fig, ax = plt.subplots(figsize=(15,5))
         # cmap=plt.get_cmap('tab20c')
@@ -174,8 +182,15 @@ def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True
         for i in range(len(colordict)):
             colordict[i+1] = cmap(colordict[i+1])
         df["Color"] = df[catcol].apply(lambda x: colordict[x])
+
         # df['Color'] = sns.color_palette("deep",len(colordict))
-        ax.scatter(df[xcol], df[ycol], c=df.Color, s=50)
+        if selected_cluster>=0:
+            selected_cluster+=1
+            coolors = np.where(df["cluster"]==selected_cluster,'#BE0209','grey')
+            ax.scatter(df[xcol], df[ycol], c=coolors, s=50)
+
+        else:
+            ax.scatter(df[xcol], df[ycol], c=df.Color, s=50)
 
         first = df[xcol].values[0]
         last = df[xcol].values[-1]
@@ -226,7 +241,7 @@ def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True
             wcss.append(kmeans.inertia_) # Sum of squared distances of samples to their closest cluster center.
         plt.plot(range(1, knn_clusters+1), wcss)
         plt.margins(0)
-        plt.title('WT04: Elbow Method')
+        plt.title(f'WT0{wt_num}, {dataset_name}: Elbow Method')
         plt.xlabel('Number of clusters')
         plt.ylabel('WCSS')
 
@@ -235,7 +250,7 @@ def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True
 
         
         # Saving the elbow plot.
-        save_path=f'../../plots/cluster_results'
+        save_path=f'../../plots/cluster_results/wt0{wt_num}'
         plt.tight_layout()
         plt.savefig(f'{save_path}/wt_{wt_num}_{dataset_name}_elbow.png',dpi=300)
         plt.show()
@@ -265,9 +280,9 @@ def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True
         cluster_map['cluster'] = cluster
 
 
-        fig,ax = dfScatter(df, cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
-        plt.title("WT04: Clustering assignment for each signal over time")
-        plt.ylabel("Cluster number")
+        fig,ax = dfScatter(df, cluster_map,'data_index','cluster','cluster',selected_cluster)
+        plt.title(f"WT0{wt_num}, {plottitle}: Clustering assignment for each signal over time")
+        plt.ylabel("Cluster index")
 
         plt.xlabel("Data sample index")
         locs, labels = plt.yticks()            # Get locations and labels
@@ -282,8 +297,8 @@ def k_means_clustering(wt_num,df,kind,knn_clusters=8,pca_components=10,plot=True
 
         # Saving the cluster development plot
         plt.tight_layout()
-        save_path=f'../../plots/cluster_results'
-        plt.savefig(f'{save_path}/wt_{wt_num}_wcss_{dataset_name}_dev.png',dpi=300)
+        save_path=f'../../plots/cluster_results/wt0{wt_num}'
+        plt.savefig(f'{save_path}/wt_{wt_num}_{dataset_name}_scatter_dev.png',dpi=300)
         plt.show()
     return pred_y
 
@@ -297,11 +312,11 @@ def db_scan_clustering(df,kind,eps=0.25,min_samples=5,pca_components=8,knn_clust
     res = df
     cluster_df=res
     try:
-        cluster_df= res.drop(labels=['Index'],axis=1) # Removing the index feature.
+        cluster_df= cluster_df.drop(labels=['Index'],axis=1) # Removing the index feature.
     except:
         print('Index does not exist')
     try:
-        features_cleaned.drop(['cluster_assigned'],axis=1)
+        cluster_df=cluster_df.drop(['cluster_assigned'],axis=1)
     except:
         pass
     scaled = scale_df(cluster_df)
@@ -309,7 +324,7 @@ def db_scan_clustering(df,kind,eps=0.25,min_samples=5,pca_components=8,knn_clust
     # Find the optimal epsilon
     def map_index(index):
         result=feature_df.iloc[index,:]['Index']
-    return result
+        return result
 
     def dfScatter(df, xcol='Height', ycol='Weight', catcol='Gender'):
         fig, ax = plt.subplots(figsize=(15,4))
@@ -413,7 +428,7 @@ def db_scan_clustering(df,kind,eps=0.25,min_samples=5,pca_components=8,knn_clust
         if plot: 
             fig,ax = dfScatter(cluster_map,xcol='data_index',ycol='cluster',catcol='cluster')
             plt.title("Clustering assignment for each time interval")
-            plt.xlabel("Clusters")
+            plt.xlabel("Cluster index")
             plt.xticks(rotation=90)
 
             fig.text(0.04, -0.16, 'August\n2018', horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,fontsize=14)
@@ -431,12 +446,13 @@ def db_scan_clustering(df,kind,eps=0.25,min_samples=5,pca_components=8,knn_clust
         return clustering.labels_,principalDf
 
 
-def plot_clusters_pair_plot(wt_num,k,cluster_method,df,features,y_clusters,dataset_name=''):
+def plot_clusters_pair_plot(selected_cluster,plottitle,wt_num,k,cluster_method,df,features,y_clusters,dataset_name=''):
     '''
     df:: The dataframe with all features for wt.
     features:: the featres in the pairplot to be studied. EX: ['ActPower','B1','B4']
     y_clusters:: The cluster assignment. 
     '''
+
 
     min_clus = y_clusters.min()
     if min_clus < 0:
@@ -447,14 +463,64 @@ def plot_clusters_pair_plot(wt_num,k,cluster_method,df,features,y_clusters,datas
         y_clusters = y_clusters + 1
 
     min_clus = 0
-    df['cluster_assigned'] = y_clusters
+    copy_df = df 
+    copy_df['cluster_assigned'] = y_clusters
     
     # hue='Index'
-    ax=sns.pairplot(df,vars=features, hue='cluster_assigned',palette=sns.color_palette(sns.hls_palette(8, l=.4, s=.8), len(np.unique(y_clusters))))
+
+    different_hues = np.unique(y_clusters)
+    marker_styles1 = np.repeat('o',len(different_hues)).tolist()
+    marker_styles1[selected_cluster] = 'o'
+
+    marker_styles = np.repeat(50,len(y_clusters))
+
+    # loop thorugh cols in copy_df and replace the 'k' with 'l' for every clsuters_assigned == selected_cluster
+
+    '''
+    indexes = copy_df.index[copy_df['cluster_assigned']==selected_cluster].tolist()
+    for i in indexes:
+        marker_styles[i]=50
+
+
+    marker_styles=marker_styles.tolist()
+
+    copy_df['marker_styles']=marker_styles
+    '''
+
+    # print(pd.value_counts(copy_df['marker_styles'].values.flatten()))
+
+    g=sns.pairplot(copy_df,vars=features, 
+        hue='cluster_assigned',
+        diag_kind=None, palette=sns.color_palette(sns.hls_palette(8, l=.4, s=.8), 
+        len(np.unique(y_clusters))),
+        markers=marker_styles1,plot_kws={"s": 15})
+
+    # plot_kws={"s": 10})
+
     
+    '''for lh in g._legend.legendHandles: 
+        lh.set_alpha(1)
+        lh._sizes = [50]'''
+
+    print('DIFFERENT HUES',different_hues)
+    for ax in np.ravel(g.axes):
+        if len(ax.collections) == len(different_hues):
+            ax.collections[selected_cluster].set_sizes([20])
+            ax.collections[selected_cluster].set_color('#BE0209')
+    g.fig.legends[0].legendHandles[selected_cluster].set_sizes([20])
+    g.fig.legends[0].legendHandles[selected_cluster].set_color('#BE0209')
+
+
+
+    t = "\n".join(wrap(f'WT0{wt_num}, {plottitle}: Pairplot for {features}.',60))
+    g.fig.suptitle(t,y=0.99)
+    plt.subplots_adjust(top=0.94)
+
+    # ax.fig.legend(markerscale=1.2)
+
     # Saving the cluster development plot
-    plt.tight_layout()
-    save_path=f'../../plots/cluster_results'
+    # plt.tight_layout()
+    save_path=f'../../plots/cluster_results/wt0{wt_num}'
     plt.savefig(f'{save_path}/wt{wt_num}_{cluster_method}_{k}_{dataset_name}_clusters_pairplot.png',dpi=300)
     plt.show()
     #current_palette = sns.color_palette()
@@ -464,6 +530,80 @@ def plot_clusters_pair_plot(wt_num,k,cluster_method,df,features,y_clusters,datas
 
 
 
+def scatter_plot(selected_cluster,plottitle,wt_num,k,cluster_method,df,features,y_clusters,dataset_name=''):
+    
+    feat1=features[0]
+    feat2=features[1]
 
+
+    min_clus = y_clusters.min()
+    if min_clus < 0:
+        y_clusters = y_clusters + (min_clus*-1+1)    
+    elif min_clus > 0:
+        y_clusters = y_clusters - min_clus
+    elif min_clus == 0:
+        y_clusters = y_clusters + 1
+
+    min_clus = 0
+    copy_df = df 
+    copy_df['cluster_assigned'] = y_clusters
+    
+    # hue='Index'
+
+    different_hues = np.unique(y_clusters)
+    marker_styles1 = np.repeat('o',len(different_hues)).tolist()
+    marker_styles1[selected_cluster] = 'o'
+
+    marker_styles = np.repeat(50,len(y_clusters))
+
+    # loop thorugh cols in copy_df and replace the 'k' with 'l' for every clsuters_assigned == selected_cluster
+
+    '''
+    indexes = copy_df.index[copy_df['cluster_assigned']==selected_cluster].tolist()
+    for i in indexes:
+        marker_styles[i]=50
+
+
+    marker_styles=marker_styles.tolist()
+
+    copy_df['marker_styles']=marker_styles
+    '''
+
+    # print(pd.value_counts(copy_df['marker_styles'].values.flatten()))
+
+    ax = sns.scatterplot(x=feat1, y=feat2, data=copy_df,hue='cluster_assigned',markers=marker_styles1,legend='full',s= 15)
+    '''
+    g=sns.pairplot(copy_df,vars=features, 
+        hue='cluster_assigned',
+        diag_kind='kde', palette=sns.color_palette(sns.hls_palette(8, l=.4, s=.8), 
+        len(np.unique(y_clusters))),
+        markers=marker_styles1,plot_kws={"s": 15})
+
+    # plot_kws={"s": 10})
+    '''
+    
+    '''for lh in g._legend.legendHandles: 
+        lh.set_alpha(1)
+        lh._sizes = [50]'''
+
+   
+    if len(ax.collections) == len(different_hues):
+        ax.collections[selected_cluster].set_sizes([20])
+        ax.collections[selected_cluster].set_color('#BE0209')
+    
+    ax.legends[0].legendHandles[selected_cluster].set_sizes([20])
+    ax.legends[0].legendHandles[selected_cluster].set_color('#BE0209')
+
+
+    g.fig.suptitle(f'WT0{wt_num}, {plottitle}: Pairplot for {features}.',y=0.99)
+    plt.subplots_adjust(top=0.94)
+
+    # ax.fig.legend(markerscale=1.2)
+
+    # Saving the cluster development plot
+    # plt.tight_layout()
+    save_path=f'../../plots/cluster_results/wt0{wt_num}'
+    plt.savefig(f'{save_path}/wt{wt_num}_{cluster_method}_{k}_{dataset_name}_{feat1}_{feat2}_clusters_scatter.png',dpi=300)
+    plt.show()
 
 

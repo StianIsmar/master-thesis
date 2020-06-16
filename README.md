@@ -10,11 +10,11 @@ The source code is found in `src`.
 
 
 The code for the three implemented analyis methods are in folder: 
- 1. order_analysis
- 2. envelope_order
- 3. clustering
+ 1. `src/order_analysis`
+ 2. `src/envelope_order`
+ 3. `src/clustering`
  
-Support functions are found in `utils`, `data_processing`, `hybrid_analysis_process_functions`. 
+Support functions are found in `src/utils`, `src/data_processing`, `src/hybrid_analysis_process_functions`. 
  
  
 The signals were built from a uff-file into pickled objects, using the code in `data_processing` The `read_pyuff` was used to extract the uff-data.

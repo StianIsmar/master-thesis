@@ -31,9 +31,10 @@ def do_linear_resampling(time, vibration_signal, peak_array, number_of_resample_
     return x_round, resampled_y, x_time
 
 def do_cubic_resampling(time, vibration_signal, peak_array, number_of_resample_points=2000):
+    
     _, _, x_round, resampled_y, x_time = resample.cubic_interpolation_resampling(time,
                                                                                  vibration_signal,
                                                                                  peak_array, 
                                                                                  number_of_resample_points=number_of_resample_points)
-
+    
     return x_round, resampled_y, x_time

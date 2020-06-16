@@ -164,8 +164,8 @@ class FastFourierTransform:
 
 
     def fft_transform_time(self, rot_data=[], avg_power=-1, avg_rpm=-1, name="", interval_num='unknown', plot=False,
-                           get_rms_for_bins=False, bins=0, plot_bin_lines=False, x_lim=None, frequency_lines=[],
-                           horisontal_lines=[], spectrum_lower_range=-1, spectrum_higher_range=1):
+                           get_rms_for_bins=False, bins=0, plot_bin_lines=False, x_min=0, x_max=None, y_max=None, frequency_lines=[],
+                           horisontal_lines=[], spectrum_lower_range=-1, spectrum_higher_range=1, plot_lim=False, save_path=None, default_title=True ):
         mean_amplitude = np.mean(self.s)
         self.s = self.s - mean_amplitude  # Centering around 0
         fft = np.fft.fft(self.s)
@@ -173,13 +173,14 @@ class FastFourierTransform:
         # We now have the fft for every timestep in out plot.
 
         # T is the sample frequency in the data set
-        T = self.t[10001] - self.t[10000]  # This is true when the period between each sample in the time waveform is equal
+        T = self.t[101] - self.t[100]  # This is true when the period between each sample in the time waveform is equal
         N = self.s.size  # size of the amplitude vector
         f = np.linspace(0, 1 / T, N, )  # start, stop, number of. 1 / T = frequency is the biggest freq
         f = f[:N // 2]
         y = np.abs(fft)[:N // 2]
         y_norm = np.abs(fft)[:N // 2] * 1 / N  # Normalized
         fft_modulus_norm = y_norm
+        
 
         # Calculate the bins
         rms_bins = []
@@ -214,7 +215,7 @@ class FastFourierTransform:
                 self.fft_transform_time_specified_range(y_norm, f, bins, spectrum_lower_range, spectrum_higher_range)
             self.bin_indexes_range = bin_indexes_range
             self.rms_bins_range_magnitude = rms_bins_range_magnitude
-
+        
         title = ''
         if plot == True:
             if (len(rot_data) > 0) and (avg_power > -1):
@@ -223,7 +224,11 @@ class FastFourierTransform:
                         f'STD RPM: {rot_data["std"]:.2f}'
             elif (avg_rpm > -1) and (avg_power > -1):
                 title = f'Avg Power: {avg_power:.2f}     Mean RPM: {avg_rpm:.2f},     '
-                
+            
+            start_heading = ''
+            if default_title:
+                start_heading = 'FFT Transformation     '
+
             fig, ax1 = plt.subplots(figsize=(15, 5))
             ax1.set_xlabel("Frequency [Hz]")
             ax1.set_ylabel("Normalised amplitude")
@@ -239,13 +244,16 @@ class FastFourierTransform:
                 x = [(frequency_bins[a] + frequency_bins[a + 1]) / 2 for a in range(len(frequency_bins) - 1)]
                 ax2.plot(x, rms_bins, c='g', label='RMS for each bin')
                 plt.title(
-                    f"Time Domain FFT Transformation     {bins} RMS bins     {name}     Interval: {interval_num}\n"
+                    f"FFT Transformation     {bins} RMS bins     {name}     Interval: {interval_num}\n"
                     + title)
                 fig.legend(loc='upper right', bbox_to_anchor=(0.32, 0.35, 0.5, 0.5))
             else:
                 # Use another title if we don't plot RMS values
-                plt.title(f"Time Domain FFT Transformation     {name}     Interval: {interval_num}\n" + title)
-
+                if interval_num > -1:
+                    plt.title(f"{start_heading}{name}     Interval: {interval_num}\n" + title)
+                else:
+                    plt.title(f"{start_heading}{name}" + title)
+            
             # Plot bin lines in the same plot
             if plot_bin_lines:
                 for i, bin in enumerate(frequency_bins):
@@ -259,18 +267,26 @@ class FastFourierTransform:
                 for line in horisontal_lines:
                     plt.axhline(y=line, c='y', linewidth=0.5)
 
-            if x_lim != None:
-                plt.xlim(0, x_lim)
+            if x_max != None:
+                plt.xlim(x_min, x_max)
+            if plot_lim:
+                plt.axvline(x=(25600/(avg_rpm/60)/2), c='r', linewidth=0.8)
 
-
+            if y_max != None:
+                plt.ylim(top=y_max)
             plt.margins(0)
+            if save_path is not None:
+                plt.savefig(f'{save_path}.png', dpi=300)
             plt.show()
 
         time = f[:N // 2]
         self.normalized_amp = y_norm
 
+        
+
         # Calculate the spectral centroid
         centroid = self.find_spectral_centroid(f, y_norm)
+        
         return fft, time, centroid, rms, rms_bins, x
 
 

@@ -513,7 +513,7 @@ def print3d_modular(x,y,z,turbine_number,sensor_name,plot_title, z_max_plot, col
     # Get the numpy arrays on the correct shape
     freq_data = x.T
     amp_data = z.T
-    rad_data = np.linspace(0,amp_data.shape[1],amp_data.shape[1])
+    rad_data = np.linspace(0,amp_data.shape[1]-1,amp_data.shape[1])
     
     verts = []
 

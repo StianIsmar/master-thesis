@@ -175,10 +175,12 @@ def cubic_interpolation_resampling(time_stamps, vibration_signal, peak_array, nu
     time_stamps = np.array(time_stamps)
     vibration_signal = np.array(vibration_signal)
     peak_array = np.array(peak_array)
-
+    
     # Get the index's for each shaft revolution from time_stamps
     peak_indexes = []
     for i, peak in enumerate(peak_array):
+        if peak == 0.0:
+            continue
         peak_indexes.append(np.where(time_stamps == peak))
     peak_indexes = np.array(peak_indexes).flatten()
 
@@ -190,10 +192,12 @@ def cubic_interpolation_resampling(time_stamps, vibration_signal, peak_array, nu
         one_y_interval = vibration_signal[peak_indexes[i]:peak_indexes[i + 1] - 1]
         x_interval.append(one_x_interval)
         y_interval.append(one_y_interval)
-
+        
+    
     # Convert to numpy arrays for easier data processing
     x_interval = np.array(x_interval)
     y_interval = np.array(y_interval)
+    
 
     resampled_x_values = []
     resampled_y_values = []
@@ -222,6 +226,7 @@ def cubic_interpolation_resampling(time_stamps, vibration_signal, peak_array, nu
     resampled_x_values = np.array(resampled_x_values)
     resampled_y_values = np.array(resampled_y_values)
     X_values_round_domain_list = np.array(X_values_round_domain_list)
+    
 
     # Print various values to check if everything is as it should
     if printing:

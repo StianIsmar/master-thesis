@@ -94,7 +94,7 @@ python-utils==2.4.0
 pytz==2019.3
 pyuff==1.22
 PyWavelets==1.1.1
-PyYAML==5.3
+PyYAML==5.4
 pyzmq==18.1.1
 qtconsole==4.6.0
 requests==2.22.0

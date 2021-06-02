@@ -131,7 +131,7 @@ tf-nightly==2.2.0.dev20200219
 tornado==6.0.3
 -e git+https://github.com/tqdm/tqdm.git@5e8978909c639bc20f58bf877e66cc6a0b9fb5bf#egg=tqdm
 traitlets==4.3.3
-urllib3==1.25.8
+urllib3==1.26.5
 wcwidth==0.1.8
 webencodings==0.5.1
 Werkzeug==1.0.0

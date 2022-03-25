@@ -1,5 +1,3 @@
-test
-
 # Master Thesis: Engineering and ICT at NTNU
 ## Title: Detecting Gear and Bearing Faults in Wind Turbines Using Vibration Analysis: 
 ### A Practical Application of Spectral Analysis and K- Means Clustering
